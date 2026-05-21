@@ -122,12 +122,12 @@ function DashboardPage() {
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
               {[
-                { label: "Sidebar", value: "Collapsible · animated", tone: "story" },
-                { label: "Top bar", value: "XP · streak · search", tone: "explore" },
-                { label: "Motion", value: "Soft · cinematic", tone: "reflect" },
+                { label: "Sidebar", value: "Collapsible · animated", chip: "bg-story-soft text-story" },
+                { label: "Top bar", value: "XP · streak · search", chip: "bg-explore-soft text-explore" },
+                { label: "Motion", value: "Soft · cinematic", chip: "bg-reflect-soft text-reflect" },
               ].map((b) => (
                 <div key={b.label} className="rounded-2xl border border-border/70 bg-card/70 p-4 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[var(--shadow-soft)]">
-                  <div className={`tone-chip bg-${b.tone}/10 text-${b.tone}`}>{b.label}</div>
+                  <div className={`tone-chip ${b.chip}`}>{b.label}</div>
                   <div className="mt-2 font-display text-lg font-bold text-foreground">{b.value}</div>
                 </div>
               ))}
