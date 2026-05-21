@@ -143,7 +143,7 @@ function ActivitiesHub() {
                         <div className="flex items-center gap-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
                           <span className={cn("inline-block h-1.5 w-1.5 rounded-full", `bg-${a.meta.tone}`)} />
                           Activity {a.meta.activityNumber} · {a.meta.weekLabel}
-                          {completed && (
+                          {completedFlag && (
                             <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-success-soft px-1.5 py-0.5 text-[0.55rem] text-success">
                               <Trophy className="h-2.5 w-2.5" /> Done
                             </span>
