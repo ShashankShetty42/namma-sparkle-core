@@ -332,6 +332,7 @@ export function LessonFrame({
           <RewardModal
             meta={meta}
             onContinue={() => {
+              if (slug) markCompleted(slug);
               setShowReward(false);
               if (meta.nextHref) navigate({ to: meta.nextHref });
               else navigate({ to: "/activities" });
