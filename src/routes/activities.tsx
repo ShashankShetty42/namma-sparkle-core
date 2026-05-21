@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronRight, Flame, Lock, Sparkles, Star, Trophy } from "lucide-react";
 
@@ -25,6 +25,9 @@ export const Route = createFileRoute("/activities")({
 });
 
 function ActivitiesHub() {
+  const location = useLocation();
+  if (location.pathname !== "/activities") return <Outlet />;
+
   const totalXp = ACTIVITY_ORDER.reduce((s, k) => s + ACTIVITIES[k].meta.totalXp, 0);
 
   const [completed, setCompleted] = React.useState<Set<string>>(new Set());
