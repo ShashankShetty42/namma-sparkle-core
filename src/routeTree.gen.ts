@@ -9,18 +9,66 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RewardsRouteImport } from './routes/rewards'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as MissionsRouteImport } from './routes/missions'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
+import { Route as BadgesRouteImport } from './routes/badges'
+import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RewardsRoute = RewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MissionsRoute = MissionsRouteImport.update({
+  id: '/missions',
+  path: '/missions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JourneyRoute = JourneyRouteImport.update({
+  id: '/journey',
+  path: '/journey',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DesignSystemRoute = DesignSystemRouteImport.update({
   id: '/design-system',
   path: '/design-system',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BadgesRoute = BadgesRouteImport.update({
+  id: '/badges',
+  path: '/badges',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivitiesRoute = ActivitiesRouteImport.update({
+  id: '/activities',
+  path: '/activities',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,36 +79,109 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/activities': typeof ActivitiesRoute
+  '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
+  '/journey': typeof JourneyRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/missions': typeof MissionsRoute
+  '/resources': typeof ResourcesRoute
+  '/rewards': typeof RewardsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activities': typeof ActivitiesRoute
+  '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
+  '/journey': typeof JourneyRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/missions': typeof MissionsRoute
+  '/resources': typeof ResourcesRoute
+  '/rewards': typeof RewardsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/activities': typeof ActivitiesRoute
+  '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
+  '/journey': typeof JourneyRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/missions': typeof MissionsRoute
+  '/resources': typeof ResourcesRoute
+  '/rewards': typeof RewardsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/design-system' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/activities'
+    | '/badges'
+    | '/design-system'
+    | '/journey'
+    | '/leaderboard'
+    | '/missions'
+    | '/resources'
+    | '/rewards'
+    | '/sitemap.xml'
+    | '/support'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/design-system' | '/sitemap.xml'
-  id: '__root__' | '/' | '/design-system' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/activities'
+    | '/badges'
+    | '/design-system'
+    | '/journey'
+    | '/leaderboard'
+    | '/missions'
+    | '/resources'
+    | '/rewards'
+    | '/sitemap.xml'
+    | '/support'
+  id:
+    | '__root__'
+    | '/'
+    | '/activities'
+    | '/badges'
+    | '/design-system'
+    | '/journey'
+    | '/leaderboard'
+    | '/missions'
+    | '/resources'
+    | '/rewards'
+    | '/sitemap.xml'
+    | '/support'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ActivitiesRoute: typeof ActivitiesRoute
+  BadgesRoute: typeof BadgesRoute
   DesignSystemRoute: typeof DesignSystemRoute
+  JourneyRoute: typeof JourneyRoute
+  LeaderboardRoute: typeof LeaderboardRoute
+  MissionsRoute: typeof MissionsRoute
+  ResourcesRoute: typeof ResourcesRoute
+  RewardsRoute: typeof RewardsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SupportRoute: typeof SupportRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -68,11 +189,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rewards': {
+      id: '/rewards'
+      path: '/rewards'
+      fullPath: '/rewards'
+      preLoaderRoute: typeof RewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/missions': {
+      id: '/missions'
+      path: '/missions'
+      fullPath: '/missions'
+      preLoaderRoute: typeof MissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journey': {
+      id: '/journey'
+      path: '/journey'
+      fullPath: '/journey'
+      preLoaderRoute: typeof JourneyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/design-system': {
       id: '/design-system'
       path: '/design-system'
       fullPath: '/design-system'
       preLoaderRoute: typeof DesignSystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/badges': {
+      id: '/badges'
+      path: '/badges'
+      fullPath: '/badges'
+      preLoaderRoute: typeof BadgesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activities': {
+      id: '/activities'
+      path: '/activities'
+      fullPath: '/activities'
+      preLoaderRoute: typeof ActivitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,9 +257,27 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ActivitiesRoute: ActivitiesRoute,
+  BadgesRoute: BadgesRoute,
   DesignSystemRoute: DesignSystemRoute,
+  JourneyRoute: JourneyRoute,
+  LeaderboardRoute: LeaderboardRoute,
+  MissionsRoute: MissionsRoute,
+  ResourcesRoute: ResourcesRoute,
+  RewardsRoute: RewardsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SupportRoute: SupportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
