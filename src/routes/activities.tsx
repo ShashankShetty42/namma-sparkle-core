@@ -1,9 +1,11 @@
+import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronRight, Flame, Lock, Sparkles, Star, Trophy } from "lucide-react";
 
 import { AppShell } from "@/components/namma/app-shell";
 import { ACTIVITIES, ACTIVITY_ORDER, HUB_ICONS } from "@/components/namma/activity/lesson-data";
+import { getCompleted } from "@/components/namma/activity/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
