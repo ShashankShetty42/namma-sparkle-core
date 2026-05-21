@@ -20,6 +20,7 @@ import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as BadgesRouteImport } from './routes/badges'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ActivitiesSlugRouteImport } from './routes/activities.$slug'
 
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
@@ -76,10 +77,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ActivitiesSlugRoute = ActivitiesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ActivitiesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/activities': typeof ActivitiesRoute
+  '/activities': typeof ActivitiesRouteWithChildren
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/journey': typeof JourneyRoute
@@ -89,10 +95,11 @@ export interface FileRoutesByFullPath {
   '/rewards': typeof RewardsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
+  '/activities/$slug': typeof ActivitiesSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/activities': typeof ActivitiesRoute
+  '/activities': typeof ActivitiesRouteWithChildren
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/journey': typeof JourneyRoute
@@ -102,11 +109,12 @@ export interface FileRoutesByTo {
   '/rewards': typeof RewardsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
+  '/activities/$slug': typeof ActivitiesSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/activities': typeof ActivitiesRoute
+  '/activities': typeof ActivitiesRouteWithChildren
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/journey': typeof JourneyRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/rewards': typeof RewardsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
+  '/activities/$slug': typeof ActivitiesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/rewards'
     | '/sitemap.xml'
     | '/support'
+    | '/activities/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/rewards'
     | '/sitemap.xml'
     | '/support'
+    | '/activities/$slug'
   id:
     | '__root__'
     | '/'
@@ -157,11 +168,12 @@ export interface FileRouteTypes {
     | '/rewards'
     | '/sitemap.xml'
     | '/support'
+    | '/activities/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ActivitiesRoute: typeof ActivitiesRoute
+  ActivitiesRoute: typeof ActivitiesRouteWithChildren
   BadgesRoute: typeof BadgesRoute
   DesignSystemRoute: typeof DesignSystemRoute
   JourneyRoute: typeof JourneyRoute
@@ -252,12 +264,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/activities/$slug': {
+      id: '/activities/$slug'
+      path: '/$slug'
+      fullPath: '/activities/$slug'
+      preLoaderRoute: typeof ActivitiesSlugRouteImport
+      parentRoute: typeof ActivitiesRoute
+    }
   }
 }
 
+interface ActivitiesRouteChildren {
+  ActivitiesSlugRoute: typeof ActivitiesSlugRoute
+}
+
+const ActivitiesRouteChildren: ActivitiesRouteChildren = {
+  ActivitiesSlugRoute: ActivitiesSlugRoute,
+}
+
+const ActivitiesRouteWithChildren = ActivitiesRoute._addFileChildren(
+  ActivitiesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ActivitiesRoute: ActivitiesRoute,
+  ActivitiesRoute: ActivitiesRouteWithChildren,
   BadgesRoute: BadgesRoute,
   DesignSystemRoute: DesignSystemRoute,
   JourneyRoute: JourneyRoute,
