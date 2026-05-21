@@ -1,24 +1,20 @@
 import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import {
-  BookOpen,
+  ArrowLeft,
   Brain,
   Check,
+  ChevronLeft,
   ChevronRight,
-  Cpu,
   Eye,
-  Flame,
-  Lightbulb,
-  MessageCircle,
   Mic,
   PartyPopper,
-  Rocket,
   Sparkles,
   Star,
   Trophy,
   Wand2,
-  Zap,
+  X,
 } from "lucide-react";
 
 import devExplaining from "@/assets/characters/dev-explaining.png";
@@ -26,28 +22,14 @@ import devHappy from "@/assets/characters/dev-happy.png";
 import devThinking from "@/assets/characters/dev-thinking.png";
 import devCelebrating from "@/assets/characters/dev-celebrating.png";
 import neoHappy from "@/assets/characters/neo-happy.png";
+import neoExplaining from "@/assets/characters/neo-explaining.png";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 
 import { AppShell } from "@/components/namma/app-shell";
-import { fadeUp } from "@/components/namma/motion";
-import {
-  ActivityHero,
-  AnalogyGrid,
-  BottomCTAs,
-  CharacterChorus,
-  ConceptStage,
-  DeepConcepts,
-  KnowledgeRow,
-  LearningLadder,
-  MissionStrip,
-  QuizCard,
-  StoryFlow,
-  type Analogy,
-  type DeepConceptItem,
-  type MissionStat,
-  type Pillar,
-  type StoryStep,
-} from "@/components/namma/activity";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { nammaEase } from "@/components/namma/motion";
+import type { Tone } from "@/components/namma/activity";
 
 export const Route = createFileRoute("/activities")({
   head: () => ({
@@ -56,13 +38,7 @@ export const Route = createFileRoute("/activities")({
       {
         name: "description",
         content:
-          "A magical Story & Concept lesson with Dev and Neo. Discover what Artificial Intelligence really is — through stories, analogies, examples, and playful mini quizzes.",
-      },
-      { property: "og:title", content: "What is AI? — A Namma AI Adventure" },
-      {
-        property: "og:description",
-        content:
-          "Step into a cinematic AI lesson with Dev and Neo, designed for Grades 5–10.",
+          "A cinematic, card-by-card Story & Concept lesson with Dev and Neo. Swipe through the story, learn the concept, try a mini quiz, and celebrate.",
       },
     ],
   }),
@@ -70,57 +46,150 @@ export const Route = createFileRoute("/activities")({
 });
 
 /* ------------------------------------------------------------------ */
-/*  Lesson content (data-driven; components are reusable)              */
+/*  Card definitions                                                   */
 /* ------------------------------------------------------------------ */
 
-const STORY_STEPS: StoryStep[] = [
-  { icon: <Sparkles className="h-4 w-4" />, title: "Open the story", sub: "Meet Dev" },
-  { icon: <Lightbulb className="h-4 w-4" />, title: "What is AI?", sub: "The big idea" },
-  { icon: <Brain className="h-4 w-4" />, title: "How AI thinks", sub: "Patterns & data" },
-  { icon: <Eye className="h-4 w-4" />, title: "AI in your day", sub: "Real examples" },
-  { icon: <Wand2 className="h-4 w-4" />, title: "Try a mini quiz", sub: "Brain workout" },
-  { icon: <PartyPopper className="h-4 w-4" />, title: "Celebrate", sub: "Claim your XP" },
-];
+type CardBase = {
+  id: string;
+  phase: "Story" | "Concept" | "Examples" | "Quiz" | "Celebrate";
+  tone: Tone;
+};
 
-const PILLARS: Pillar[] = [
-  { tone: "story", icon: <Eye className="h-4 w-4" />, title: "See", body: "AI looks at lots of examples — photos, words, sounds." },
-  { tone: "challenge", icon: <Brain className="h-4 w-4" />, title: "Spot patterns", body: "It notices what repeats and what makes things similar." },
-  { tone: "bonus", icon: <Sparkles className="h-4 w-4" />, title: "Predict", body: "It guesses the next answer — and gets better each time." },
-];
+type StoryCard = CardBase & {
+  kind: "story";
+  character: { name: string; image: string };
+  partnerImage?: string;
+  message: string;
+  emphasis?: string;
+};
 
-const LADDER_RUNGS = [
-  { label: "See examples", w: "20%" },
-  { label: "Notice patterns", w: "45%" },
-  { label: "Make a guess", w: "70%" },
-  { label: "Get feedback & improve", w: "95%" },
-];
+type ConceptCard = CardBase & {
+  kind: "concept";
+  title: string;
+  body: string;
+  character: { name: string; image: string };
+  pillars: { icon: React.ReactNode; title: string; body: string; tone: Tone }[];
+};
 
-const ANALOGIES: Analogy[] = [
-  { tone: "story", emoji: "🐱", title: "Recognising a cat", body: "Your brain has seen many cats. AI looks at millions of cat photos to learn the same trick." },
-  { tone: "explore", emoji: "🎵", title: "Remembering a song", body: "Hum two notes and you know the song. AI does that with patterns in sound waves." },
-  { tone: "bonus", emoji: "🍳", title: "Following a recipe", body: "You repeat the steps until pancakes are perfect. AI repeats and adjusts to get better." },
-  { tone: "reflect", emoji: "🧩", title: "Solving a puzzle", body: "You try a piece, rotate it, try again. AI guesses, checks, and learns from mistakes." },
-];
+type ExamplesCard = CardBase & {
+  kind: "examples";
+  title: string;
+  intro: string;
+  character: { name: string; image: string };
+  items: { icon: React.ReactNode; title: string; body: string; tone: Tone }[];
+};
 
-const AI_EXAMPLES = [
-  { icon: <Eye className="h-4 w-4" />, title: "Camera filters", body: "AI finds your face and adds the funny dog ears in real time.", tone: "bg-explore-soft text-explore" },
-  { icon: <Mic className="h-4 w-4" />, title: "Voice assistants", body: "Siri and Alexa turn your voice into text, then guess what you want.", tone: "bg-bonus-soft text-bonus" },
-  { icon: <Sparkles className="h-4 w-4" />, title: "Recommendations", body: "YouTube guesses the next video you'll love based on patterns.", tone: "bg-story-soft text-story" },
-  { icon: <Brain className="h-4 w-4" />, title: "Smart maps", body: "Google Maps predicts traffic by learning from millions of trips.", tone: "bg-challenge-soft text-challenge" },
-];
+type QuizCardData = CardBase & {
+  kind: "quiz";
+  question: string;
+  options: { id: string; text: string; correct: boolean }[];
+  character: { name: string; image: string };
+  partnerImage?: string;
+  correctMessage: string;
+  wrongMessage: string;
+};
 
-const DEEP_CONCEPTS: DeepConceptItem[] = [
-  { value: "data", tone: "story", icon: <Brain className="h-4 w-4" />, title: "What is data?", body: "Data is just information — photos, words, numbers, sounds. AI eats data like you eat snacks: the more (and the better the quality), the smarter it gets." },
-  { value: "model", tone: "challenge", icon: <Cpu className="h-4 w-4" />, title: "What is a model?", body: "A model is the 'brain' AI builds after looking at lots of data. It's a giant recipe of patterns it can use to make guesses about new things." },
-  { value: "train", tone: "explore", icon: <Wand2 className="h-4 w-4" />, title: "What does 'training' mean?", body: "Training is when AI practises. We show it tons of examples and gently say 'yes' or 'no' until its guesses get really, really good." },
-  { value: "limit", tone: "decide", icon: <Eye className="h-4 w-4" />, title: "What AI can't do", body: "AI doesn't feel, dream, or truly understand the world like you. It's amazing at patterns — but kindness, creativity and curiosity? That's your superpower." },
-];
+type CelebrateCard = CardBase & {
+  kind: "celebrate";
+  title: string;
+  body: string;
+  reward: string;
+  character: { name: string; image: string };
+  partnerImage?: string;
+};
 
-const QUIZ_OPTIONS = [
-  { id: "a", text: "By looking at lots of examples", correct: false },
-  { id: "b", text: "By spotting patterns in data", correct: false },
-  { id: "c", text: "By drinking a magical potion 🧪", correct: true },
-  { id: "d", text: "By practising and getting feedback", correct: false },
+type LessonCard = StoryCard | ConceptCard | ExamplesCard | QuizCardData | CelebrateCard;
+
+const CARDS: LessonCard[] = [
+  {
+    id: "story-1",
+    kind: "story",
+    phase: "Story",
+    tone: "story",
+    character: { name: "Dev", image: devExplaining },
+    partnerImage: neoHappy,
+    message:
+      "Hey! Have you ever wondered how your phone knows what you want to type next? Or how Netflix picks the perfect movie for you?",
+    emphasis: "Today we'll find out — together.",
+  },
+  {
+    id: "story-2",
+    kind: "story",
+    phase: "Story",
+    tone: "explore",
+    character: { name: "Neo", image: neoExplaining },
+    partnerImage: devHappy,
+    message:
+      "That's all Artificial Intelligence! AI is like giving computers the ability to learn and make decisions, just like humans do — but using data and patterns!",
+  },
+  {
+    id: "story-3",
+    kind: "story",
+    phase: "Story",
+    tone: "bonus",
+    character: { name: "Dev", image: devHappy },
+    partnerImage: neoCelebrating,
+    message:
+      "Wow, so AI is everywhere around us? In our phones, in games, even in hospitals? That's amazing — and a little magical too!",
+  },
+  {
+    id: "concept-1",
+    kind: "concept",
+    phase: "Concept",
+    tone: "challenge",
+    title: "What is Artificial Intelligence?",
+    body:
+      "AI is a branch of computer science that helps machines learn from experience, adjust to new things, and do tasks that usually need human intelligence.",
+    character: { name: "Dev", image: devThinking },
+    pillars: [
+      { tone: "story", icon: <Eye className="h-4 w-4" />, title: "See", body: "Looks at lots of examples" },
+      { tone: "challenge", icon: <Brain className="h-4 w-4" />, title: "Spot patterns", body: "Notices what repeats" },
+      { tone: "bonus", icon: <Sparkles className="h-4 w-4" />, title: "Predict", body: "Guesses the next answer" },
+    ],
+  },
+  {
+    id: "examples-1",
+    kind: "examples",
+    phase: "Examples",
+    tone: "explore",
+    title: "AI is already in your day",
+    intro: "You probably use AI every single day — without even noticing it.",
+    character: { name: "Neo", image: neoHappy },
+    items: [
+      { tone: "explore", icon: <Eye className="h-4 w-4" />, title: "Camera filters", body: "Finds your face in real time" },
+      { tone: "bonus", icon: <Mic className="h-4 w-4" />, title: "Voice assistants", body: "Siri & Alexa understand you" },
+      { tone: "story", icon: <Sparkles className="h-4 w-4" />, title: "Recommendations", body: "YouTube picks the next video" },
+      { tone: "challenge", icon: <Brain className="h-4 w-4" />, title: "Smart maps", body: "Predict traffic instantly" },
+    ],
+  },
+  {
+    id: "quiz-1",
+    kind: "quiz",
+    phase: "Quiz",
+    tone: "challenge",
+    question: "Which of these is NOT a way AI usually learns?",
+    options: [
+      { id: "a", text: "By looking at lots of examples", correct: false },
+      { id: "b", text: "By spotting patterns in data", correct: false },
+      { id: "c", text: "By drinking a magical potion 🧪", correct: true },
+      { id: "d", text: "By practising and getting feedback", correct: false },
+    ],
+    character: { name: "Dev", image: devThinking },
+    partnerImage: neoHappy,
+    correctMessage: "Brilliant! AI learns from data, patterns and feedback — never magic.",
+    wrongMessage: "Almost — pick the one that feels a little silly. AI can't sip potions!",
+  },
+  {
+    id: "celebrate-1",
+    kind: "celebrate",
+    phase: "Celebrate",
+    tone: "success",
+    title: "You did it!",
+    body: "You finished the Story & Concept adventure. Dev and Neo are SO proud of you.",
+    reward: "+120 XP · Explorer badge unlocked",
+    character: { name: "Dev", image: devCelebrating },
+    partnerImage: neoCelebrating,
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -128,205 +197,607 @@ const QUIZ_OPTIONS = [
 /* ------------------------------------------------------------------ */
 
 function StoryActivityPage() {
-  const [step, setStep] = React.useState(2);
-  const [completed, setCompleted] = React.useState<Set<number>>(new Set([0, 1]));
-  const totalSteps = STORY_STEPS.length;
-  const progress = Math.round((completed.size / totalSteps) * 100);
+  const [index, setIndex] = React.useState(0);
+  const [direction, setDirection] = React.useState<1 | -1>(1);
+  const [quizState, setQuizState] = React.useState<Record<string, "correct" | "wrong" | undefined>>({});
 
-  const completeStep = (i: number) => {
-    setCompleted((prev) => {
-      const next = new Set(prev);
-      next.add(i);
-      return next;
-    });
-    setStep((s) => Math.min(totalSteps - 1, Math.max(s, i + 1)));
+  const total = CARDS.length;
+  const card = CARDS[index];
+  const progress = Math.round(((index + 1) / total) * 100);
+
+  const canGoNext =
+    card.kind === "quiz" ? quizState[card.id] === "correct" : index < total - 1;
+  const canGoPrev = index > 0;
+
+  const go = (delta: 1 | -1) => {
+    setDirection(delta);
+    setIndex((i) => Math.min(total - 1, Math.max(0, i + delta)));
   };
 
-  const missionStats: MissionStat[] = [
-    { icon: <Trophy className="h-4 w-4" />, label: "Mission", value: "Story Mode", tone: "story" },
-    { icon: <Star className="h-4 w-4" />, label: "XP earned", value: "120 / 200", tone: "xp" },
-    { icon: <Flame className="h-4 w-4" />, label: "Streak", value: "5 days", tone: "decide" },
-    { icon: <Zap className="h-4 w-4" />, label: "Step", value: `${step + 1} / ${totalSteps}`, tone: "challenge" },
-    { icon: <Check className="h-4 w-4" />, label: "Completed", value: `${completed.size} / ${totalSteps}`, tone: "success" },
-    { icon: <Sparkles className="h-4 w-4" />, label: "Progress", value: `${progress}%`, tone: "bonus" },
-  ];
+  const onDragEnd = (_: unknown, info: PanInfo) => {
+    const threshold = 80;
+    if (info.offset.x < -threshold && canGoNext) go(1);
+    else if (info.offset.x > threshold && canGoPrev) go(-1);
+  };
+
+  const isLast = index === total - 1;
 
   return (
     <AppShell>
-      <div className="shell-inner">
-        {/* Breadcrumb */}
-        <motion.div
-          {...fadeUp}
-          className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
-        >
-          <Link to="/" className="hover:text-foreground transition-colors">Dashboard</Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="hover:text-foreground transition-colors">Activities</span>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="font-semibold text-foreground">Story &amp; Concept</span>
-        </motion.div>
-
-        <ActivityHero
-          eyebrow="Story & Concept · Week 2 · Lesson 3"
-          eyebrowIcon={<BookOpen className="h-4 w-4" />}
-          title={
-            <>
-              What <span className="text-story">really</span> is{" "}
-              <span className="bg-gradient-to-r from-story via-challenge to-explore bg-clip-text text-transparent">
-                Artificial Intelligence
+      <div className="shell-inner !gap-6">
+        {/* HEADER ROW */}
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            to="/"
+            className="group inline-flex items-center gap-3 rounded-2xl border border-border/60 bg-card/70 px-3 py-2 text-sm font-semibold text-foreground shadow-[var(--shadow-soft)] backdrop-blur transition-all hover:border-story/40 hover:bg-story-soft/40"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-story-soft text-story transition-transform group-hover:-translate-x-0.5">
+              <ArrowLeft className="h-4 w-4" />
+            </span>
+            <span className="flex flex-col leading-tight text-left">
+              <span className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                Week 9 · Activity 1
               </span>
-              ?
-            </>
-          }
-          description="Dev is going to take you on a cinematic journey through the magical world of AI — with simple stories, surprising examples, and tiny brain workouts. Neo will cheer you on along the way."
-          characterImage={devExplaining}
-          characterName="Dev"
-          secondaryCharacterImage={neoHappy}
-          secondaryCharacterName="Neo"
-          speech="Ready? Let me show you something wild about AI..."
-          floatingChips={[
-            { icon: <Eye className="h-3.5 w-3.5" />, label: "Vision", tone: "explore" },
-            { icon: <Mic className="h-3.5 w-3.5" />, label: "Voice", tone: "bonus" },
-            { icon: <Brain className="h-3.5 w-3.5" />, label: "Think", tone: "challenge" },
-          ]}
-          progress={{
-            percent: progress,
-            valueLabel: `${completed.size}/${totalSteps} steps`,
-            caption: "Lesson 3 of 5 this week",
-            label: "Week 2 progress",
-          }}
-          reward={{ reward: "+80 XP", subline: "+ Explorer badge at lesson end" }}
-          streakDays={5}
-          primaryAction={{ label: "Begin the story", icon: <Rocket className="h-4 w-4" /> }}
-        />
+              <span className="font-display text-base font-bold text-foreground">
+                Story &amp; Concept
+              </span>
+            </span>
+          </Link>
 
-        <MissionStrip items={missionStats} />
+          <div className="hidden md:flex items-center gap-2">
+            <Badge icon={<Trophy className="h-3.5 w-3.5" />} tone="story" label="Story Mode" />
+            <Badge icon={<Star className="h-3.5 w-3.5" />} tone="xp" label="120 / 200 XP" />
+          </div>
 
-        <StoryFlow
-          steps={STORY_STEPS}
-          currentStep={step}
-          completed={completed}
-          onSelectStep={setStep}
-        />
+          <Link
+            to="/"
+            aria-label="Close activity"
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/60 bg-card/70 text-muted-foreground shadow-[var(--shadow-soft)] backdrop-blur transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
+          >
+            <X className="h-4 w-4" />
+          </Link>
+        </div>
 
-        <ConceptStage
-          stepKey={step}
-          eyebrow={`Concept · Step ${step + 1}`}
-          title="The big idea: AI learns the way you do."
-          body={
-            <>
-              Imagine your brain when you first learned to recognise a cat. You saw many cats,
-              noticed patterns — pointy ears, whiskers, a tail — and then could spot cats
-              everywhere. <strong className="text-foreground">AI does the same thing</strong>, just
-              with millions of examples and a little bit of math magic.
-            </>
-          }
-          pillars={PILLARS}
-          ladder={<LearningLadder rungs={LADDER_RUNGS} />}
-          characterImage={devHappy}
-          characterImageThinking={devThinking}
-          characterName="Dev"
-          speech={
-            <>
-              AI is when computers learn to <strong>spot patterns</strong> — just like how you
-              recognise your best friend in a crowd.
-            </>
-          }
-          floatingChips={[
-            { tone: "challenge", icon: <Brain className="h-3 w-3" />, label: "Patterns" },
-            { tone: "bonus", icon: <Sparkles className="h-3 w-3" />, label: "Data" },
-            { tone: "explore", icon: <Eye className="h-3 w-3" />, label: "Learn" },
-          ]}
-          primaryAction={{
-            label: "I got it",
-            icon: <Check className="h-4 w-4" />,
-            onClick: () => completeStep(step),
-          }}
-          secondaryAction={{
-            label: "Ask Dev a question",
-            icon: <MessageCircle className="h-4 w-4" />,
-          }}
-        />
+        {/* PROGRESS */}
+        <ProgressBar phase={card.phase} percent={progress} step={index + 1} total={total} tone={card.tone} />
 
-        <AnalogyGrid items={ANALOGIES} />
+        {/* CARD STAGE */}
+        <div
+          className="relative mx-auto w-full max-w-3xl"
+          style={{ perspective: 1400 }}
+        >
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={card.id}
+              custom={direction}
+              variants={cardVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.5, ease: nammaEase }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.18}
+              onDragEnd={onDragEnd}
+              className="cursor-grab active:cursor-grabbing"
+            >
+              <CardRenderer
+                card={card}
+                quizState={quizState[card.id]}
+                onAnswer={(correct) =>
+                  setQuizState((s) => ({ ...s, [card.id]: correct ? "correct" : "wrong" }))
+                }
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-        <KnowledgeRow
-          fact={{
-            headline: (
+        {/* CONTROLS */}
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4">
+          <ArrowBtn dir="prev" disabled={!canGoPrev} onClick={() => go(-1)} />
+          <Dots total={total} active={index} tone={card.tone} onJump={(i) => { setDirection(i > index ? 1 : -1); setIndex(i); }} />
+          <ArrowBtn dir="next" disabled={!canGoNext} onClick={() => go(1)} />
+        </div>
+
+        {/* PRIMARY CTA */}
+        <div className="mx-auto w-full max-w-3xl">
+          <Button
+            variant="hero"
+            size="xl"
+            disabled={!isLast && !canGoNext}
+            onClick={() => {
+              if (isLast) return;
+              go(1);
+            }}
+            className="w-full"
+          >
+            {isLast ? (
               <>
-                The word &ldquo;Artificial Intelligence&rdquo; was first used in{" "}
-                <span className="text-bonus">1956</span>.
+                <PartyPopper className="h-5 w-5" /> Claim your reward
               </>
-            ),
-            body: "At a tiny summer workshop in the USA, a small group of scientists dreamed up a world where machines could think and learn. Almost 70 years later — here you are, learning all about it.",
-            tags: [
-              { tone: "bonus", label: "Origin story" },
-              { tone: "story", label: "Fun fact" },
-              { tone: "explore", label: "History" },
-            ],
-          }}
-          examples={AI_EXAMPLES}
-        />
-
-        <QuizCard
-          question="Which of these is NOT a way AI usually learns?"
-          options={QUIZ_OPTIONS}
-          eyebrow="Mini quiz · 1 of 3"
-          description="Pick the one that doesn't belong. Dev believes in you — and Neo is already practising the victory dance."
-          helperCharacter={{
-            image: neoCelebrating,
-            name: "Neo",
-            label: "Neo cheers",
-            message: "You've got this — trust your patterns!",
-          }}
-          correctTitle="Brilliant! +20 XP unlocked"
-          correctDescription="AI learns by examples, patterns, and feedback — never by magic potions."
-          wrongTitle="Almost! Try the one that feels silly 🪄"
-          wrongDescription="Hint: AI is powerful, but it can't sip a potion to get smart."
-          onCorrect={() => completeStep(step)}
-        />
-
-        <DeepConcepts items={DEEP_CONCEPTS} />
-
-        <CharacterChorus
-          primaryImage={devCelebrating}
-          primaryName="Dev"
-          secondaryImage={neoCelebrating}
-          secondaryName="Neo"
-          title="Dev & Neo are SO proud of you."
-          body={
-            <>
-              Three steps left to finish today&apos;s adventure and unlock the{" "}
-              <strong className="text-bonus">Explorer badge</strong>. Keep that 5-day streak
-              glowing!
-            </>
-          }
-          secondaryAction={{ label: "Talk to Neo" }}
-        />
-
-        <BottomCTAs
-          continueProps={{
-            progress,
-            characterImage: devHappy,
-            characterName: "Dev",
-          }}
-          nextProps={{
-            title: "Explore & Observe: Spot the AI",
-            body: (
+            ) : card.kind === "quiz" && quizState[card.id] !== "correct" ? (
+              <>Pick the right answer to continue</>
+            ) : (
               <>
-                A playful scavenger hunt where you find AI hidden in everyday apps. Earn another{" "}
-                <strong className="text-explore">+60 XP</strong>.
+                {ctaLabel(card.phase, CARDS[index + 1]?.phase)}
+                <ChevronRight className="h-5 w-5" />
               </>
-            ),
-            tags: [
-              { tone: "explore", label: "Observation" },
-              { tone: "bonus", label: "+60 XP" },
-            ],
-            characterImage: neoHappy,
-            characterName: "Neo",
-          }}
-        />
+            )}
+          </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Tip: swipe left or right on the card, or use the arrow keys.
+          </p>
+        </div>
       </div>
+
+      {/* keyboard nav */}
+      <KeyboardNav onPrev={() => canGoPrev && go(-1)} onNext={() => canGoNext && go(1)} />
     </AppShell>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Sub-components                                                     */
+/* ------------------------------------------------------------------ */
+
+const cardVariants = {
+  enter: (dir: 1 | -1) => ({ opacity: 0, x: dir * 80, rotateY: dir * 8, scale: 0.96 }),
+  center: { opacity: 1, x: 0, rotateY: 0, scale: 1 },
+  exit: (dir: 1 | -1) => ({ opacity: 0, x: dir * -80, rotateY: dir * -8, scale: 0.96 }),
+};
+
+function ctaLabel(current: LessonCard["phase"], next?: LessonCard["phase"]) {
+  if (!next) return "Finish";
+  if (current === next) return "Next";
+  return `Continue to ${next}`;
+}
+
+function ProgressBar({
+  phase,
+  percent,
+  step,
+  total,
+  tone,
+}: {
+  phase: string;
+  percent: number;
+  step: number;
+  total: number;
+  tone: Tone;
+}) {
+  return (
+    <div className="rounded-3xl border border-border/60 bg-card/70 p-4 shadow-[var(--shadow-soft)] backdrop-blur">
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+          <span className={cn("inline-block h-2 w-2 rounded-full", `bg-${tone}`)} />
+          Week 9 — {phase}
+          <span className="text-muted-foreground/70">· Card {step} of {total}</span>
+        </div>
+        <div className={cn("font-display text-sm font-bold", `text-${tone}`)}>{percent}%</div>
+      </div>
+      <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-muted">
+        <motion.div
+          className={cn("absolute inset-y-0 left-0 rounded-full bg-gradient-to-r",
+            tone === "story" && "from-story to-explore",
+            tone === "explore" && "from-explore to-bonus",
+            tone === "challenge" && "from-challenge to-story",
+            tone === "bonus" && "from-bonus to-challenge",
+            tone === "success" && "from-success to-explore",
+            tone === "decide" && "from-decide to-bonus",
+            tone === "reflect" && "from-reflect to-story",
+            tone === "xp" && "from-xp to-bonus",
+            tone === "locked" && "from-locked to-muted",
+          )}
+          initial={false}
+          animate={{ width: `${percent}%` }}
+          transition={{ duration: 0.7, ease: nammaEase }}
+        />
+        <div className="pointer-events-none absolute inset-0 opacity-50 mix-blend-overlay [background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.5)_0_6px,transparent_6px_12px)]" />
+      </div>
+    </div>
+  );
+}
+
+function Badge({ icon, tone, label }: { icon: React.ReactNode; tone: Tone; label: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold backdrop-blur",
+        `border-${tone}/30 bg-${tone}-soft/60 text-${tone}`,
+      )}
+    >
+      {icon} {label}
+    </span>
+  );
+}
+
+function ArrowBtn({ dir, disabled, onClick }: { dir: "prev" | "next"; disabled?: boolean; onClick: () => void }) {
+  const Icon = dir === "prev" ? ChevronLeft : ChevronRight;
+  return (
+    <motion.button
+      whileHover={{ scale: disabled ? 1 : 1.06 }}
+      whileTap={{ scale: disabled ? 1 : 0.94 }}
+      disabled={disabled}
+      onClick={onClick}
+      aria-label={dir === "prev" ? "Previous card" : "Next card"}
+      className={cn(
+        "flex h-12 w-12 items-center justify-center rounded-2xl border shadow-[var(--shadow-soft)] backdrop-blur transition-all",
+        disabled
+          ? "border-border/40 bg-card/40 text-muted-foreground/50 cursor-not-allowed"
+          : "border-border/60 bg-card/80 text-foreground hover:border-story/40 hover:bg-story-soft/60 hover:text-story",
+      )}
+    >
+      <Icon className="h-5 w-5" />
+    </motion.button>
+  );
+}
+
+function Dots({ total, active, tone, onJump }: { total: number; active: number; tone: Tone; onJump: (i: number) => void }) {
+  return (
+    <div className="flex items-center gap-2">
+      {Array.from({ length: total }).map((_, i) => {
+        const isActive = i === active;
+        const isDone = i < active;
+        return (
+          <button
+            key={i}
+            onClick={() => onJump(i)}
+            aria-label={`Go to card ${i + 1}`}
+            className={cn(
+              "relative h-2.5 rounded-full transition-all",
+              isActive ? cn("w-8", `bg-${tone}`) : isDone ? "w-2.5 bg-foreground/40" : "w-2.5 bg-muted",
+            )}
+          >
+            {isActive && (
+              <motion.span
+                layoutId="dot-glow"
+                className={cn("absolute inset-0 rounded-full opacity-60 blur-sm", `bg-${tone}`)}
+              />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function KeyboardNav({ onPrev, onNext }: { onPrev: () => void; onNext: () => void }) {
+  React.useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") onPrev();
+      if (e.key === "ArrowRight" || e.key === "Enter") onNext();
+    };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [onPrev, onNext]);
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Card renderers                                                     */
+/* ------------------------------------------------------------------ */
+
+function CardRenderer({
+  card,
+  quizState,
+  onAnswer,
+}: {
+  card: LessonCard;
+  quizState?: "correct" | "wrong";
+  onAnswer: (correct: boolean) => void;
+}) {
+  switch (card.kind) {
+    case "story":
+      return <StoryCardView card={card} />;
+    case "concept":
+      return <ConceptCardView card={card} />;
+    case "examples":
+      return <ExamplesCardView card={card} />;
+    case "quiz":
+      return <QuizCardView card={card} state={quizState} onAnswer={onAnswer} />;
+    case "celebrate":
+      return <CelebrateCardView card={card} />;
+  }
+}
+
+function CardShell({
+  tone,
+  children,
+  className,
+}: {
+  tone: Tone;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-[32px] border border-white/70 bg-gradient-to-br from-white via-white to-white/90 p-7 shadow-[var(--shadow-float)] md:p-10",
+        className,
+      )}
+    >
+      {/* tone glow */}
+      <div
+        className={cn(
+          "pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full opacity-50 blur-3xl",
+          `bg-${tone}/40`,
+        )}
+      />
+      <div
+        className={cn(
+          "pointer-events-none absolute -bottom-32 -left-20 h-72 w-72 rounded-full opacity-30 blur-3xl",
+          `bg-${tone}-soft`,
+        )}
+      />
+      {/* grid */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:linear-gradient(currentColor_1px,transparent_1px),linear-gradient(90deg,currentColor_1px,transparent_1px)] [background-size:28px_28px]" />
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
+
+function CharacterStage({
+  image,
+  name,
+  partnerImage,
+  tone,
+}: {
+  image: string;
+  name: string;
+  partnerImage?: string;
+  tone: Tone;
+}) {
+  return (
+    <div className="relative mx-auto flex items-end justify-center">
+      <div
+        className={cn(
+          "relative flex h-56 w-56 items-end justify-center rounded-[32px] border border-white/70 p-3 md:h-64 md:w-64",
+          `bg-gradient-to-br from-${tone}-soft via-white to-white`,
+        )}
+      >
+        <div className={cn("absolute inset-4 rounded-[24px] opacity-50", `bg-${tone}/10`)} />
+        <motion.img
+          key={image}
+          src={image}
+          alt={name}
+          initial={{ y: 12, opacity: 0, scale: 0.94 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          transition={{ duration: 0.55, ease: nammaEase }}
+          className="relative h-full w-full object-contain animate-[namma-float_5s_ease-in-out_infinite] drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]"
+        />
+        {/* sparkles */}
+        <Sparkles className={cn("absolute -top-3 -right-2 h-5 w-5", `text-${tone}`)} />
+        <Sparkles className={cn("absolute bottom-4 -left-3 h-4 w-4 opacity-70", `text-${tone}`)} />
+      </div>
+
+      {partnerImage && (
+        <motion.img
+          src={partnerImage}
+          alt="partner"
+          initial={{ x: 16, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.25, duration: 0.5 }}
+          className="absolute -right-4 -bottom-2 hidden h-24 w-24 object-contain drop-shadow-[0_16px_24px_rgba(0,0,0,0.16)] animate-[namma-float_4.5s_ease-in-out_infinite] sm:block"
+        />
+      )}
+    </div>
+  );
+}
+
+function StoryCardView({ card }: { card: StoryCard }) {
+  return (
+    <CardShell tone={card.tone}>
+      <div className="grid items-center gap-8 md:grid-cols-[auto_1fr]">
+        <CharacterStage image={card.character.image} name={card.character.name} partnerImage={card.partnerImage} tone={card.tone} />
+        <div className="space-y-4">
+          <div className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.2em]",
+            `bg-${card.tone}-soft text-${card.tone}`,
+          )}>
+            <Sparkles className="h-3 w-3" /> {card.character.name} says
+          </div>
+          <h2 className="font-display text-2xl font-bold leading-snug text-foreground md:text-3xl">
+            {card.message}
+          </h2>
+          {card.emphasis && (
+            <p className={cn("font-display text-lg font-semibold", `text-${card.tone}`)}>
+              {card.emphasis}
+            </p>
+          )}
+        </div>
+      </div>
+    </CardShell>
+  );
+}
+
+function ConceptCardView({ card }: { card: ConceptCard }) {
+  return (
+    <CardShell tone={card.tone}>
+      <div className="grid items-center gap-8 md:grid-cols-[auto_1fr]">
+        <CharacterStage image={card.character.image} name={card.character.name} tone={card.tone} />
+        <div className="space-y-5">
+          <div className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.2em]",
+            `bg-${card.tone}-soft text-${card.tone}`,
+          )}>
+            <Brain className="h-3 w-3" /> Concept
+          </div>
+          <h2 className="font-display text-2xl font-bold leading-tight text-foreground md:text-3xl">
+            {card.title}
+          </h2>
+          <p className="text-base leading-relaxed text-muted-foreground md:text-lg">{card.body}</p>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {card.pillars.map((p, i) => (
+              <motion.div
+                key={p.title}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 + i * 0.08, duration: 0.4 }}
+                className={cn(
+                  "rounded-2xl border p-3",
+                  `border-${p.tone}/25 bg-${p.tone}-soft/40`,
+                )}
+              >
+                <div className={cn("flex h-8 w-8 items-center justify-center rounded-xl text-white", `bg-${p.tone}`)}>
+                  {p.icon}
+                </div>
+                <div className="mt-2 font-display text-sm font-bold text-foreground">{p.title}</div>
+                <div className="text-xs text-muted-foreground">{p.body}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </CardShell>
+  );
+}
+
+function ExamplesCardView({ card }: { card: ExamplesCard }) {
+  return (
+    <CardShell tone={card.tone}>
+      <div className="grid items-center gap-8 md:grid-cols-[auto_1fr]">
+        <CharacterStage image={card.character.image} name={card.character.name} tone={card.tone} />
+        <div className="space-y-5">
+          <div className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.2em]",
+            `bg-${card.tone}-soft text-${card.tone}`,
+          )}>
+            <Eye className="h-3 w-3" /> Examples around you
+          </div>
+          <h2 className="font-display text-2xl font-bold leading-tight text-foreground md:text-3xl">
+            {card.title}
+          </h2>
+          <p className="text-sm text-muted-foreground md:text-base">{card.intro}</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {card.items.map((it, i) => (
+              <motion.div
+                key={it.title}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 + i * 0.07, duration: 0.4 }}
+                className={cn(
+                  "flex items-start gap-3 rounded-2xl border p-3",
+                  `border-${it.tone}/25 bg-${it.tone}-soft/40`,
+                )}
+              >
+                <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white", `bg-${it.tone}`)}>
+                  {it.icon}
+                </div>
+                <div>
+                  <div className="font-display text-sm font-bold text-foreground">{it.title}</div>
+                  <div className="text-xs text-muted-foreground">{it.body}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </CardShell>
+  );
+}
+
+function QuizCardView({
+  card,
+  state,
+  onAnswer,
+}: {
+  card: QuizCardData;
+  state?: "correct" | "wrong";
+  onAnswer: (correct: boolean) => void;
+}) {
+  const [picked, setPicked] = React.useState<string | null>(null);
+  return (
+    <CardShell tone={card.tone}>
+      <div className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
+        <CharacterStage image={card.character.image} name={card.character.name} partnerImage={card.partnerImage} tone={card.tone} />
+        <div className="space-y-5">
+          <div className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.2em]",
+            `bg-${card.tone}-soft text-${card.tone}`,
+          )}>
+            <Wand2 className="h-3 w-3" /> Mini quiz
+          </div>
+          <h2 className="font-display text-xl font-bold leading-snug text-foreground md:text-2xl">
+            {card.question}
+          </h2>
+          <div className="grid gap-2.5">
+            {card.options.map((opt) => {
+              const isPicked = picked === opt.id;
+              const reveal = state !== undefined;
+              const showCorrect = reveal && opt.correct;
+              const showWrong = reveal && isPicked && !opt.correct;
+              return (
+                <motion.button
+                  key={opt.id}
+                  whileHover={{ x: reveal ? 0 : 4 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    if (state === "correct") return;
+                    setPicked(opt.id);
+                    onAnswer(opt.correct);
+                  }}
+                  className={cn(
+                    "group flex items-center justify-between gap-3 rounded-2xl border bg-card/80 px-4 py-3 text-left text-sm font-semibold transition-all",
+                    !reveal && "border-border/60 hover:border-challenge/40 hover:bg-challenge-soft/40",
+                    showCorrect && "border-success/50 bg-success-soft/60 text-success",
+                    showWrong && "border-destructive/50 bg-destructive/10 text-destructive",
+                    reveal && !isPicked && !opt.correct && "opacity-60",
+                  )}
+                >
+                  <span className="flex items-center gap-3">
+                    <span className={cn(
+                      "flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold uppercase",
+                      showCorrect ? "bg-success text-white"
+                        : showWrong ? "bg-destructive text-white"
+                        : "bg-muted text-muted-foreground group-hover:bg-challenge group-hover:text-white",
+                    )}>
+                      {showCorrect ? <Check className="h-3.5 w-3.5" /> : showWrong ? <X className="h-3.5 w-3.5" /> : opt.id}
+                    </span>
+                    {opt.text}
+                  </span>
+                </motion.button>
+              );
+            })}
+          </div>
+          <AnimatePresence>
+            {state && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className={cn(
+                  "rounded-2xl border px-4 py-3 text-sm font-semibold",
+                  state === "correct"
+                    ? "border-success/40 bg-success-soft/60 text-success"
+                    : "border-destructive/40 bg-destructive/10 text-destructive",
+                )}
+              >
+                {state === "correct" ? card.correctMessage : card.wrongMessage}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </CardShell>
+  );
+}
+
+function CelebrateCardView({ card }: { card: CelebrateCard }) {
+  return (
+    <CardShell tone={card.tone}>
+      <div className="grid items-center gap-8 md:grid-cols-[auto_1fr]">
+        <CharacterStage image={card.character.image} name={card.character.name} partnerImage={card.partnerImage} tone={card.tone} />
+        <div className="space-y-5">
+          <div className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.2em]",
+            `bg-${card.tone}-soft text-${card.tone}`,
+          )}>
+            <PartyPopper className="h-3 w-3" /> Celebrate
+          </div>
+          <h2 className="font-display text-3xl font-bold leading-tight text-foreground md:text-4xl">
+            {card.title}
+          </h2>
+          <p className="text-base leading-relaxed text-muted-foreground md:text-lg">{card.body}</p>
+          <div className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-bonus to-xp px-4 py-3 font-display text-base font-bold text-white shadow-[var(--shadow-glow)]">
+            <Star className="h-5 w-5" /> {card.reward}
+          </div>
+        </div>
+      </div>
+    </CardShell>
   );
 }
