@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import type { Tone } from "@/components/namma/activity";
+import { markCompleted } from "@/components/namma/activity/progress";
 
 /* ============================================================ */
 /*  Types                                                        */
@@ -168,9 +169,11 @@ export type LessonMeta = {
 export function LessonFrame({
   meta,
   cards,
+  slug,
 }: {
   meta: LessonMeta;
   cards: LessonCard[];
+  slug?: string;
 }) {
   const navigate = useNavigate();
   const [index, setIndex] = React.useState(0);
@@ -329,6 +332,7 @@ export function LessonFrame({
           <RewardModal
             meta={meta}
             onContinue={() => {
+              if (slug) markCompleted(slug);
               setShowReward(false);
               if (meta.nextHref) navigate({ to: meta.nextHref });
               else navigate({ to: "/activities" });

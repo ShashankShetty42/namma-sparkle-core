@@ -1,9 +1,11 @@
+import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronRight, Flame, Lock, Sparkles, Star, Trophy } from "lucide-react";
 
 import { AppShell } from "@/components/namma/app-shell";
 import { ACTIVITIES, ACTIVITY_ORDER, HUB_ICONS } from "@/components/namma/activity/lesson-data";
+import { getCompleted } from "@/components/namma/activity/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
@@ -24,6 +26,22 @@ export const Route = createFileRoute("/activities")({
 
 function ActivitiesHub() {
   const totalXp = ACTIVITY_ORDER.reduce((s, k) => s + ACTIVITIES[k].meta.totalXp, 0);
+
+  const [completed, setCompleted] = React.useState<Set<string>>(new Set());
+  React.useEffect(() => {
+    const load = () => setCompleted(new Set(getCompleted()));
+    load();
+    window.addEventListener("namma:progress", load);
+    window.addEventListener("storage", load);
+    return () => {
+      window.removeEventListener("namma:progress", load);
+      window.removeEventListener("storage", load);
+    };
+  }, []);
+
+  const nextUpSlug =
+    ACTIVITY_ORDER.find((s) => !completed.has(s)) ?? ACTIVITY_ORDER[0];
+  const allDone = completed.size >= ACTIVITY_ORDER.length;
 
   return (
     <AppShell>
@@ -51,14 +69,20 @@ function ActivitiesHub() {
                 Six magical activities, three friendly guides, and a whole week of discovery. Finish them all to unlock the legendary Week 9 badge.
               </p>
               <div className="flex flex-wrap items-center gap-3">
-                <Link to="/activities/$slug" params={{ slug: "story" }}>
-                  <Button variant="hero" size="lg">Begin journey <ArrowRight className="h-5 w-5" /></Button>
+                <Link to="/activities/$slug" params={{ slug: nextUpSlug }}>
+                  <Button variant="hero" size="lg">
+                    {allDone
+                      ? <>Replay journey <ArrowRight className="h-5 w-5" /></>
+                      : completed.size === 0
+                        ? <>Begin journey <ArrowRight className="h-5 w-5" /></>
+                        : <>Continue: {ACTIVITIES[nextUpSlug].meta.title} <ArrowRight className="h-5 w-5" /></>}
+                  </Button>
                 </Link>
                 <span className="inline-flex items-center gap-2 rounded-2xl border border-xp/30 bg-xp-soft/70 px-3 py-2 font-display text-sm font-bold text-xp">
                   <Star className="h-4 w-4" /> {totalXp} XP available
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-2xl border border-success/30 bg-success-soft/70 px-3 py-2 font-display text-sm font-bold text-success">
-                  <Flame className="h-4 w-4" /> 6 streak days
+                  <Flame className="h-4 w-4" /> {completed.size}/{ACTIVITY_ORDER.length} done
                 </span>
               </div>
             </div>
@@ -90,8 +114,10 @@ function ActivitiesHub() {
             {ACTIVITY_ORDER.map((slug, i) => {
               const a = ACTIVITIES[slug];
               const Icon = HUB_ICONS[slug];
-              const locked = false; // demo: all unlocked
-              const completed = i === 0; // demo: only first marked complete
+              const isCompleted = completed.has(slug);
+              const prevDone = i === 0 || completed.has(ACTIVITY_ORDER[i - 1]);
+              const locked = !isCompleted && !prevDone;
+              const completedFlag = isCompleted;
               return (
                 <motion.div
                   key={slug}
@@ -117,7 +143,7 @@ function ActivitiesHub() {
                         <div className="flex items-center gap-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
                           <span className={cn("inline-block h-1.5 w-1.5 rounded-full", `bg-${a.meta.tone}`)} />
                           Activity {a.meta.activityNumber} · {a.meta.weekLabel}
-                          {completed && (
+                          {completedFlag && (
                             <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-success-soft px-1.5 py-0.5 text-[0.55rem] text-success">
                               <Trophy className="h-2.5 w-2.5" /> Done
                             </span>

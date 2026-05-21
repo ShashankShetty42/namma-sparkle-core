@@ -42,7 +42,7 @@ function ActivityPage() {
   const { activity } = Route.useLoaderData();
   return (
     <AppShell>
-      <LessonFrame meta={activity.meta} cards={activity.cards} />
+      <LessonFrame meta={activity.meta} cards={activity.cards} slug={activity.slug} />
     </AppShell>
   );
 }
