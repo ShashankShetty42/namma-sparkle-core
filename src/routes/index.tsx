@@ -182,13 +182,19 @@ function StatTile({
   sub: string;
   tone: "xp" | "decide" | "bonus" | "challenge";
 }) {
+  const toneClass: Record<typeof tone, string> = {
+    xp: "bg-xp-soft text-xp",
+    decide: "bg-decide-soft text-decide",
+    bonus: "bg-bonus-soft text-bonus",
+    challenge: "bg-challenge-soft text-challenge",
+  };
   return (
     <motion.div
       whileHover={{ y: -3 }}
       transition={{ type: "spring", stiffness: 300, damping: 22 }}
       className="stat-pill !p-4"
     >
-      <span className={`stat-pill-icon bg-${tone}-soft text-${tone}`}>{icon}</span>
+      <span className={`stat-pill-icon ${toneClass[tone]}`}>{icon}</span>
       <div className="leading-tight">
         <div className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
           {label}
@@ -213,12 +219,18 @@ function QuickLink({
   sub: string;
   tone: "challenge" | "decide" | "reflect" | "bonus";
 }) {
+  const toneClass: Record<typeof tone, string> = {
+    challenge: "bg-challenge-soft text-challenge",
+    decide: "bg-decide-soft text-decide",
+    reflect: "bg-reflect-soft text-reflect",
+    bonus: "bg-bonus-soft text-bonus",
+  };
   return (
     <Link
       to={to}
       className="group preview-card flex items-center gap-3 !p-4 transition-all hover:-translate-y-1"
     >
-      <span className={`preview-icon !h-11 !w-11 bg-${tone}-soft text-${tone}`}>{icon}</span>
+      <span className={`preview-icon !h-11 !w-11 ${toneClass[tone]}`}>{icon}</span>
       <div className="min-w-0 flex-1">
         <div className="truncate font-display text-base font-bold text-foreground">{title}</div>
         <div className="truncate text-xs text-muted-foreground">{sub}</div>
