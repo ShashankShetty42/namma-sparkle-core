@@ -303,7 +303,7 @@ function StoryActivityPage() {
         <div className="mx-auto w-full max-w-3xl">
           <Button
             variant="hero"
-            size="xl"
+            size="lg"
             disabled={!isLast && !canGoNext}
             onClick={() => {
               if (isLast) return;
