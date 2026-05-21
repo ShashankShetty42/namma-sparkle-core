@@ -26,8 +26,6 @@ export const Route = createFileRoute("/activities")({
 
 function ActivitiesHub() {
   const location = useLocation();
-  if (location.pathname !== "/activities") return <Outlet />;
-
   const totalXp = ACTIVITY_ORDER.reduce((s, k) => s + ACTIVITIES[k].meta.totalXp, 0);
 
   const [completed, setCompleted] = React.useState<Set<string>>(new Set());
@@ -45,6 +43,8 @@ function ActivitiesHub() {
   const nextUpSlug =
     ACTIVITY_ORDER.find((s) => !completed.has(s)) ?? ACTIVITY_ORDER[0];
   const allDone = completed.size >= ACTIVITY_ORDER.length;
+
+  if (location.pathname !== "/activities") return <Outlet />;
 
   return (
     <AppShell>
