@@ -1,21 +1,22 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, useParams } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/namma/app-shell";
 import { ACTIVITIES } from "@/components/namma/activity/lesson-data";
 import { LessonFrame } from "@/components/namma/activity/lesson-frame";
 
 export const Route = createFileRoute("/activities/$slug")({
-  loader: ({ params }) => {
-    const activity = ACTIVITIES[params.slug];
-    if (!activity) throw notFound();
-    return { activity };
+  beforeLoad: ({ params }) => {
+    if (!ACTIVITIES[params.slug]) throw notFound();
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: `${loaderData?.activity.meta.title} · Namma AI` },
-      { name: "description", content: loaderData?.activity.blurb ?? "" },
-    ],
-  }),
+  head: ({ params }) => {
+    const activity = ACTIVITIES[params.slug];
+    return {
+      meta: [
+        { title: `${activity?.meta.title ?? "Activity"} · Namma AI` },
+        { name: "description", content: activity?.blurb ?? "" },
+      ],
+    };
+  },
   notFoundComponent: () => (
     <AppShell>
       <div className="shell-inner">
@@ -39,7 +40,9 @@ export const Route = createFileRoute("/activities/$slug")({
 });
 
 function ActivityPage() {
-  const { activity } = Route.useLoaderData();
+  const { slug } = useParams({ from: "/activities/$slug" });
+  const activity = ACTIVITIES[slug];
+  if (!activity) return null;
   return (
     <AppShell>
       <LessonFrame meta={activity.meta} cards={activity.cards} slug={activity.slug} />
