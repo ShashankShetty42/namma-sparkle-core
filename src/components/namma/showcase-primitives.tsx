@@ -34,6 +34,11 @@ const toneClasses = {
     badge: "bg-bonus/14 text-bonus",
     glow: "from-bonus-soft via-background to-background",
   },
+  success: {
+    shell: "border-success/24 bg-success-soft text-success",
+    badge: "bg-success/12 text-success",
+    glow: "from-success-soft via-background to-background",
+  },
   xp: {
     shell: "border-xp/24 bg-xp-soft text-xp",
     badge: "bg-xp/12 text-xp",
