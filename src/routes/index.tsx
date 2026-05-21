@@ -54,7 +54,15 @@ export const Route = createFileRoute("/")({
 
 /* ───────────────────────── data ───────────────────────── */
 
-const WEEKLY_ROADMAP = [
+type RoadmapDay = {
+  day: string;
+  label: string;
+  tone: string;
+  done: boolean;
+  today?: boolean;
+  locked?: boolean;
+};
+const WEEKLY_ROADMAP: RoadmapDay[] = [
   { day: "Mon", label: "Kickoff", tone: "story", done: true },
   { day: "Tue", label: "Explore", tone: "explore", done: true },
   { day: "Wed", label: "Decide", tone: "decide", done: true },
@@ -62,7 +70,7 @@ const WEEKLY_ROADMAP = [
   { day: "Fri", label: "Ethics", tone: "challenge", done: false },
   { day: "Sat", label: "Quiz", tone: "xp", done: false },
   { day: "Sun", label: "Reward", tone: "bonus", done: false, locked: true },
-] as const;
+];
 
 const ACHIEVEMENTS = [
   { name: "First Mission", tone: "story", icon: Rocket, earned: true, sub: "Sealed Day 1" },
