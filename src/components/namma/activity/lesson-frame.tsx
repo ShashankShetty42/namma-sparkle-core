@@ -169,9 +169,11 @@ export type LessonMeta = {
 export function LessonFrame({
   meta,
   cards,
+  slug,
 }: {
   meta: LessonMeta;
   cards: LessonCard[];
+  slug?: string;
 }) {
   const navigate = useNavigate();
   const [index, setIndex] = React.useState(0);
