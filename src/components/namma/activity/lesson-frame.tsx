@@ -5,12 +5,18 @@ import {
   ArrowLeft,
   ArrowRight,
   Brain,
+  Camera,
   Check,
   ChevronLeft,
   ChevronRight,
   Eye,
   Feather,
   Gem,
+  Heart,
+  Lightbulb,
+  MapPin,
+  Mic,
+  Music,
   PartyPopper,
   Pencil,
   Plus,
@@ -46,6 +52,8 @@ export type Phase =
 
 export type Character = { name: string; image: string };
 
+export type LessonIconName = "eye" | "brain" | "sparkles" | "camera" | "mic" | "map" | "wand" | "music" | "heart" | "lightbulb";
+
 type CardBase = { id: string; phase: Phase; tone: Tone };
 
 export type StoryCard = CardBase & {
@@ -61,7 +69,7 @@ export type ConceptCard = CardBase & {
   character: Character;
   title: string;
   body: string;
-  pillars: { icon: React.ReactNode; title: string; body: string; tone: Tone }[];
+  pillars: { icon: LessonIconName; title: string; body: string; tone: Tone }[];
 };
 
 export type ExamplesCard = CardBase & {
@@ -69,7 +77,7 @@ export type ExamplesCard = CardBase & {
   character: Character;
   title: string;
   intro: string;
-  items: { icon: React.ReactNode; title: string; body: string; tone: Tone }[];
+  items: { icon: LessonIconName; title: string; body: string; tone: Tone }[];
 };
 
 export type SpotCard = CardBase & {
@@ -79,7 +87,7 @@ export type SpotCard = CardBase & {
   helper?: string;
   slots: number;
   placeholders: string[];
-  examples?: { icon?: React.ReactNode; title: string; body: string; tone: Tone }[];
+  examples?: { icon?: LessonIconName; title: string; body: string; tone: Tone }[];
 };
 
 export type DecideCard = CardBase & {
@@ -525,6 +533,23 @@ function CardRenderer(props: {
   }
 }
 
+function LessonIcon({ name, className = "h-4 w-4" }: { name?: LessonIconName; className?: string }) {
+  const icons: Record<LessonIconName, React.ElementType> = {
+    eye: Eye,
+    brain: Brain,
+    sparkles: Sparkles,
+    camera: Camera,
+    mic: Mic,
+    map: MapPin,
+    wand: Wand2,
+    music: Music,
+    heart: Heart,
+    lightbulb: Lightbulb,
+  };
+  const Icon = name ? icons[name] : Sparkles;
+  return <Icon className={className} />;
+}
+
 function StoryCardView({ card }: { card: StoryCard }) {
   return (
     <CardShell tone={card.tone}>
@@ -552,7 +577,7 @@ function ConceptCardView({ card }: { card: ConceptCard }) {
           <div className="grid gap-3 sm:grid-cols-3">
             {card.pillars.map((p, i) => (
               <motion.div key={p.title} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.08, duration: 0.4 }} className={cn("rounded-2xl border p-3", `border-${p.tone}/25 bg-${p.tone}-soft/40`)}>
-                <div className={cn("flex h-8 w-8 items-center justify-center rounded-xl text-white", `bg-${p.tone}`)}>{p.icon}</div>
+                <div className={cn("flex h-8 w-8 items-center justify-center rounded-xl text-white", `bg-${p.tone}`)}><LessonIcon name={p.icon} /></div>
                 <div className="mt-2 font-display text-sm font-bold text-foreground">{p.title}</div>
                 <div className="text-xs text-muted-foreground">{p.body}</div>
               </motion.div>
@@ -576,7 +601,7 @@ function ExamplesCardView({ card }: { card: ExamplesCard }) {
           <div className="grid gap-3 sm:grid-cols-2">
             {card.items.map((it, i) => (
               <motion.div key={it.title} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.07, duration: 0.4 }} className={cn("flex items-start gap-3 rounded-2xl border p-3", `border-${it.tone}/25 bg-${it.tone}-soft/40`)}>
-                <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white", `bg-${it.tone}`)}>{it.icon}</div>
+                <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white", `bg-${it.tone}`)}><LessonIcon name={it.icon} /></div>
                 <div>
                   <div className="font-display text-sm font-bold text-foreground">{it.title}</div>
                   <div className="text-xs text-muted-foreground">{it.body}</div>
@@ -644,7 +669,7 @@ function SpotCardView({ card, answer, onAnswer }: { card: SpotCard; answer: { te
                   className={cn("flex items-start gap-3 rounded-2xl border bg-white/80 p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]", `border-${ex.tone}/25 hover:border-${ex.tone}/50`)}
                 >
                   <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white", `bg-${ex.tone}`)}>
-                    {ex.icon ?? <Sparkles className="h-4 w-4" />}
+                    <LessonIcon name={ex.icon} />
                   </div>
                   <div>
                     <div className="font-display text-sm font-bold text-foreground">{ex.title}</div>
