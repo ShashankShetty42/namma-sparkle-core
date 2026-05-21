@@ -669,7 +669,7 @@ function SpotCardView({ card, answer, onAnswer }: { card: SpotCard; answer: { te
                   className={cn("flex items-start gap-3 rounded-2xl border bg-white/80 p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]", `border-${ex.tone}/25 hover:border-${ex.tone}/50`)}
                 >
                   <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white", `bg-${ex.tone}`)}>
-                    {ex.icon ?? <Sparkles className="h-4 w-4" />}
+                    <LessonIcon name={ex.icon} />
                   </div>
                   <div>
                     <div className="font-display text-sm font-bold text-foreground">{ex.title}</div>
