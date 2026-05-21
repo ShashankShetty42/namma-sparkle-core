@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import type { Tone } from "@/components/namma/activity";
+import { markCompleted } from "@/components/namma/activity/progress";
 
 /* ============================================================ */
 /*  Types                                                        */
