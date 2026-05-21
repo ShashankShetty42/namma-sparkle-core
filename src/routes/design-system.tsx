@@ -63,9 +63,11 @@ const fadeUp = {
   transition: { duration: 0.55, ease: "easeOut" as const },
 };
 
+import { AppShell } from "@/components/namma/app-shell";
+
 function Index() {
   return (
-    <main className="page-shell">
+    <AppShell>
       <div className="shell-inner">
         <motion.section className="hero-panel" {...fadeUp}>
           <div className="hero-characters items-center gap-6">
