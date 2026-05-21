@@ -27,6 +27,22 @@ export const Route = createFileRoute("/activities")({
 function ActivitiesHub() {
   const totalXp = ACTIVITY_ORDER.reduce((s, k) => s + ACTIVITIES[k].meta.totalXp, 0);
 
+  const [completed, setCompleted] = React.useState<Set<string>>(new Set());
+  React.useEffect(() => {
+    const load = () => setCompleted(new Set(getCompleted()));
+    load();
+    window.addEventListener("namma:progress", load);
+    window.addEventListener("storage", load);
+    return () => {
+      window.removeEventListener("namma:progress", load);
+      window.removeEventListener("storage", load);
+    };
+  }, []);
+
+  const nextUpSlug =
+    ACTIVITY_ORDER.find((s) => !completed.has(s)) ?? ACTIVITY_ORDER[0];
+  const allDone = completed.size >= ACTIVITY_ORDER.length;
+
   return (
     <AppShell>
       <div className="shell-inner !gap-8">
