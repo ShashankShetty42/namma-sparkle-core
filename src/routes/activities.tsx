@@ -104,7 +104,7 @@ function ActivitiesHub() {
                     params={{ slug }}
                     className={cn(
                       "group relative block overflow-hidden rounded-[28px] border bg-white/85 p-6 shadow-[var(--shadow-soft)] backdrop-blur transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-float)]",
-                      `border-${a.meta.tone}/25 hover:border-${a.meta.tone}/55`,
+                      `border-${a.meta.tone}/25 hover:border-foreground/30`,
                       locked && "pointer-events-none opacity-60",
                     )}
                   >

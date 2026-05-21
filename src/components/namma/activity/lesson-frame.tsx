@@ -616,7 +616,7 @@ function SpotCardView({ card, answer, onAnswer }: { card: SpotCard; answer: { te
                 placeholder={card.placeholders[i] ?? "Type what you spot…"}
                 className={cn(
                   "w-full rounded-2xl border bg-white/90 py-4 pl-14 pr-4 text-sm font-medium text-foreground placeholder:text-muted-foreground/70 shadow-[var(--shadow-soft)] outline-none transition-all",
-                  `border-border/60 focus:border-${card.tone}/50 focus:ring-2 focus:ring-${card.tone}/20`,
+                  `border-border/60 focus:border-foreground/40`,
                 )}
               />
             </div>
@@ -676,7 +676,7 @@ function OptionList({ options, picked, tone, onPick }: {
             className={cn(
               "group flex items-start gap-3 rounded-2xl border bg-card/85 px-4 py-3.5 text-left text-sm font-semibold transition-all",
               isPicked
-                ? cn(`border-${t}/60 bg-${t}-soft/70 text-foreground shadow-[var(--shadow-soft)] ring-2 ring-${t}/30`)
+                ? cn(`border-${t}/60 bg-${t}-soft/70 text-foreground shadow-[var(--shadow-soft)] `)
                 : "border-border/60 hover:border-foreground/30 hover:bg-white",
             )}
           >
@@ -726,7 +726,7 @@ function DecideCardView({ card, answer, onAnswer }: { card: DecideCard; answer: 
                 rows={3}
                 placeholder={card.reasoningPlaceholder ?? "Share your reasoning…"}
                 className={cn("w-full resize-none rounded-2xl border bg-white px-4 py-3 text-sm leading-6 text-foreground placeholder:text-muted-foreground/70 outline-none transition-all",
-                  `border-border/60 focus:border-${card.tone}/50 focus:ring-2 focus:ring-${card.tone}/20`)}
+                  `border-border/60 focus:border-foreground/40`)}
               />
             </motion.div>
           )}
@@ -777,7 +777,7 @@ function DilemmaCardView({ card, answer, onAnswer }: { card: DilemmaCard; answer
                 rows={4}
                 placeholder={card.reasoningPlaceholder ?? "There's no right or wrong answer — share your reasoning."}
                 className={cn("w-full resize-none rounded-2xl border bg-white px-4 py-3 text-sm leading-6 text-foreground placeholder:text-muted-foreground/70 outline-none transition-all",
-                  `border-border/60 focus:border-${card.tone}/50 focus:ring-2 focus:ring-${card.tone}/20`)}
+                  `border-border/60 focus:border-foreground/40`)}
               />
             </motion.div>
           )}
