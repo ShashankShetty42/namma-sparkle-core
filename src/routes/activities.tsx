@@ -114,8 +114,10 @@ function ActivitiesHub() {
             {ACTIVITY_ORDER.map((slug, i) => {
               const a = ACTIVITIES[slug];
               const Icon = HUB_ICONS[slug];
-              const locked = false; // demo: all unlocked
-              const completed = i === 0; // demo: only first marked complete
+              const isCompleted = completed.has(slug);
+              const prevDone = i === 0 || completed.has(ACTIVITY_ORDER[i - 1]);
+              const locked = !isCompleted && !prevDone;
+              const completedFlag = isCompleted;
               return (
                 <motion.div
                   key={slug}
