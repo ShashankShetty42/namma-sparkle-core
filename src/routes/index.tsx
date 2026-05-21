@@ -1,173 +1,608 @@
+import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
+  Award,
+  CalendarDays,
+  CheckCircle2,
+  ChevronRight,
   Compass,
+  Crown,
   Flame,
   Gift,
+  Lock,
+  Medal,
   Rocket,
   Sparkles,
   Star,
+  Target,
   Trophy,
   Zap,
 } from "lucide-react";
 
+import anayaCelebrating from "@/assets/characters/anaya-celebrating.png";
 import anayaHappy from "@/assets/characters/anaya-happy.png";
 import devExplaining from "@/assets/characters/dev-explaining.png";
+import devHappy from "@/assets/characters/dev-happy.png";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
+import neoExplaining from "@/assets/characters/neo-explaining.png";
 import { AppShell } from "@/components/namma/app-shell";
+import {
+  ACTIVITIES,
+  ACTIVITY_ORDER,
+  HUB_ICONS,
+} from "@/components/namma/activity/lesson-data";
+import { getCompleted } from "@/components/namma/activity/progress";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { nammaEase } from "@/components/namma/motion";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Namma AI" },
+      { title: "Dashboard · Namma AI" },
       {
         name: "description",
         content:
-          "Your personal AI learning dashboard with missions, XP, badges, streaks, and character-led guidance from Neo, Dev and Anaya.",
+          "Premium AI learning dashboard for Grades 5–10. Weekly roadmap, XP, streaks, badges, leaderboards and character-led missions with Neo, Dev & Anaya.",
       },
     ],
   }),
   component: DashboardPage,
 });
 
-const fadeUp = {
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: "easeOut" as const },
-};
+/* ───────────────────────── data ───────────────────────── */
+
+const WEEKLY_ROADMAP = [
+  { day: "Mon", label: "Kickoff", tone: "story", done: true },
+  { day: "Tue", label: "Explore", tone: "explore", done: true },
+  { day: "Wed", label: "Decide", tone: "decide", done: true },
+  { day: "Thu", label: "Reflect", tone: "reflect", done: false, today: true },
+  { day: "Fri", label: "Ethics", tone: "challenge", done: false },
+  { day: "Sat", label: "Quiz", tone: "xp", done: false },
+  { day: "Sun", label: "Reward", tone: "bonus", done: false, locked: true },
+] as const;
+
+const ACHIEVEMENTS = [
+  { name: "First Mission", tone: "story", icon: Rocket, earned: true, sub: "Sealed Day 1" },
+  { name: "3-Day Streak", tone: "decide", icon: Flame, earned: true, sub: "On fire 🔥" },
+  { name: "AI Spotter", tone: "explore", icon: Compass, earned: true, sub: "10 examples found" },
+  { name: "Ethics Hero", tone: "challenge", icon: Medal, earned: false, sub: "Finish ethics" },
+  { name: "Weekly Champ", tone: "xp", icon: Crown, earned: false, sub: "Complete week" },
+  { name: "Reward Hunter", tone: "bonus", icon: Gift, earned: false, sub: "Open 5 rewards" },
+] as const;
+
+const LEADERBOARD = [
+  { rank: 1, name: "Meera P.", xp: 1840, you: false },
+  { rank: 2, name: "Aarav (You)", xp: 1620, you: true },
+  { rank: 3, name: "Kabir S.", xp: 1495, you: false },
+  { rank: 4, name: "Diya R.", xp: 1380, you: false },
+  { rank: 5, name: "Ishaan V.", xp: 1240, you: false },
+] as const;
+
+const REWARDS = [
+  { title: "Daily login XP", sub: "+50 XP ready to claim", icon: Star, tone: "xp", cta: "Claim" },
+  { title: "Streak chest", sub: "Open after 5-day streak", icon: Gift, tone: "bonus", cta: "Open" },
+  { title: "Mystery sticker", sub: "Earn 3 more badges", icon: Sparkles, tone: "reflect", cta: "Preview" },
+] as const;
+
+/* ───────────────────────── page ───────────────────────── */
 
 function DashboardPage() {
+  const [completed, setCompleted] = React.useState<Set<string>>(new Set());
+  React.useEffect(() => {
+    const load = () => setCompleted(new Set(getCompleted()));
+    load();
+    window.addEventListener("namma:progress", load);
+    window.addEventListener("storage", load);
+    return () => {
+      window.removeEventListener("namma:progress", load);
+      window.removeEventListener("storage", load);
+    };
+  }, []);
+
+  const totalXp = ACTIVITY_ORDER.reduce((s, k) => s + ACTIVITIES[k].meta.totalXp, 0);
+  const earnedXp = ACTIVITY_ORDER.filter((s) => completed.has(s)).reduce(
+    (s, k) => s + ACTIVITIES[k].meta.totalXp,
+    0,
+  );
+  const baseXp = 1620;
+  const liveXp = baseXp + earnedXp;
+  const xpToNext = 2000;
+  const xpPercent = Math.min(100, Math.round((liveXp / xpToNext) * 100));
+  const weekPercent = Math.round((completed.size / ACTIVITY_ORDER.length) * 100);
+  const nextSlug = ACTIVITY_ORDER.find((s) => !completed.has(s)) ?? ACTIVITY_ORDER[0];
+  const next = ACTIVITIES[nextSlug];
+  const NextIcon = HUB_ICONS[nextSlug];
+  const earnedBadges = ACHIEVEMENTS.filter((a) => a.earned).length;
+
   return (
     <AppShell>
-      <div className="mx-auto flex max-w-6xl flex-col gap-6">
-        {/* Hero */}
-        <motion.section {...fadeUp} className="hero-panel">
-          <div className="grid items-center gap-6 md:grid-cols-[1.3fr_1fr]">
+      <div className="shell-inner !gap-8">
+        {/* ───── HERO ───── */}
+        <motion.section
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: nammaEase }}
+          className="relative overflow-hidden rounded-[36px] border border-white/70 bg-gradient-to-br from-story-soft via-white to-explore-soft p-6 shadow-[var(--shadow-float)] md:p-10"
+        >
+          <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-story/30 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-bonus/25 blur-3xl" />
+          <div className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:linear-gradient(currentColor_1px,transparent_1px),linear-gradient(90deg,currentColor_1px,transparent_1px)] [background-size:32px_32px]" />
+
+          <div className="relative grid items-center gap-8 md:grid-cols-[1.45fr_1fr]">
             <div className="space-y-5">
-              <div className="eyebrow">
-                <Sparkles className="h-4 w-4" />
-                <span>App shell · Phase 2</span>
+              <div className="inline-flex items-center gap-2 rounded-full bg-story/10 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-story">
+                <Sparkles className="h-3 w-3" /> Welcome back, Aarav
               </div>
-              <h1 className="display-hero !text-3xl md:!text-5xl">
-                Hi Aarav — your next adventure is ready.
+              <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-foreground md:text-5xl">
+                Your next{" "}
+                <span className="bg-gradient-to-r from-story via-reflect to-decide bg-clip-text text-transparent">
+                  AI adventure
+                </span>{" "}
+                is one tap away.
               </h1>
-              <p className="hero-copy">
-                Continue your AI journey with playful missions, earn XP, and unlock badges. Neo,
-                Dev, and Anaya are here to guide every step.
+              <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+                Continue Week 9 with Dev, Neo & Anaya. Earn XP, light up your streak,
+                and unlock the legendary Weekly Champion badge.
               </p>
-              <div className="flex flex-wrap gap-3">
-                <Button variant="hero" size="lg">
-                  Continue mission
-                  <ArrowRight className="h-4 w-4" />
+
+              {/* XP rail */}
+              <div className="rounded-[22px] border border-white/60 bg-white/70 p-4 backdrop-blur">
+                <div className="flex items-center justify-between text-[0.7rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  <span className="inline-flex items-center gap-2 text-xp">
+                    <Star className="h-3.5 w-3.5" /> Level 7 · Explorer
+                  </span>
+                  <span className="text-foreground">
+                    {liveXp} / {xpToNext} XP
+                  </span>
+                </div>
+                <div className="progress-shell mt-3 !h-3">
+                  <motion.div
+                    className="progress-fill"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${xpPercent}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                  />
+                </div>
+                <div className="mt-2 flex items-center justify-between text-[0.72rem] text-muted-foreground">
+                  <span>{xpToNext - liveXp} XP to Level 8</span>
+                  <span className="font-bold text-foreground">{xpPercent}%</span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Button variant="hero" size="lg" asChild>
+                  <Link to="/activities/$slug" params={{ slug: nextSlug }}>
+                    <NextIcon className="h-5 w-5" />
+                    Continue · {next.meta.title}
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
                 </Button>
                 <Button variant="xp" size="lg">
-                  Claim daily XP
+                  <Gift className="h-4 w-4" /> Claim +50 XP
                 </Button>
-                <Link
-                  to="/design-system"
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-5 text-sm font-bold text-foreground transition-all hover:-translate-y-0.5 hover:border-primary/30"
-                  style={{ height: "52px", paddingInline: "1.5rem" }}
-                >
-                  View design system
-                </Link>
               </div>
             </div>
 
-            <div className="relative flex h-full min-h-[260px] items-center justify-center">
-              <div className="absolute h-64 w-64 rounded-full bg-gradient-to-br from-story/25 via-explore/20 to-bonus/25 blur-2xl" />
-              <img
-                src={neoCelebrating}
-                alt="Neo celebrating"
-                className="relative h-72 w-72 object-contain animate-[namma-float_5.5s_ease-in-out_infinite]"
+            {/* Character moment */}
+            <div className="relative hidden h-72 items-end justify-center md:flex">
+              <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-white/60 to-white/20 backdrop-blur-sm" />
+              <motion.img
+                src={devHappy}
+                alt="Dev"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="absolute bottom-2 left-2 h-36 w-36 object-contain animate-[namma-float_5s_ease-in-out_infinite] drop-shadow-[0_20px_30px_rgba(0,0,0,0.16)]"
               />
+              <motion.img
+                src={neoCelebrating}
+                alt="Neo"
+                initial={{ y: 24, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="relative h-52 w-52 object-contain animate-[namma-float_4.6s_ease-in-out_infinite] drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]"
+              />
+              <motion.img
+                src={anayaHappy}
+                alt="Anaya"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="absolute bottom-2 right-2 h-36 w-36 object-contain animate-[namma-float_5.2s_ease-in-out_infinite] drop-shadow-[0_20px_30px_rgba(0,0,0,0.16)]"
+              />
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-2xl border border-white bg-white/95 px-3 py-1.5 text-xs font-bold text-foreground shadow-[var(--shadow-soft)]"
+              >
+                <span className="text-story">Neo:</span> Let&apos;s GO! 🚀
+              </motion.div>
             </div>
           </div>
         </motion.section>
 
-        {/* Quick stats */}
+        {/* ───── STAT STRIP ───── */}
         <motion.section
-          {...fadeUp}
-          transition={{ ...fadeUp.transition, delay: 0.05 }}
-          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.05 }}
+          className="grid grid-cols-2 gap-3 md:grid-cols-4"
         >
-          <StatTile icon={<Star className="h-5 w-5" />} tone="xp" label="Total XP" value="320" sub="+50 today" />
-          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Streak" value="5 days" sub="Keep it alive!" />
-          <StatTile icon={<Trophy className="h-5 w-5" />} tone="bonus" label="Badges" value="12" sub="2 new this week" />
-          <StatTile icon={<Rocket className="h-5 w-5" />} tone="challenge" label="Missions" value="3 active" sub="1 nearly done" />
+          <StatTile icon={<Star className="h-5 w-5" />} tone="xp" label="Total XP" value={String(liveXp)} sub={`+${earnedXp || 50} today`} />
+          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Streak" value="5 days" sub="Best yet!" />
+          <StatTile icon={<Trophy className="h-5 w-5" />} tone="bonus" label="Badges" value={`${earnedBadges}/${ACHIEVEMENTS.length}`} sub="2 new this week" />
+          <StatTile icon={<Target className="h-5 w-5" />} tone="challenge" label="Rank" value="#2" sub="↑ 1 this week" />
         </motion.section>
 
-        {/* Shell preview & character row */}
+        {/* ───── WEEKLY ROADMAP ───── */}
         <motion.section
-          {...fadeUp}
-          transition={{ ...fadeUp.transition, delay: 0.1 }}
-          className="grid gap-4 lg:grid-cols-[1.4fr_1fr]"
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5 }}
+          className="section-panel"
         >
-          <div className="section-panel">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div className="space-y-2">
-                <div className="eyebrow">
-                  <Compass className="h-4 w-4" />
-                  <span>Shell preview</span>
-                </div>
-                <h2 className="section-title !text-2xl">
-                  Premium navigation, ready to scale.
-                </h2>
-                <p className="section-copy !text-base">
-                  Your sidebar, top bar, character guidance, and motion language are wired in. Full
-                  dashboard content arrives in the next phase.
-                </p>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <div className="eyebrow">
+                <CalendarDays className="h-3.5 w-3.5" /> Weekly roadmap
               </div>
+              <h2 className="mt-2 font-display text-2xl font-bold text-foreground md:text-3xl">
+                Your 7-day quest line
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Keep the chain alive — finish today to extend your streak.
+              </p>
             </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              {[
-                { label: "Sidebar", value: "Collapsible · animated", chip: "bg-story-soft text-story" },
-                { label: "Top bar", value: "XP · streak · search", chip: "bg-explore-soft text-explore" },
-                { label: "Motion", value: "Soft · cinematic", chip: "bg-reflect-soft text-reflect" },
-              ].map((b) => (
-                <div key={b.label} className="rounded-2xl border border-border/70 bg-card/70 p-4 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[var(--shadow-soft)]">
-                  <div className={`tone-chip ${b.chip}`}>{b.label}</div>
-                  <div className="mt-2 font-display text-lg font-bold text-foreground">{b.value}</div>
-                </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-success/30 bg-success-soft/70 px-3 py-1.5 font-display text-sm font-bold text-success">
+              <CheckCircle2 className="h-4 w-4" /> {weekPercent}% week complete
+            </div>
+          </div>
+
+          <div className="relative mt-6">
+            <div className="absolute top-7 right-4 left-4 h-1 rounded-full bg-secondary" />
+            <motion.div
+              className="absolute top-7 left-4 h-1 rounded-full bg-gradient-to-r from-story via-decide to-xp"
+              initial={{ width: 0 }}
+              whileInView={{ width: `calc(${weekPercent}% - 2rem)` }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: "easeOut" }}
+            />
+            <div className="relative grid grid-cols-7 gap-2">
+              {WEEKLY_ROADMAP.map((d, i) => (
+                <motion.div
+                  key={d.day}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <div
+                    className={cn(
+                      "flex h-14 w-14 items-center justify-center rounded-2xl border-2 text-sm font-display font-bold shadow-[var(--shadow-soft)] transition-all",
+                      d.done && `bg-${d.tone} text-white border-${d.tone}`,
+                      !d.done && d.today && `bg-white text-${d.tone} border-${d.tone} animate-[namma-pulse_2.4s_ease-in-out_infinite]`,
+                      !d.done && !d.today && !d.locked && "bg-white text-muted-foreground border-border",
+                      d.locked && "bg-muted text-locked border-locked/30",
+                    )}
+                  >
+                    {d.done ? <CheckCircle2 className="h-6 w-6" /> : d.locked ? <Lock className="h-4 w-4" /> : d.day}
+                  </div>
+                  <div className="text-center leading-tight">
+                    <div className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">{d.day}</div>
+                    <div className={cn("text-xs font-bold", d.today ? `text-${d.tone}` : "text-foreground")}>{d.label}</div>
+                  </div>
+                </motion.div>
               ))}
             </div>
           </div>
+        </motion.section>
 
-          <div className="section-panel relative overflow-hidden">
-            <div className="eyebrow">
-              <Sparkles className="h-4 w-4" />
-              <span>Your guides</span>
+        {/* ───── CONTINUE JOURNEY + REWARDS ───── */}
+        <section className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+          {/* Continue journey card */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className={cn(
+              "relative overflow-hidden rounded-[28px] border bg-white/85 p-6 shadow-[var(--shadow-card)] backdrop-blur",
+              `border-${next.meta.tone}/30`,
+            )}
+          >
+            <div className={cn("pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full opacity-50 blur-3xl", `bg-${next.meta.tone}/40`)} />
+            <div className="relative flex flex-col gap-5 md:flex-row md:items-center">
+              <div className={cn("flex h-20 w-20 shrink-0 items-center justify-center rounded-[24px] text-white shadow-[var(--shadow-float)]", `bg-gradient-to-br from-${next.meta.tone} to-${next.meta.tone}/70`)}>
+                <NextIcon className="h-9 w-9" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[0.62rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                  Continue journey · Activity {next.meta.activityNumber} of {ACTIVITY_ORDER.length}
+                </div>
+                <h3 className="mt-1 font-display text-2xl font-bold text-foreground">
+                  {next.emoji} {next.meta.title}
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">{next.blurb}</p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.65rem] font-bold", `bg-${next.meta.tone}-soft text-${next.meta.tone}`)}>
+                    <Star className="h-3 w-3" /> +{next.meta.totalXp} XP
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[0.65rem] font-bold text-muted-foreground">
+                    <Trophy className="h-3 w-3" /> {next.meta.badge}
+                  </span>
+                </div>
+              </div>
+              <Button variant="hero" size="lg" asChild>
+                <Link to="/activities/$slug" params={{ slug: nextSlug }}>
+                  Resume <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
             </div>
-            <h3 className="mt-2 font-display text-xl font-bold text-foreground">
-              Neo, Dev & Anaya
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              They&apos;ll cheer you on across every screen.
-            </p>
-            <div className="mt-4 flex items-end justify-around gap-2">
-              <img src={anayaHappy} alt="Anaya" className="h-24 w-24 object-contain animate-[namma-float_5s_ease-in-out_infinite]" />
-              <img src={neoCelebrating} alt="Neo" className="h-28 w-28 object-contain animate-[namma-float_4.5s_ease-in-out_infinite] [animation-delay:-1s]" />
-              <img src={devExplaining} alt="Dev" className="h-24 w-24 object-contain animate-[namma-float_5.5s_ease-in-out_infinite] [animation-delay:-2s]" />
+
+            {/* mini path */}
+            <div className="relative mt-6 flex items-center gap-1.5">
+              {ACTIVITY_ORDER.map((slug) => {
+                const done = completed.has(slug);
+                const isNext = slug === nextSlug && !done;
+                const tone = ACTIVITIES[slug].meta.tone;
+                return (
+                  <div
+                    key={slug}
+                    className={cn(
+                      "h-2 flex-1 rounded-full transition-all",
+                      done && `bg-${tone}`,
+                      !done && isNext && `bg-${tone}/40 animate-pulse`,
+                      !done && !isNext && "bg-secondary",
+                    )}
+                  />
+                );
+              })}
             </div>
+          </motion.div>
+
+          {/* Rewards stack */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="section-panel !p-5"
+          >
+            <div className="flex items-center justify-between">
+              <div className="eyebrow">
+                <Gift className="h-3.5 w-3.5" /> Rewards
+              </div>
+              <Link to="/rewards" className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline">
+                Vault <ChevronRight className="h-3 w-3" />
+              </Link>
+            </div>
+            <div className="mt-4 space-y-3">
+              {REWARDS.map((r, i) => (
+                <motion.div
+                  key={r.title}
+                  initial={{ opacity: 0, x: 8 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06 }}
+                  whileHover={{ y: -2 }}
+                  className={cn("flex items-center gap-3 rounded-[20px] border bg-white/80 p-3", `border-${r.tone}/25`)}
+                >
+                  <div className={cn("flex h-11 w-11 items-center justify-center rounded-2xl", `bg-${r.tone}-soft text-${r.tone}`)}>
+                    <r.icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-display text-sm font-bold text-foreground">{r.title}</div>
+                    <div className="truncate text-[0.72rem] text-muted-foreground">{r.sub}</div>
+                  </div>
+                  <Button variant="xp" size="sm">
+                    {r.cta}
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ───── ACHIEVEMENT CARDS ───── */}
+        <motion.section
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="space-y-4"
+        >
+          <div className="flex items-end justify-between">
+            <div>
+              <div className="eyebrow">
+                <Award className="h-3.5 w-3.5" /> Achievements
+              </div>
+              <h2 className="mt-2 font-display text-2xl font-bold text-foreground md:text-3xl">
+                Trophies in your case
+              </h2>
+            </div>
+            <Link to="/badges" className="hidden items-center gap-1 text-sm font-bold text-primary hover:underline md:inline-flex">
+              All badges <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+            {ACHIEVEMENTS.map((a, i) => (
+              <motion.div
+                key={a.name}
+                initial={{ opacity: 0, scale: 0.94 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, type: "spring", stiffness: 220, damping: 20 }}
+                whileHover={{ y: -4 }}
+                className={cn(
+                  "relative overflow-hidden rounded-[24px] border p-4 text-center shadow-[var(--shadow-soft)] backdrop-blur transition-all",
+                  a.earned ? `bg-${a.tone}-soft/60 border-${a.tone}/30` : "bg-white/70 border-border opacity-80",
+                )}
+              >
+                {a.earned && (
+                  <div className={cn("pointer-events-none absolute -top-10 -right-10 h-24 w-24 rounded-full blur-2xl", `bg-${a.tone}/40`)} />
+                )}
+                <div
+                  className={cn(
+                    "relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl shadow-[var(--shadow-soft)]",
+                    a.earned ? `bg-gradient-to-br from-${a.tone} to-${a.tone}/70 text-white` : "bg-muted text-locked",
+                  )}
+                >
+                  {a.earned ? <a.icon className="h-6 w-6" /> : <Lock className="h-5 w-5" />}
+                </div>
+                <div className="relative mt-3 font-display text-sm font-bold text-foreground">{a.name}</div>
+                <div className="relative text-[0.68rem] text-muted-foreground">{a.sub}</div>
+              </motion.div>
+            ))}
           </div>
         </motion.section>
 
-        {/* Quick links */}
+        {/* ───── LEADERBOARD + CHARACTER MOMENT ───── */}
+        <section className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="section-panel"
+          >
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="eyebrow">
+                  <Crown className="h-3.5 w-3.5" /> Leaderboard
+                </div>
+                <h2 className="mt-2 font-display text-2xl font-bold text-foreground">
+                  Class Explorers · Week 9
+                </h2>
+              </div>
+              <Link to="/leaderboard" className="text-xs font-bold text-primary hover:underline">
+                Full board →
+              </Link>
+            </div>
+            <ul className="mt-4 space-y-2">
+              {LEADERBOARD.map((p, i) => (
+                <motion.li
+                  key={p.rank}
+                  initial={{ opacity: 0, x: -8 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className={cn(
+                    "flex items-center gap-3 rounded-2xl border p-3 transition-all",
+                    p.you
+                      ? "border-primary/40 bg-primary/8 shadow-[var(--shadow-soft)]"
+                      : "border-border/60 bg-white/70 hover:bg-white",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-2xl font-display text-sm font-bold",
+                      p.rank === 1 && "bg-xp text-white",
+                      p.rank === 2 && "bg-explore text-white",
+                      p.rank === 3 && "bg-decide text-white",
+                      p.rank > 3 && "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {p.rank === 1 ? <Crown className="h-5 w-5" /> : `#${p.rank}`}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-display text-sm font-bold text-foreground">{p.name}</div>
+                    <div className="text-[0.7rem] text-muted-foreground">Level {Math.max(1, Math.round(p.xp / 250))} · Explorer</div>
+                  </div>
+                  <div className="inline-flex items-center gap-1 rounded-full bg-xp-soft px-2.5 py-1 font-display text-xs font-bold text-xp">
+                    <Star className="h-3 w-3" /> {p.xp}
+                  </div>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Motivational character moment */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.05 }}
+            className="relative overflow-hidden rounded-[28px] border border-white/70 bg-gradient-to-br from-reflect-soft via-white to-bonus-soft p-6 shadow-[var(--shadow-float)]"
+          >
+            <div className="pointer-events-none absolute -bottom-20 -right-16 h-64 w-64 rounded-full bg-reflect/25 blur-3xl" />
+            <div className="relative space-y-4">
+              <div className="inline-flex items-center gap-2 rounded-full bg-reflect/10 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-reflect">
+                <Sparkles className="h-3 w-3" /> Anaya says
+              </div>
+              <p className="font-display text-xl font-bold leading-tight text-foreground md:text-2xl">
+                &ldquo;You&apos;re only <span className="text-reflect">2 activities</span> away from
+                unlocking the Weekly Champion crown — I believe in you!&rdquo;
+              </p>
+              <div className="flex items-end gap-3">
+                <motion.img
+                  src={anayaCelebrating}
+                  alt="Anaya celebrating"
+                  className="h-32 w-32 object-contain animate-[namma-float_5s_ease-in-out_infinite] drop-shadow-[0_18px_28px_rgba(0,0,0,0.16)]"
+                />
+                <motion.img
+                  src={neoExplaining}
+                  alt="Neo"
+                  className="h-24 w-24 object-contain animate-[namma-float_5.4s_ease-in-out_infinite] drop-shadow-[0_18px_28px_rgba(0,0,0,0.16)]"
+                />
+                <motion.img
+                  src={devExplaining}
+                  alt="Dev"
+                  className="h-24 w-24 object-contain animate-[namma-float_4.8s_ease-in-out_infinite] drop-shadow-[0_18px_28px_rgba(0,0,0,0.16)]"
+                />
+              </div>
+              <Button variant="hero" size="lg" className="w-full" asChild>
+                <Link to="/activities">
+                  <Zap className="h-4 w-4" />
+                  Open the journey map
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ───── PROGRESS WIDGETS ───── */}
         <motion.section
-          {...fadeUp}
-          transition={{ ...fadeUp.transition, delay: 0.15 }}
-          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="grid gap-4 md:grid-cols-3"
         >
-          <QuickLink to="/missions" icon={<Rocket className="h-5 w-5" />} tone="challenge" title="Continue mission" sub="Mission 4 · 60% done" />
-          <QuickLink to="/activities" icon={<Compass className="h-5 w-5" />} tone="decide" title="Today's activity" sub="Explore & Observe" />
-          <QuickLink to="/rewards" icon={<Gift className="h-5 w-5" />} tone="reflect" title="Claim rewards" sub="+50 XP waiting" />
-          <QuickLink to="/badges" icon={<Zap className="h-5 w-5" />} tone="bonus" title="Next badge" sub="2 missions to unlock" />
+          <ProgressWidget
+            tone="story"
+            icon={<Compass className="h-5 w-5" />}
+            label="Week 9 progress"
+            percent={weekPercent}
+            caption={`${completed.size}/${ACTIVITY_ORDER.length} activities`}
+          />
+          <ProgressWidget
+            tone="xp"
+            icon={<Star className="h-5 w-5" />}
+            label="XP to Level 8"
+            percent={xpPercent}
+            caption={`${liveXp} / ${xpToNext} XP`}
+          />
+          <ProgressWidget
+            tone="decide"
+            icon={<Flame className="h-5 w-5" />}
+            label="Streak goal · 7 days"
+            percent={Math.round((5 / 7) * 100)}
+            caption="5 / 7 days · keep going!"
+          />
         </motion.section>
       </div>
     </AppShell>
   );
 }
+
+/* ───────────────────────── widgets ───────────────────────── */
 
 function StatTile({
   icon,
@@ -196,46 +631,54 @@ function StatTile({
     >
       <span className={`stat-pill-icon ${toneClass[tone]}`}>{icon}</span>
       <div className="leading-tight">
-        <div className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+        <div className="text-[0.66rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
           {label}
         </div>
         <div className="font-display text-xl font-bold text-foreground">{value}</div>
-        <div className="text-[0.72rem] text-muted-foreground">{sub}</div>
+        <div className="text-[0.7rem] text-muted-foreground">{sub}</div>
       </div>
     </motion.div>
   );
 }
 
-function QuickLink({
-  to,
-  icon,
-  title,
-  sub,
+function ProgressWidget({
   tone,
+  icon,
+  label,
+  percent,
+  caption,
 }: {
-  to: string;
+  tone: "story" | "xp" | "decide";
   icon: React.ReactNode;
-  title: string;
-  sub: string;
-  tone: "challenge" | "decide" | "reflect" | "bonus";
+  label: string;
+  percent: number;
+  caption: string;
 }) {
-  const toneClass: Record<typeof tone, string> = {
-    challenge: "bg-challenge-soft text-challenge",
-    decide: "bg-decide-soft text-decide",
-    reflect: "bg-reflect-soft text-reflect",
-    bonus: "bg-bonus-soft text-bonus",
-  };
   return (
-    <Link
-      to={to}
-      className="group preview-card flex items-center gap-3 !p-4 transition-all hover:-translate-y-1"
+    <motion.div
+      whileHover={{ y: -3 }}
+      transition={{ type: "spring", stiffness: 280, damping: 22 }}
+      className={cn("rounded-[24px] border bg-white/80 p-5 shadow-[var(--shadow-soft)] backdrop-blur", `border-${tone}/25`)}
     >
-      <span className={`preview-icon !h-11 !w-11 ${toneClass[tone]}`}>{icon}</span>
-      <div className="min-w-0 flex-1">
-        <div className="truncate font-display text-base font-bold text-foreground">{title}</div>
-        <div className="truncate text-xs text-muted-foreground">{sub}</div>
+      <div className="flex items-center gap-3">
+        <span className={cn("flex h-10 w-10 items-center justify-center rounded-2xl", `bg-${tone}-soft text-${tone}`)}>
+          {icon}
+        </span>
+        <div className="leading-tight">
+          <div className="text-[0.66rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">{label}</div>
+          <div className="font-display text-lg font-bold text-foreground">{percent}%</div>
+        </div>
       </div>
-      <ArrowRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
-    </Link>
+      <div className="progress-shell mt-4 !h-2.5">
+        <motion.div
+          className="progress-fill"
+          initial={{ width: 0 }}
+          whileInView={{ width: `${percent}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        />
+      </div>
+      <div className="mt-2 text-[0.72rem] text-muted-foreground">{caption}</div>
+    </motion.div>
   );
 }
