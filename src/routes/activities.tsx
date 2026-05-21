@@ -69,14 +69,20 @@ function ActivitiesHub() {
                 Six magical activities, three friendly guides, and a whole week of discovery. Finish them all to unlock the legendary Week 9 badge.
               </p>
               <div className="flex flex-wrap items-center gap-3">
-                <Link to="/activities/$slug" params={{ slug: "story" }}>
-                  <Button variant="hero" size="lg">Begin journey <ArrowRight className="h-5 w-5" /></Button>
+                <Link to="/activities/$slug" params={{ slug: nextUpSlug }}>
+                  <Button variant="hero" size="lg">
+                    {allDone
+                      ? <>Replay journey <ArrowRight className="h-5 w-5" /></>
+                      : completed.size === 0
+                        ? <>Begin journey <ArrowRight className="h-5 w-5" /></>
+                        : <>Continue: {ACTIVITIES[nextUpSlug].meta.title} <ArrowRight className="h-5 w-5" /></>}
+                  </Button>
                 </Link>
                 <span className="inline-flex items-center gap-2 rounded-2xl border border-xp/30 bg-xp-soft/70 px-3 py-2 font-display text-sm font-bold text-xp">
                   <Star className="h-4 w-4" /> {totalXp} XP available
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-2xl border border-success/30 bg-success-soft/70 px-3 py-2 font-display text-sm font-bold text-success">
-                  <Flame className="h-4 w-4" /> 6 streak days
+                  <Flame className="h-4 w-4" /> {completed.size}/{ACTIVITY_ORDER.length} done
                 </span>
               </div>
             </div>
