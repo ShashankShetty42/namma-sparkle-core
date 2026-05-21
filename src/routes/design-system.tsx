@@ -425,6 +425,6 @@ function Index() {
           </div>
         </motion.section>
       </div>
-    </main>
+    </AppShell>
   );
 }
