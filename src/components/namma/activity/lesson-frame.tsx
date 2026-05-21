@@ -5,12 +5,18 @@ import {
   ArrowLeft,
   ArrowRight,
   Brain,
+  Camera,
   Check,
   ChevronLeft,
   ChevronRight,
   Eye,
   Feather,
   Gem,
+  Heart,
+  Lightbulb,
+  MapPin,
+  Mic,
+  Music,
   PartyPopper,
   Pencil,
   Plus,
@@ -46,6 +52,8 @@ export type Phase =
 
 export type Character = { name: string; image: string };
 
+export type LessonIconName = "eye" | "brain" | "sparkles" | "camera" | "mic" | "map" | "wand" | "music" | "heart" | "lightbulb";
+
 type CardBase = { id: string; phase: Phase; tone: Tone };
 
 export type StoryCard = CardBase & {
@@ -61,7 +69,7 @@ export type ConceptCard = CardBase & {
   character: Character;
   title: string;
   body: string;
-  pillars: { icon: React.ReactNode; title: string; body: string; tone: Tone }[];
+  pillars: { icon: LessonIconName; title: string; body: string; tone: Tone }[];
 };
 
 export type ExamplesCard = CardBase & {
@@ -69,7 +77,7 @@ export type ExamplesCard = CardBase & {
   character: Character;
   title: string;
   intro: string;
-  items: { icon: React.ReactNode; title: string; body: string; tone: Tone }[];
+  items: { icon: LessonIconName; title: string; body: string; tone: Tone }[];
 };
 
 export type SpotCard = CardBase & {
@@ -79,7 +87,7 @@ export type SpotCard = CardBase & {
   helper?: string;
   slots: number;
   placeholders: string[];
-  examples?: { icon?: React.ReactNode; title: string; body: string; tone: Tone }[];
+  examples?: { icon?: LessonIconName; title: string; body: string; tone: Tone }[];
 };
 
 export type DecideCard = CardBase & {
