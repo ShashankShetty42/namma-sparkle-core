@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { nammaEase, fadeUp } from "@/components/namma/motion";
 import { getCompleted } from "@/components/namma/activity/progress";
 import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
+import { getTotalXP, getWeeklyStreak, onNammaState } from "@/lib/namma-progress";
 
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import neoHappy from "@/assets/characters/neo-happy.png";
