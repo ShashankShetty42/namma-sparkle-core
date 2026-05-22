@@ -411,7 +411,7 @@ function HeroStat({
       `border-${tone}/30`,
     )}>
       <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", `bg-${tone}/15 text-${tone}`)}>
-        <Icon className="h-4.5 w-4.5" />
+        <Icon className="h-4 w-4" />
       </div>
       <div className="leading-tight">
         <div className="font-display text-sm font-extrabold text-foreground">{value}</div>
