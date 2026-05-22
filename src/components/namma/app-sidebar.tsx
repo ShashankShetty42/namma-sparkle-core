@@ -32,10 +32,11 @@ const NAV: NavItem[] = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard, tone: "story" },
   { label: "My Journey", to: "/journey", icon: Map, tone: "explore" },
   { label: "Weekly Adventure", to: "/activities", icon: Compass, tone: "decide" },
-  { label: "Elite Challenges", to: "/challenges", icon: Rocket, tone: "challenge", badge: "New" },
   { label: "Badges", to: "/badges", icon: Award, tone: "bonus" },
   { label: "Rewards", to: "/rewards", icon: Gift, tone: "reflect" },
   { label: "Profile", to: "/profile", icon: Shield, tone: "story" },
+  { label: "Resources", to: "/resources", icon: BookOpenText, tone: "explore" },
+  { label: "Help & Support", to: "/support", icon: LifeBuoy, tone: "challenge" },
 ];
 
 const toneText: Record<NavItem["tone"], string> = {
