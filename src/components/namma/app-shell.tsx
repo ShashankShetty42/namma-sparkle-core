@@ -7,6 +7,7 @@ import { AppShellProvider, useAppShell } from "@/components/namma/app-shell-cont
 import { AppSidebar } from "@/components/namma/app-sidebar";
 import { TopBar } from "@/components/namma/top-bar";
 import { OnboardingDialog } from "@/components/namma/onboarding-dialog";
+import { BrandMark } from "@/components/namma/brand-mark";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { getAuth, getProfile, onNammaState } from "@/lib/namma-progress";
 
@@ -74,8 +75,11 @@ function ShellInner({ children }: { children: React.ReactNode }) {
   if (authed === null || authed === false) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-story-soft via-background to-explore-soft">
-        <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-foreground/10 border-t-foreground/60" />
+        <div className="flex flex-col items-center gap-4 text-muted-foreground">
+          <div className="relative">
+            <span className="absolute inset-[-10px] rounded-full border-2 border-foreground/10 border-t-foreground/60 animate-spin" />
+            <BrandMark size={56} />
+          </div>
           <span className="text-xs font-bold uppercase tracking-[0.22em]">Opening portal…</span>
         </div>
       </div>

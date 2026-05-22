@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import { getAuth, type UserRole } from "@/lib/namma-progress";
+import { BrandMark } from "@/components/namma/brand-mark";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import devHappy from "@/assets/characters/dev-happy.png";
 import anayaHappy from "@/assets/characters/anaya-happy.png";
@@ -97,10 +98,8 @@ function WelcomePage() {
 
       {/* nav */}
       <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 md:px-8">
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-bonus via-challenge to-explore text-base shadow-[var(--shadow-glow)]">
-            <Sparkles className="h-4 w-4 text-white" />
-          </div>
+        <div className="flex items-center gap-2.5">
+          <BrandMark size={44} />
           <span className="font-display text-lg font-extrabold tracking-tight text-foreground">
             Namma <span className="text-primary">AI</span>
           </span>
