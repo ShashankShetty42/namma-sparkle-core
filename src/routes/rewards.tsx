@@ -527,9 +527,9 @@ function StreakSection({ current }: { current: number }) {
   return (
     <section className="space-y-6">
       <SectionHeader
-        eyebrow="Daily Streak Rewards"
-        title="Keep the flame alive."
-        subtitle="Every day you return, the magic grows. Walk the path and unlock collectible surprises."
+        eyebrow="Weekly Champion Rewards"
+        title="Keep your weekly streak alive."
+        subtitle="Finish every activity before the next week unlocks and collect cinematic surprises along the way."
         tone="challenge"
       />
 
@@ -546,10 +546,10 @@ function StreakSection({ current }: { current: number }) {
           </motion.div>
           <div>
             <div className="font-display text-2xl font-extrabold text-foreground">
-              {current}-day streak
+              {current}-week streak
             </div>
             <div className="text-sm text-foreground/70">
-              You're glowing. Keep going to ignite bigger rewards.
+              Complete this week before the next unlocks to grow your streak.
             </div>
           </div>
         </div>
