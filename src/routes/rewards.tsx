@@ -105,6 +105,17 @@ const toneBg: Record<Tone, string> = {
   success: "bg-success",
 };
 
+const toneSoft: Record<Tone, string> = {
+  story: "bg-story-soft",
+  explore: "bg-explore-soft",
+  decide: "bg-decide-soft",
+  reflect: "bg-reflect-soft",
+  challenge: "bg-challenge-soft",
+  bonus: "bg-bonus-soft",
+  xp: "bg-xp-soft",
+  success: "bg-success-soft",
+};
+
 /* -------------------------------------------------------------- */
 /*                     STREAK MILESTONES                           */
 /* -------------------------------------------------------------- */
