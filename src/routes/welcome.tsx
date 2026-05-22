@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import { getAuth, type UserRole } from "@/lib/namma-progress";
+import { BrandMark } from "@/components/namma/brand-mark";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import devHappy from "@/assets/characters/dev-happy.png";
 import anayaHappy from "@/assets/characters/anaya-happy.png";
