@@ -32,7 +32,15 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import type { Tone } from "@/components/namma/activity";
-import { markCompleted } from "@/components/namma/activity/progress";
+import { markCompleted, getCompleted } from "@/components/namma/activity/progress";
+import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
+import {
+  markWeekComplete,
+  recordQuiz,
+  rewardActivity,
+  saveLessonAnswer,
+} from "@/lib/namma-progress";
+import { toast } from "sonner";
 
 /* ============================================================ */
 /*  Types                                                        */
