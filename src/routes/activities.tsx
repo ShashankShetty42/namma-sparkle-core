@@ -6,6 +6,7 @@ import { ArrowRight, ChevronRight, Flame, Lock, Sparkles, Star, Trophy } from "l
 import { AppShell } from "@/components/namma/app-shell";
 import { ACTIVITIES, ACTIVITY_ORDER, HUB_ICONS } from "@/components/namma/activity/lesson-data";
 import { getCompleted } from "@/components/namma/activity/progress";
+import { WeeklyChallenges } from "@/components/namma/activity/weekly-challenges";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
@@ -173,6 +174,9 @@ function ActivitiesHub() {
             })}
           </div>
         </section>
+
+        {/* BONUS LAYER — inline Advanced/Expert challenges for this week */}
+        <WeeklyChallenges weekId="week-9" />
       </div>
     </AppShell>
   );
