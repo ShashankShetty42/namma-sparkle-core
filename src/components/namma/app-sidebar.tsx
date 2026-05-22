@@ -184,9 +184,9 @@ export function AppSidebar() {
 
       {isCollapsed && (
         <div className="flex flex-col items-center gap-2">
-          <div className="namma-streak-mini" aria-label="5 day streak">
+          <div className="namma-streak-mini" aria-label="5 week streak">
             <Flame className="h-4 w-4" />
-            <span>5</span>
+            <span>5w</span>
           </div>
         </div>
       )}
