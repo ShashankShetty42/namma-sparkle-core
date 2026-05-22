@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
+import { BrandMark } from "@/components/namma/brand-mark";
 import { labelToBand, saveProfile, signIn } from "@/lib/namma-progress";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import devHappy from "@/assets/characters/dev-happy.png";

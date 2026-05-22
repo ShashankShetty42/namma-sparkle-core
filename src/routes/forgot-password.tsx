@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Mail, Sparkles } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { nammaEase } from "@/components/namma/motion";
+import { BrandMark } from "@/components/namma/brand-mark";
 import anayaHappy from "@/assets/characters/anaya-happy.png";
 
 export const Route = createFileRoute("/forgot-password")({
