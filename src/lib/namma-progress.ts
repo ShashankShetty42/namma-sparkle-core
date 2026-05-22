@@ -18,6 +18,10 @@ const XP_KEY = "namma:xp";
 const XP_LOG_KEY = "namma:xp:log";
 const SUBMISSIONS_KEY = "namma:submissions";
 const GRADE_KEY = "namma:grade";
+const WEEKS_KEY = "namma:weeks:completed";
+const QUIZ_KEY = "namma:quiz:results";
+const ANSWERS_KEY = "namma:lesson:answers";
+const CLASSMATES_KEY = "namma:classmates";
 
 const isBrowser = () => typeof window !== "undefined";
 
@@ -304,3 +308,142 @@ export function getTimeline(completedSlugs: string[]): TimelineEvent[] {
 
   return events.sort((a, b) => b.at - a.at);
 }
+
+/* ───────────── weekly streak ───────────── */
+
+export function getCompletedWeeks(): string[] {
+  if (!isBrowser()) return [];
+  try {
+    const raw = window.localStorage.getItem(WEEKS_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Mark a week as completed (idempotent). Returns true if newly added. */
+export function markWeekComplete(weekId: string): boolean {
+  if (!isBrowser()) return false;
+  const weeks = getCompletedWeeks();
+  if (weeks.includes(weekId)) return false;
+  const next = [...weeks, weekId];
+  window.localStorage.setItem(WEEKS_KEY, JSON.stringify(next));
+  emit();
+  return true;
+}
+
+export function getWeeklyStreak(): number {
+  // Streak = consecutive completed weeks count
+  return getCompletedWeeks().length;
+}
+
+/* ───────────── quiz results ───────────── */
+
+type QuizResults = Record<string, { correct: boolean; at: number; attempts: number }>;
+
+function readQuizResults(): QuizResults {
+  if (!isBrowser()) return {};
+  try {
+    const raw = window.localStorage.getItem(QUIZ_KEY);
+    return raw ? (JSON.parse(raw) as QuizResults) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Record a quiz answer. Awards XP once per cardId when first correct. */
+export function recordQuiz(slug: string, cardId: string, correct: boolean, xp = 20) {
+  if (!isBrowser()) return;
+  const map = readQuizResults();
+  const key = `${slug}:${cardId}`;
+  const prev = map[key];
+  const wasCorrect = prev?.correct === true;
+  map[key] = {
+    correct: correct || wasCorrect,
+    at: Date.now(),
+    attempts: (prev?.attempts ?? 0) + 1,
+  };
+  window.localStorage.setItem(QUIZ_KEY, JSON.stringify(map));
+  if (correct && !wasCorrect && xp > 0) addXP(xp, `Quiz · ${cardId}`, slug);
+  emit();
+}
+
+export function getQuizStats() {
+  const map = readQuizResults();
+  const all = Object.values(map);
+  return {
+    answered: all.length,
+    correct: all.filter((q) => q.correct).length,
+  };
+}
+
+/* ───────────── lesson answers (decide/reflect/spot) ───────────── */
+
+type AnswerMap = Record<string, { value: string; at: number }>;
+
+function readAnswers(): AnswerMap {
+  if (!isBrowser()) return {};
+  try {
+    const raw = window.localStorage.getItem(ANSWERS_KEY);
+    return raw ? (JSON.parse(raw) as AnswerMap) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveLessonAnswer(slug: string, cardId: string, value: string) {
+  if (!isBrowser() || !value) return;
+  const map = readAnswers();
+  map[`${slug}:${cardId}`] = { value, at: Date.now() };
+  window.localStorage.setItem(ANSWERS_KEY, JSON.stringify(map));
+  emit();
+}
+
+export function getLessonAnswer(slug: string, cardId: string): string | null {
+  return readAnswers()[`${slug}:${cardId}`]?.value ?? null;
+}
+
+/* ───────────── activity completion reward ───────────── */
+
+/** Award the XP + badge for finishing an activity (idempotent per slug). */
+export function rewardActivity(slug: string, meta: {
+  title: string;
+  badge: string;
+  xp: number;
+  tone?: string;
+  weekId?: string;
+}) {
+  const badgeId = `activity:${meta.weekId ?? "week"}:${slug}`;
+  const isNew = awardBadge({
+    id: badgeId,
+    name: meta.badge,
+    kind: "weekly",
+    weekId: meta.weekId,
+    tone: meta.tone,
+    xp: meta.xp,
+    description: `Completed ${meta.title}`,
+  });
+  if (isNew) addXP(meta.xp, `Activity · ${meta.title}`, meta.weekId);
+  return isNew;
+}
+
+/* ───────────── classmates (leaderboard) ───────────── */
+
+export type Classmate = { id: string; name: string; xp: number };
+
+export function getClassmates(): Classmate[] {
+  if (!isBrowser()) return [];
+  try {
+    const raw = window.localStorage.getItem(CLASSMATES_KEY);
+    return raw ? (JSON.parse(raw) as Classmate[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveClassmates(list: Classmate[]) {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(CLASSMATES_KEY, JSON.stringify(list));
+  emit();
+}
+

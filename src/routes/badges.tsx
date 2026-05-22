@@ -34,6 +34,13 @@ import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
+import {
+  getCompletedWeeks,
+  getEarnedBadges,
+  getTotalXP,
+  getWeeklyStreak,
+  onNammaState,
+} from "@/lib/namma-progress";
 
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import devHappy from "@/assets/characters/dev-happy.png";
@@ -215,26 +222,45 @@ const GUIDE_IMG: Record<World["guide"], string> = {
 
 function BadgesPage() {
   const [completed, setCompleted] = React.useState<Set<string>>(new Set());
+  const [weeksDone, setWeeksDone] = React.useState(0);
+  const [streak, setStreak] = React.useState(0);
+  const [storedXp, setStoredXp] = React.useState(0);
+  const [bonusEarned, setBonusEarned] = React.useState(0);
 
   React.useEffect(() => {
-    const load = () => setCompleted(new Set(getCompleted()));
+    const load = () => {
+      setCompleted(new Set(getCompleted()));
+      setWeeksDone(getCompletedWeeks().length);
+      setStreak(getWeeklyStreak());
+      setStoredXp(getTotalXP());
+      // count earned badges from the store that aren't weekly activity badges
+      setBonusEarned(
+        getEarnedBadges().filter((b) => b.kind !== "weekly").length,
+      );
+    };
     load();
+    const off = onNammaState(load);
     window.addEventListener("namma:progress", load);
-    return () => window.removeEventListener("namma:progress", load);
+    return () => {
+      off();
+      window.removeEventListener("namma:progress", load);
+    };
   }, []);
 
+  // First week begins at 1; current week = number of completed weeks + 1
+  const currentWeek = Math.max(1, Math.min(35, weeksDone + 1));
   const week9AllDone = ACTIVITY_ORDER.every((s) => completed.has(s));
 
   const statusFor = (week: number): "earned" | "current" | "locked" => {
-    if (week < CURRENT_WEEK) return "earned";
-    if (week === CURRENT_WEEK) return week9AllDone ? "earned" : "current";
+    if (week < currentWeek) return "earned";
+    if (week === currentWeek) return week9AllDone ? "earned" : "current";
     return "locked";
   };
 
   const earned = ALL_BADGES.filter((b) => statusFor(b.week) === "earned");
-  const totalEarned = earned.length;
-  const totalXp = earned.reduce((s, b) => s + b.xp, 0);
-  const collectionPct = Math.round((totalEarned / ALL_BADGES.length) * 100);
+  const totalEarned = earned.length + bonusEarned;
+  const totalXp = earned.reduce((s, b) => s + b.xp, 0) + storedXp;
+  const collectionPct = Math.round((earned.length / ALL_BADGES.length) * 100);
   const rarestEarned = earned.length ? earned[earned.length - 1] : null;
   const latestEarned = rarestEarned;
   const nextUp = ALL_BADGES.find((b) => statusFor(b.week) !== "earned") ?? ALL_BADGES[0];
@@ -249,6 +275,7 @@ function BadgesPage() {
           rarest={rarestEarned}
           latest={latestEarned}
           nextUp={nextUp}
+          streak={streak}
         />
 
         <CollectionStrip
@@ -285,6 +312,7 @@ function Hero({
   rarest,
   latest,
   nextUp,
+  streak,
 }: {
   totalEarned: number;
   collectionPct: number;
@@ -292,6 +320,7 @@ function Hero({
   rarest: Badge | null;
   latest: Badge | null;
   nextUp: Badge;
+  streak: number;
 }) {
   return (
     <motion.section
@@ -342,7 +371,7 @@ function Hero({
 
           <div className="flex flex-wrap gap-3">
             <HeroStat icon={Trophy} value={`${totalEarned}/35`} label="Badges earned" tone="bonus" />
-            <HeroStat icon={Flame} value="9 wks" label="Weekly streak" tone="challenge" />
+            <HeroStat icon={Flame} value={`${streak} wk${streak === 1 ? "" : "s"}`} label="Weekly streak" tone="challenge" />
             <HeroStat icon={Crown} value="Explorer" label="Current rank" tone="story" />
             <HeroStat icon={Star} value={`${totalXp.toLocaleString()} XP`} label="Collected" tone="xp" />
           </div>

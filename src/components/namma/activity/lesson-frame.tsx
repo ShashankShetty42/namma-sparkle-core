@@ -32,7 +32,15 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import type { Tone } from "@/components/namma/activity";
-import { markCompleted } from "@/components/namma/activity/progress";
+import { markCompleted, getCompleted } from "@/components/namma/activity/progress";
+import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
+import {
+  markWeekComplete,
+  recordQuiz,
+  rewardActivity,
+  saveLessonAnswer,
+} from "@/lib/namma-progress";
+import { toast } from "sonner";
 
 /* ============================================================ */
 /*  Types                                                        */
@@ -297,8 +305,16 @@ export function LessonFrame({
               card={card}
               quizState={quizState[card.id]}
               answer={ans}
-              onQuiz={(correct) => setQuizState((s) => ({ ...s, [card.id]: correct ? "correct" : "wrong" }))}
-              onAnswer={(patch) => setAnswers((a) => ({ ...a, [card.id]: { ...a[card.id], ...patch } }))}
+              onQuiz={(correct) => {
+                setQuizState((s) => ({ ...s, [card.id]: correct ? "correct" : "wrong" }));
+                if (slug) recordQuiz(slug, card.id, correct, 20);
+              }}
+              onAnswer={(patch) => {
+                setAnswers((a) => ({ ...a, [card.id]: { ...a[card.id], ...patch } }));
+                if (slug && patch.text && patch.text.trim().length > 3) {
+                  saveLessonAnswer(slug, card.id, patch.text.trim());
+                }
+              }}
             />
           </motion.div>
         </AnimatePresence>
@@ -340,7 +356,32 @@ export function LessonFrame({
           <RewardModal
             meta={meta}
             onContinue={() => {
-              if (slug) markCompleted(slug);
+              if (slug) {
+                const isNew = rewardActivity(slug, {
+                  title: meta.title,
+                  badge: meta.badge,
+                  xp: meta.totalXp,
+                  tone: meta.tone,
+                  weekId: "week-9",
+                });
+                markCompleted(slug);
+                if (isNew) {
+                  toast.success(`+${meta.totalXp} XP`, {
+                    description: `${meta.badge} unlocked`,
+                  });
+                }
+                // Weekly completion check
+                const done = new Set(getCompleted());
+                done.add(slug);
+                if (ACTIVITY_ORDER.every((s) => done.has(s))) {
+                  const newWeek = markWeekComplete("week-9");
+                  if (newWeek) {
+                    toast.success("Week 9 complete!", {
+                      description: "+1 to your weekly streak · keep the momentum",
+                    });
+                  }
+                }
+              }
               setShowReward(false);
               if (meta.nextHref) navigate({ to: meta.nextHref });
               else navigate({ to: "/activities" });
