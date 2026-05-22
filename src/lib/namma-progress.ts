@@ -38,10 +38,11 @@ export type NammaProfile = {
   theme: "light" | "dark";
   sound: boolean;
   motionFx: boolean;
+  onboarded: boolean;
 };
 
 export const DEFAULT_PROFILE: NammaProfile = {
-  name: "Aarav K.",
+  name: "Explorer",
   gradeLabel: "Grade 7",
   gradeBand: "7-8",
   avatarColorId: "violet",
@@ -51,6 +52,7 @@ export const DEFAULT_PROFILE: NammaProfile = {
   theme: "light",
   sound: true,
   motionFx: true,
+  onboarded: false,
 };
 
 export type BadgeRecord = {
