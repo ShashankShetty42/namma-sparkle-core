@@ -241,7 +241,7 @@ function ProfilePage() {
         {/* JOURNEY SNAPSHOT */}
         <Section title="Journey snapshot" subtitle="A gentle peek at how far you've come.">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard icon={Flame} label="Current streak" value={`${streak} days`} gradient="from-orange-400 to-rose-400" />
+            <StatCard icon={Flame} label="Weekly streak" value={`${streak} weeks`} gradient="from-orange-400 to-rose-400" />
             <StatCard icon={Zap} label="Total XP" value={totalXP.toLocaleString()} gradient="from-amber-400 to-yellow-400" />
             <StatCard icon={Award} label="Badges earned" value={String(badges)} gradient="from-violet-400 to-fuchsia-400" />
             <StatCard icon={Star} label="Weeks completed" value={`${weeks} / 35`} gradient="from-sky-400 to-cyan-400" />
