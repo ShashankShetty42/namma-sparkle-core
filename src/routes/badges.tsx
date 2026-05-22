@@ -34,6 +34,13 @@ import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
+import {
+  getCompletedWeeks,
+  getEarnedBadges,
+  getTotalXP,
+  getWeeklyStreak,
+  onNammaState,
+} from "@/lib/namma-progress";
 
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import devHappy from "@/assets/characters/dev-happy.png";
