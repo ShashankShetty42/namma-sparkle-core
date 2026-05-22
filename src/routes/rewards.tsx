@@ -121,7 +121,7 @@ const toneSoft: Record<Tone, string> = {
 /* -------------------------------------------------------------- */
 
 type Streak = {
-  days: number;
+  weeks: number;
   title: string;
   reward: string;
   tone: Tone;
@@ -129,12 +129,12 @@ type Streak = {
 };
 
 const STREAKS: Streak[] = [
-  { days: 3, title: "Spark Lit", reward: "Neo Celebration Wallpaper", tone: "story", message: "Three days in. The fire is real." },
-  { days: 5, title: "Steady Flame", reward: "Bonus 100 XP Burst", tone: "decide", message: "Consistency is your superpower." },
-  { days: 7, title: "Week Hero", reward: "AI Explorer Certificate", tone: "explore", message: "A full week of magic. Incredible." },
-  { days: 14, title: "Fortnight Sage", reward: "Future Creator Frame", tone: "bonus", message: "Two weeks of pure dedication." },
-  { days: 21, title: "Mastermind", reward: "Holographic Avatar Aura", tone: "challenge", message: "You've built a real habit." },
-  { days: 30, title: "Legendary", reward: "Legendary Streak Aura", tone: "xp", message: "A whole month of brilliance." },
+  { weeks: 2, title: "Spark Lit", reward: "Neo Celebration Wallpaper", tone: "story", message: "Two weeks in. The spark is real." },
+  { weeks: 4, title: "Steady Flame", reward: "Bonus 100 XP Burst", tone: "decide", message: "A whole month of weekly wins." },
+  { weeks: 6, title: "Weekly Champion", reward: "AI Explorer Certificate", tone: "explore", message: "Six weeks of magical learning." },
+  { weeks: 10, title: "Adventure Sage", reward: "Future Creator Frame", tone: "bonus", message: "Ten weeks of pure dedication." },
+  { weeks: 18, title: "Mastermind", reward: "Holographic Avatar Aura", tone: "challenge", message: "You've built a real learning rhythm." },
+  { weeks: 28, title: "Legendary", reward: "Legendary Streak Aura", tone: "xp", message: "Nearly a full course of brilliance." },
 ];
 
 /* -------------------------------------------------------------- */
