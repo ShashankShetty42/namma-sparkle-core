@@ -44,7 +44,11 @@ export const Route = createFileRoute("/missions")({
       },
     ],
   }),
-  component: MissionsPage,
+  component: () => (
+    <AppShell>
+      <MissionsPage />
+    </AppShell>
+  ),
 });
 
 type MissionTone = "story" | "explore" | "decide" | "reflect" | "challenge" | "bonus" | "xp";
