@@ -261,7 +261,7 @@ function RewardsPage() {
           xp={TOTAL_XP}
           collected={collectedCount}
           nextLabel={nextStreak.reward}
-          nextIn={nextStreak.days - CURRENT_STREAK}
+          nextIn={nextStreak.weeks - CURRENT_STREAK}
         />
 
         <StreakSection current={CURRENT_STREAK} />
