@@ -28,6 +28,8 @@ import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import { getCompleted } from "@/components/namma/activity/progress";
 import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
+import { addXP, awardBadge, getSubmission, hasBadge, saveSubmission } from "@/lib/namma-progress";
+import { toast } from "sonner";
 
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import neoHappy from "@/assets/characters/neo-happy.png";
@@ -288,12 +290,83 @@ export function WeeklyChallenges({ weekId = "week-9" }: { weekId?: string }) {
         setShowUnlock(true);
         seenUnlockRef.current = true;
         window.localStorage.setItem(key, "1");
+
+        // Reward artifact for the unlock moment
+        const tierUnlockBadge =
+          tier === "advanced"
+            ? { name: "Advanced Portal Opened", desc: "Unlocked the Advanced Explorer track." }
+            : { name: "Expert Lab Opened", desc: "Unlocked the Expert Creator Lab." };
+        const awarded = awardBadge({
+          id: `tier-unlock:${weekId}:${tier}`,
+          name: tierUnlockBadge.name,
+          kind: "tier-unlock",
+          weekId,
+          tone: "bonus",
+          xp: 100,
+          description: tierUnlockBadge.desc,
+        });
+        if (awarded) {
+          addXP(100, `Portal unlocked · ${tier}`, weekId);
+          toast.success(`${tierUnlockBadge.name}`, {
+            description: "+100 bonus XP · new badge added to your vault",
+          });
+        }
       }
     }
   }, [weeklyDone, tier, weekId]);
 
-  const completeChallenge = (id: string) => {
+  const completeChallenge = (id: string, values: Record<string, unknown>) => {
+    const ch = challenges.find((c) => c.id === id);
+    if (!ch) return;
+    const already = !!getSubmission(weekId, id);
     markChallengeDone(weekId, id);
+    saveSubmission({
+      id,
+      weekId,
+      title: ch.title,
+      tier: ch.tier,
+      values,
+      xp: ch.xp,
+    });
+    if (!already) {
+      addXP(ch.xp, `Challenge · ${ch.title}`, weekId);
+      const newlyBadged = awardBadge({
+        id: `challenge:${weekId}:${id}`,
+        name: `${ch.title} Badge`,
+        kind: "challenge",
+        weekId,
+        tone: ch.tone,
+        xp: ch.xp,
+        description: ch.tagline,
+      });
+      toast.success(`+${ch.xp} XP earned`, {
+        description: newlyBadged ? `${ch.title} Badge unlocked` : `${ch.title} re-submitted`,
+      });
+
+      // Tier-completion master badge
+      const nextDone = new Set([...doneChallenges, id]);
+      const allTierDone = challenges.every((c) => nextDone.has(c.id));
+      if (allTierDone) {
+        const tierBadgeName =
+          ch.tier === "advanced" ? "Advanced Explorer Badge" : "Future Innovator Badge";
+        const awarded = awardBadge({
+          id: `tier-complete:${weekId}:${ch.tier}`,
+          name: tierBadgeName,
+          kind: "milestone",
+          weekId,
+          tone: "bonus",
+          xp: 200,
+        });
+        if (awarded) {
+          addXP(200, `Tier complete · ${ch.tier}`, weekId);
+          toast.success(`${tierBadgeName} unlocked!`, {
+            description: "+200 bonus XP · all 3 elite missions complete",
+          });
+        }
+      }
+    } else {
+      toast(`${ch.title} re-submitted`, { description: "Your latest answers are saved." });
+    }
     setDoneChallenges(new Set([...doneChallenges, id]));
   };
 
@@ -311,8 +384,9 @@ export function WeeklyChallenges({ weekId = "week-9" }: { weekId?: string }) {
         <ChallengeFlow
           challenge={active}
           isDone={doneChallenges.has(active.id)}
+          weekId={weekId}
           onBack={() => setActive(null)}
-          onComplete={() => completeChallenge(active.id)}
+          onComplete={(values) => completeChallenge(active.id, values)}
         />
       )}
 
@@ -650,8 +724,23 @@ function UnlockedHub({ tier, challenges, done, onOpen }: { tier: "advanced" | "e
 }
 
 /* Challenge flow */
-function ChallengeFlow({ challenge, isDone, onBack, onComplete }: { challenge: Challenge; isDone: boolean; onBack: () => void; onComplete: () => void }) {
-  const [values, setValues] = React.useState<Record<string, any>>({});
+function ChallengeFlow({
+  challenge,
+  isDone,
+  weekId,
+  onBack,
+  onComplete,
+}: {
+  challenge: Challenge;
+  isDone: boolean;
+  weekId: string;
+  onBack: () => void;
+  onComplete: (values: Record<string, unknown>) => void;
+}) {
+  const existing = React.useMemo(() => getSubmission(weekId, challenge.id), [weekId, challenge.id]);
+  const [values, setValues] = React.useState<Record<string, any>>(
+    (existing?.values as Record<string, any>) ?? {},
+  );
   const [submitted, setSubmitted] = React.useState(isDone);
   const set = (k: string, v: any) => setValues((p) => ({ ...p, [k]: v }));
 
@@ -708,7 +797,7 @@ function ChallengeFlow({ challenge, isDone, onBack, onComplete }: { challenge: C
           <Button
             variant="hero"
             size="lg"
-            onClick={() => { setSubmitted(true); onComplete(); }}
+            onClick={() => { setSubmitted(true); onComplete(values); }}
             disabled={filledCount === 0}
             className="w-full !rounded-2xl !py-6 text-base"
           >

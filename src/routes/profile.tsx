@@ -5,6 +5,7 @@ import {
   Award,
   Brush,
   Check,
+  Clock,
   Edit3,
   Flame,
   LogOut,
@@ -22,6 +23,7 @@ import {
   Wand2,
   Zap,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/namma/app-shell";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,21 @@ import { cn } from "@/lib/utils";
 import { nammaEase, fadeUp, floatY } from "@/components/namma/motion";
 import { getCompleted } from "@/components/namma/activity/progress";
 import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
+import {
+  DEFAULT_PROFILE,
+  getEarnedBadges,
+  getProfile,
+  getSubmissions,
+  getTimeline,
+  getTotalXP,
+  labelToBand,
+  onNammaState,
+  saveProfile,
+  type BadgeRecord,
+  type ChallengeSubmission,
+  type NammaProfile,
+  type TimelineEvent,
+} from "@/lib/namma-progress";
 
 import neoHappy from "@/assets/characters/neo-happy.png";
 import devHappy from "@/assets/characters/dev-happy.png";
@@ -102,30 +119,53 @@ const characters = [
 ] as const;
 
 const learningStyles = ["Visual", "Story", "Hands-on", "Curious"] as const;
+const gradeOptions = ["Grade 5", "Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10"];
 
 function ProfilePage() {
-  const [name, setName] = React.useState("Aarav K.");
-  const [grade, setGrade] = React.useState("Grade 7");
+  const [profile, setProfile] = React.useState<NammaProfile>(DEFAULT_PROFILE);
   const [editingName, setEditingName] = React.useState(false);
-  const [color, setColor] = React.useState(avatarColors[0]);
-  const [iconId, setIconId] = React.useState(avatarIcons[0].id);
-  const [favorite, setFavorite] = React.useState<(typeof characters)[number]["id"]>("neo");
-  const [style, setStyle] = React.useState<(typeof learningStyles)[number]>("Visual");
-  const [theme, setTheme] = React.useState<"light" | "dark">("light");
-  const [sound, setSound] = React.useState(true);
-  const [motionFx, setMotionFx] = React.useState(true);
+  const [completedSlugs, setCompletedSlugs] = React.useState<string[]>([]);
+  const [badges, setBadges] = React.useState<BadgeRecord[]>([]);
+  const [submissions, setSubmissions] = React.useState<ChallengeSubmission[]>([]);
+  const [xp, setXp] = React.useState(0);
 
-  const completed = getCompleted();
-  const completedCount = ACTIVITY_ORDER.filter((s) => completed.includes(s)).length;
-  const totalXP = 1620 + completedCount * 80;
+  React.useEffect(() => {
+    const refresh = () => {
+      setProfile(getProfile());
+      setCompletedSlugs(getCompleted());
+      setBadges(getEarnedBadges());
+      setSubmissions(getSubmissions());
+      setXp(getTotalXP());
+    };
+    refresh();
+    return onNammaState(refresh);
+  }, []);
+
+  const update = React.useCallback((patch: Partial<NammaProfile>, msg?: string) => {
+    saveProfile(patch);
+    setProfile((p) => ({ ...p, ...patch }));
+    if (msg) toast.success(msg);
+  }, []);
+
+  const completedCount = ACTIVITY_ORDER.filter((s) => completedSlugs.includes(s)).length;
+  const baseXP = 1620;
+  const totalXP = baseXP + completedCount * 80 + xp;
   const streak = 12;
-  const badges = 8 + completedCount;
+  const badgeCount = 8 + completedCount + badges.length;
   const weeks = Math.min(35, 4 + Math.floor(completedCount / 2));
   const level = Math.floor(totalXP / 500) + 1;
   const xpToNext = 500 - (totalXP % 500);
 
-  const ActiveIcon = avatarIcons.find((i) => i.id === iconId)?.icon ?? Sparkles;
-  const fav = characters.find((c) => c.id === favorite)!;
+  const color = avatarColors.find((c) => c.id === profile.avatarColorId) ?? avatarColors[0];
+  const ActiveIcon = avatarIcons.find((i) => i.id === profile.avatarIconId)?.icon ?? Sparkles;
+  const fav = characters.find((c) => c.id === profile.favorite) ?? characters[0];
+
+  const timeline = React.useMemo(
+    () => getTimeline(completedSlugs).slice(0, 12),
+    [completedSlugs, badges, submissions, xp], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+
 
   return (
     <AppShell>
@@ -165,15 +205,15 @@ function ProfilePage() {
                 {editingName ? (
                   <input
                     autoFocus
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={profile.name}
+                    onChange={(e) => update({ name: e.target.value })}
                     onBlur={() => setEditingName(false)}
                     onKeyDown={(e) => e.key === "Enter" && setEditingName(false)}
                     className="w-full max-w-xs rounded-2xl border border-violet-200 bg-white/80 px-4 py-2 font-display text-3xl font-bold text-foreground outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-200/50"
                   />
                 ) : (
                   <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
-                    {name}
+                    {profile.name}
                   </h1>
                 )}
                 <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -181,7 +221,7 @@ function ProfilePage() {
                     Explorer
                   </span>
                   <span className="text-muted-foreground">•</span>
-                  <span className="font-medium text-muted-foreground">{grade}</span>
+                  <span className="font-medium text-muted-foreground">{profile.gradeLabel}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 text-sm font-bold text-white shadow-sm">
@@ -243,9 +283,18 @@ function ProfilePage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard icon={Flame} label="Weekly streak" value={`${streak} weeks`} gradient="from-orange-400 to-rose-400" />
             <StatCard icon={Zap} label="Total XP" value={totalXP.toLocaleString()} gradient="from-amber-400 to-yellow-400" />
-            <StatCard icon={Award} label="Badges earned" value={String(badges)} gradient="from-violet-400 to-fuchsia-400" />
+            <StatCard icon={Award} label="Badges earned" value={String(badgeCount)} gradient="from-violet-400 to-fuchsia-400" />
             <StatCard icon={Star} label="Weeks completed" value={`${weeks} / 35`} gradient="from-sky-400 to-cyan-400" />
           </div>
+        </Section>
+
+        {/* MY AI ADVENTURE TIMELINE */}
+        <Section title="My AI Adventure" subtitle="A live record of every activity, challenge, and badge.">
+          <TimelineCard
+            events={timeline}
+            empty={timeline.length === 0}
+            submissions={submissions.length}
+          />
         </Section>
 
         {/* PROFILE DETAILS */}
@@ -254,15 +303,19 @@ function ProfilePage() {
             <Card>
               <Field label="Your name">
                 <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={profile.name}
+                  onChange={(e) => update({ name: e.target.value })}
                   className="w-full rounded-2xl border border-border/60 bg-white/60 px-4 py-3 text-base font-medium text-foreground outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
                 />
               </Field>
               <Field label="Your grade">
                 <div className="flex flex-wrap gap-2">
-                  {["Grade 5", "Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10"].map((g) => (
-                    <Chip key={g} active={grade === g} onClick={() => setGrade(g)}>
+                  {gradeOptions.map((g) => (
+                    <Chip
+                      key={g}
+                      active={profile.gradeLabel === g}
+                      onClick={() => update({ gradeLabel: g, gradeBand: labelToBand(g) }, `Grade set to ${g}`)}
+                    >
                       {g}
                     </Chip>
                   ))}
@@ -271,7 +324,7 @@ function ProfilePage() {
               <Field label="Learning style">
                 <div className="flex flex-wrap gap-2">
                   {learningStyles.map((s) => (
-                    <Chip key={s} active={style === s} onClick={() => setStyle(s)}>
+                    <Chip key={s} active={profile.learningStyle === s} onClick={() => update({ learningStyle: s })}>
                       {s}
                     </Chip>
                   ))}
@@ -285,15 +338,15 @@ function ProfilePage() {
                   {avatarColors.map((c) => (
                     <button
                       key={c.id}
-                      onClick={() => setColor(c)}
+                      onClick={() => update({ avatarColorId: c.id })}
                       title={c.label}
                       className={cn(
                         "relative h-11 w-11 rounded-full bg-gradient-to-br ring-offset-2 transition-all hover:scale-110",
                         c.gradient,
-                        color.id === c.id ? "ring-2 ring-foreground/60 scale-110" : "ring-0",
+                        profile.avatarColorId === c.id ? "ring-2 ring-foreground/60 scale-110" : "ring-0",
                       )}
                     >
-                      {color.id === c.id && (
+                      {profile.avatarColorId === c.id && (
                         <Check className="absolute inset-0 m-auto h-5 w-5 text-white drop-shadow" />
                       )}
                     </button>
@@ -305,11 +358,11 @@ function ProfilePage() {
                   {avatarIcons.map(({ id, icon: Icon, label }) => (
                     <button
                       key={id}
-                      onClick={() => setIconId(id)}
+                      onClick={() => update({ avatarIconId: id })}
                       title={label}
                       className={cn(
                         "grid h-12 w-12 place-items-center rounded-2xl border transition-all hover:-translate-y-0.5",
-                        iconId === id
+                        profile.avatarIconId === id
                           ? "border-violet-400 bg-violet-50 text-violet-600 shadow-md"
                           : "border-border/60 bg-white/60 text-muted-foreground hover:text-foreground",
                       )}
@@ -327,12 +380,12 @@ function ProfilePage() {
         <Section title="Favorite guide" subtitle="Choose who greets you across your adventure.">
           <div className="grid gap-4 md:grid-cols-3">
             {characters.map((c) => {
-              const active = favorite === c.id;
+              const active = profile.favorite === c.id;
               return (
                 <motion.button
                   key={c.id}
                   whileHover={{ y: -4 }}
-                  onClick={() => setFavorite(c.id)}
+                  onClick={() => update({ favorite: c.id })}
                   className={cn(
                     "relative overflow-hidden rounded-[28px] border bg-white/70 p-6 text-left backdrop-blur-xl transition-all",
                     active
@@ -403,37 +456,37 @@ function ProfilePage() {
           <Card>
             <div className="divide-y divide-border/40">
               <SettingRow
-                icon={sound ? Volume2 : VolumeX}
+                icon={profile.sound ? Volume2 : VolumeX}
                 title="Sound effects"
                 description="Little chimes and celebrations."
-                control={<Toggle value={sound} onChange={setSound} />}
+                control={<Toggle value={profile.sound} onChange={(v) => update({ sound: v })} />}
               />
               <SettingRow
                 icon={Wand2}
                 title="Animation magic"
                 description="Soft motion across the portal."
-                control={<Toggle value={motionFx} onChange={setMotionFx} />}
+                control={<Toggle value={profile.motionFx} onChange={(v) => update({ motionFx: v })} />}
               />
               <SettingRow
-                icon={theme === "light" ? Sun : Moon}
+                icon={profile.theme === "light" ? Sun : Moon}
                 title="Theme mode"
                 description="Pick your vibe."
                 control={
                   <div className="flex rounded-full bg-muted p-1">
                     <button
-                      onClick={() => setTheme("light")}
+                      onClick={() => update({ theme: "light" })}
                       className={cn(
                         "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                        theme === "light" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground",
+                        profile.theme === "light" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground",
                       )}
                     >
                       <Sun className="h-3.5 w-3.5" /> Light
                     </button>
                     <button
-                      onClick={() => setTheme("dark")}
+                      onClick={() => update({ theme: "dark" })}
                       className={cn(
                         "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                        theme === "dark" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground",
+                        profile.theme === "dark" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground",
                       )}
                     >
                       <Moon className="h-3.5 w-3.5" /> Dark
@@ -683,3 +736,84 @@ function FloatingParticles() {
     </div>
   );
 }
+
+function timeAgo(at: number): string {
+  const s = Math.max(1, Math.floor((Date.now() - at) / 1000));
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
+function TimelineCard({
+  events,
+  empty,
+  submissions,
+}: {
+  events: TimelineEvent[];
+  empty: boolean;
+  submissions: number;
+}) {
+  if (empty) {
+    return (
+      <div className="rounded-[28px] border border-white/60 bg-white/70 p-8 text-center shadow-[0_15px_45px_-25px_rgba(15,23,42,0.2)] backdrop-blur-xl">
+        <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-violet-100 to-sky-100 text-violet-600">
+          <Clock className="h-5 w-5" />
+        </div>
+        <h3 className="font-display text-lg font-bold">Your adventure starts soon</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Complete an activity or elite challenge to start your timeline.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-[28px] border border-white/60 bg-white/70 p-6 shadow-[0_15px_45px_-25px_rgba(15,23,42,0.2)] backdrop-blur-xl md:p-8">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+          Recent events
+        </div>
+        <div className="text-xs text-muted-foreground">{submissions} challenge submissions saved</div>
+      </div>
+      <ol className="relative space-y-4 border-l-2 border-violet-100 pl-5">
+        {events.map((e) => {
+          const meta =
+            e.kind === "activity"
+              ? { Icon: Star, color: "from-sky-400 to-cyan-400", label: "Activity completed" }
+              : e.kind === "challenge"
+                ? { Icon: Trophy, color: "from-amber-400 to-orange-400", label: `${e.tier === "advanced" ? "Advanced" : "Expert"} challenge` }
+                : { Icon: Award, color: "from-violet-500 to-fuchsia-500", label: "Badge earned" };
+          return (
+            <li key={e.id} className="relative">
+              <span
+                className={cn(
+                  "absolute -left-[27px] top-1 grid h-5 w-5 place-items-center rounded-full bg-gradient-to-br text-white shadow-md ring-4 ring-white",
+                  meta.color,
+                )}
+              >
+                <meta.Icon className="h-3 w-3" />
+              </span>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <div className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    {meta.label}
+                  </div>
+                  <div className="font-display text-base font-bold text-foreground">{e.title}</div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {"xp" in e && e.xp ? (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 font-bold text-amber-700">
+                      +{e.xp} XP
+                    </span>
+                  ) : null}
+                  <span>{timeAgo(e.at)}</span>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
