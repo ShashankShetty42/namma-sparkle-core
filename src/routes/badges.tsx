@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
-  Compass,
+  Compass as CompassIcon,
   Crown,
   Flame,
   Lock,
@@ -23,7 +23,6 @@ import {
   Globe,
   Bot,
   Cpu,
-  Compass as CompassIcon,
   Atom,
   Infinity as InfinityIcon,
   Award,
