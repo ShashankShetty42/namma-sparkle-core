@@ -109,7 +109,7 @@ function ActivitiesHub() {
               <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">6 activities, one journey</h2>
             </div>
             <div className="hidden items-center gap-2 text-xs font-semibold text-muted-foreground md:flex">
-              <Trophy className="h-4 w-4 text-xp" /> Complete in order for streak bonus
+              <Trophy className="h-4 w-4 text-xp" /> Finish all 6 before next week unlocks
             </div>
           </div>
 

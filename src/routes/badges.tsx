@@ -342,7 +342,7 @@ function Hero({
 
           <div className="flex flex-wrap gap-3">
             <HeroStat icon={Trophy} value={`${totalEarned}/35`} label="Badges earned" tone="bonus" />
-            <HeroStat icon={Flame} value="9 wks" label="Current streak" tone="challenge" />
+            <HeroStat icon={Flame} value="9 wks" label="Weekly streak" tone="challenge" />
             <HeroStat icon={Crown} value="Explorer" label="Current rank" tone="story" />
             <HeroStat icon={Star} value={`${totalXp.toLocaleString()} XP`} label="Collected" tone="xp" />
           </div>

@@ -4,16 +4,20 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   Award,
-  CalendarDays,
+  BookOpen,
+  Brain,
   CheckCircle2,
   ChevronRight,
   Compass,
   Crown,
   Flame,
   Gift,
+  HelpCircle,
   Lock,
   Medal,
+  PenLine,
   Rocket,
+  Scale,
   Sparkles,
   Star,
   Target,
@@ -54,30 +58,33 @@ export const Route = createFileRoute("/")({
 
 /* ───────────────────────── data ───────────────────────── */
 
-type RoadmapDay = {
-  day: string;
+type FlowNode = {
+  key: string;
   label: string;
   tone: string;
+  icon: React.ComponentType<{ className?: string }>;
   done: boolean;
-  today?: boolean;
+  current?: boolean;
   locked?: boolean;
 };
-const WEEKLY_ROADMAP: RoadmapDay[] = [
-  { day: "Mon", label: "Kickoff", tone: "story", done: true },
-  { day: "Tue", label: "Explore", tone: "explore", done: true },
-  { day: "Wed", label: "Decide", tone: "decide", done: true },
-  { day: "Thu", label: "Reflect", tone: "reflect", done: false, today: true },
-  { day: "Fri", label: "Ethics", tone: "challenge", done: false },
-  { day: "Sat", label: "Quiz", tone: "xp", done: false },
-  { day: "Sun", label: "Reward", tone: "bonus", done: false, locked: true },
+
+// Weekly Adventure Flow — the 7-step sequence that repeats every week.
+const WEEKLY_FLOW: FlowNode[] = [
+  { key: "story", label: "Story & Concept", tone: "story", icon: BookOpen, done: true },
+  { key: "explore", label: "Explore & Observe", tone: "explore", icon: Compass, done: true },
+  { key: "decide", label: "Do & Decide", tone: "decide", icon: Target, done: true },
+  { key: "write", label: "Think & Write", tone: "reflect", icon: PenLine, done: false, current: true },
+  { key: "ethics", label: "Ethics Scenario", tone: "challenge", icon: Scale, done: false },
+  { key: "quiz", label: "Weekly Quiz", tone: "xp", icon: Brain, done: false },
+  { key: "reward", label: "Reward Unlock", tone: "bonus", icon: Gift, done: false, locked: true },
 ];
 
 const ACHIEVEMENTS = [
-  { name: "First Mission", tone: "story", icon: Rocket, earned: true, sub: "Sealed Day 1" },
-  { name: "3-Day Streak", tone: "decide", icon: Flame, earned: true, sub: "On fire 🔥" },
+  { name: "First Mission", tone: "story", icon: Rocket, earned: true, sub: "Sealed Week 1" },
+  { name: "3-Week Streak", tone: "decide", icon: Flame, earned: true, sub: "Three weeks strong" },
   { name: "AI Spotter", tone: "explore", icon: Compass, earned: true, sub: "10 examples found" },
   { name: "Ethics Hero", tone: "challenge", icon: Medal, earned: false, sub: "Finish ethics" },
-  { name: "Weekly Champ", tone: "xp", icon: Crown, earned: false, sub: "Complete week" },
+  { name: "Weekly Champion", tone: "xp", icon: Crown, earned: false, sub: "Complete this week" },
   { name: "Reward Hunter", tone: "bonus", icon: Gift, earned: false, sub: "Open 5 rewards" },
 ] as const;
 
@@ -90,8 +97,8 @@ const LEADERBOARD = [
 ] as const;
 
 const REWARDS = [
-  { title: "Daily login XP", sub: "+50 XP ready to claim", icon: Star, tone: "xp", cta: "Claim" },
-  { title: "Streak chest", sub: "Open after 5-day streak", icon: Gift, tone: "bonus", cta: "Open" },
+  { title: "Weekly Completion XP", sub: "+50 XP when this week's done", icon: Star, tone: "xp", cta: "View" },
+  { title: "Weekly Champion Chest", sub: "Unlocks after 5 completed weeks", icon: Gift, tone: "bonus", cta: "Open" },
   { title: "Mystery sticker", sub: "Earn 3 more badges", icon: Sparkles, tone: "reflect", cta: "Preview" },
 ] as const;
 
@@ -152,7 +159,7 @@ function DashboardPage() {
                 is one tap away.
               </h1>
               <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                Continue Week 9 with Dev, Neo & Anaya. Earn XP, light up your streak,
+                Continue Week 9 with Dev, Neo & Anaya. Earn XP, grow your weekly streak,
                 and unlock the legendary Weekly Champion badge.
               </p>
 
@@ -241,29 +248,32 @@ function DashboardPage() {
           className="grid grid-cols-2 gap-3 md:grid-cols-4"
         >
           <StatTile icon={<Star className="h-5 w-5" />} tone="xp" label="Total XP" value={String(liveXp)} sub={`+${earnedXp || 50} today`} />
-          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Streak" value="5 days" sub="Best yet!" />
+          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Weekly streak" value="5 weeks" sub="Champion run!" />
           <StatTile icon={<Trophy className="h-5 w-5" />} tone="bonus" label="Badges" value={`${earnedBadges}/${ACHIEVEMENTS.length}`} sub="2 new this week" />
           <StatTile icon={<Target className="h-5 w-5" />} tone="challenge" label="Rank" value="#2" sub="↑ 1 this week" />
         </motion.section>
 
-        {/* ───── WEEKLY ROADMAP ───── */}
+        {/* ───── WEEKLY ADVENTURE FLOW ───── */}
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5 }}
-          className="section-panel"
+          className="section-panel relative overflow-hidden"
         >
-          <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-story/15 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-xp/15 blur-3xl" />
+
+          <div className="relative flex flex-wrap items-end justify-between gap-3">
             <div>
               <div className="eyebrow">
-                <CalendarDays className="h-3.5 w-3.5" /> Weekly roadmap
+                <Compass className="h-3.5 w-3.5" /> Weekly Adventure Flow
               </div>
               <h2 className="mt-2 font-display text-2xl font-bold text-foreground md:text-3xl">
-                Your 7-day quest line
+                This week&apos;s magical journey
               </h2>
               <p className="text-sm text-muted-foreground">
-                Keep the chain alive — finish today to extend your streak.
+                Complete all activities before next week unlocks to grow your weekly streak.
               </p>
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-success/30 bg-success-soft/70 px-3 py-1.5 font-display text-sm font-bold text-success">
@@ -271,42 +281,77 @@ function DashboardPage() {
             </div>
           </div>
 
-          <div className="relative mt-6">
-            <div className="absolute top-7 right-4 left-4 h-1 rounded-full bg-secondary" />
+          <div className="relative mt-8">
+            {/* connecting rail */}
+            <div className="absolute top-9 right-6 left-6 h-1.5 rounded-full bg-secondary/70" />
             <motion.div
-              className="absolute top-7 left-4 h-1 rounded-full bg-gradient-to-r from-story via-decide to-xp"
+              className="absolute top-9 left-6 h-1.5 rounded-full bg-gradient-to-r from-story via-explore via-decide via-reflect via-challenge via-xp to-bonus shadow-[0_0_18px_rgba(120,80,200,0.35)]"
               initial={{ width: 0 }}
-              whileInView={{ width: `calc(${weekPercent}% - 2rem)` }}
+              whileInView={{ width: `calc(${weekPercent}% - 3rem)` }}
               viewport={{ once: true }}
-              transition={{ duration: 1, ease: "easeOut" }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
             />
-            <div className="relative grid grid-cols-7 gap-2">
-              {WEEKLY_ROADMAP.map((d, i) => (
-                <motion.div
-                  key={d.day}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                  className="flex flex-col items-center gap-2"
-                >
-                  <div
-                    className={cn(
-                      "flex h-14 w-14 items-center justify-center rounded-2xl border-2 text-sm font-display font-bold shadow-[var(--shadow-soft)] transition-all",
-                      d.done && `bg-${d.tone} text-white border-${d.tone}`,
-                      !d.done && d.today && `bg-white text-${d.tone} border-${d.tone} animate-[namma-pulse_2.4s_ease-in-out_infinite]`,
-                      !d.done && !d.today && !d.locked && "bg-white text-muted-foreground border-border",
-                      d.locked && "bg-muted text-locked border-locked/30",
-                    )}
+            <div className="relative grid grid-cols-4 gap-3 md:grid-cols-7">
+              {WEEKLY_FLOW.map((n, i) => {
+                const Icon = n.icon;
+                return (
+                  <motion.div
+                    key={n.key}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.06, type: "spring", stiffness: 220, damping: 22 }}
+                    whileHover={!n.locked ? { y: -4, scale: 1.04 } : undefined}
+                    className="group flex flex-col items-center gap-2"
                   >
-                    {d.done ? <CheckCircle2 className="h-6 w-6" /> : d.locked ? <Lock className="h-4 w-4" /> : d.day}
-                  </div>
-                  <div className="text-center leading-tight">
-                    <div className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">{d.day}</div>
-                    <div className={cn("text-xs font-bold", d.today ? `text-${d.tone}` : "text-foreground")}>{d.label}</div>
-                  </div>
-                </motion.div>
-              ))}
+                    <div className="relative">
+                      {n.current && (
+                        <span className={cn("absolute inset-0 rounded-2xl blur-md opacity-70", `bg-${n.tone}/60`)} />
+                      )}
+                      <div
+                        className={cn(
+                          "relative flex h-[72px] w-[72px] items-center justify-center rounded-2xl border-2 shadow-[var(--shadow-soft)] transition-all",
+                          n.done && `bg-gradient-to-br from-${n.tone} to-${n.tone}/70 text-white border-white/80 shadow-[0_12px_24px_-8px_rgba(0,0,0,0.25)]`,
+                          !n.done && n.current && `bg-white text-${n.tone} border-${n.tone} animate-[namma-pulse_2.4s_ease-in-out_infinite]`,
+                          !n.done && !n.current && !n.locked && `bg-white text-${n.tone}/80 border-${n.tone}/30`,
+                          n.locked && "bg-muted text-locked border-locked/30",
+                        )}
+                      >
+                        {n.done ? (
+                          <CheckCircle2 className="h-7 w-7" />
+                        ) : n.locked ? (
+                          <Lock className="h-5 w-5" />
+                        ) : (
+                          <Icon className="h-7 w-7" />
+                        )}
+                      </div>
+                      {n.current && (
+                        <span className="absolute -top-1.5 -right-1.5 inline-flex items-center gap-1 rounded-full bg-foreground px-1.5 py-0.5 text-[0.55rem] font-bold uppercase tracking-wider text-background shadow">
+                          Now
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-center leading-tight">
+                      <div className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                        Step {i + 1}
+                      </div>
+                      <div className={cn("text-[0.72rem] font-bold", n.current ? `text-${n.tone}` : n.locked ? "text-muted-foreground" : "text-foreground")}>
+                        {n.label}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <div className="relative mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-reflect/20 bg-reflect-soft/40 px-4 py-3">
+              <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
+                <Sparkles className="h-4 w-4 text-reflect" />
+                Finish this week&apos;s adventure to protect your streak and unlock rewards.
+              </div>
+              <div className="inline-flex items-center gap-1.5 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-reflect">
+                <HelpCircle className="h-3.5 w-3.5" /> 7-step weekly sequence
+              </div>
             </div>
           </div>
         </motion.section>
@@ -600,9 +645,9 @@ function DashboardPage() {
           <ProgressWidget
             tone="decide"
             icon={<Flame className="h-5 w-5" />}
-            label="Streak goal · 7 days"
-            percent={Math.round((5 / 7) * 100)}
-            caption="5 / 7 days · keep going!"
+            label="Weekly completion goal"
+            percent={weekPercent}
+            caption={`${completed.size} / ${ACTIVITY_ORDER.length} activities this week`}
           />
         </motion.section>
       </div>

@@ -123,7 +123,7 @@ function StreakFlame({ count }: { count: number }) {
       <span className="hidden sm:flex items-baseline gap-1">
         <span className="font-reward text-base leading-none text-foreground">{count}</span>
         <span className="text-[0.66rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-          day
+          week
         </span>
       </span>
     </motion.div>

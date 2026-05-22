@@ -184,9 +184,9 @@ export function AppSidebar() {
 
       {isCollapsed && (
         <div className="flex flex-col items-center gap-2">
-          <div className="namma-streak-mini" aria-label="5 day streak">
+          <div className="namma-streak-mini" aria-label="5 week streak">
             <Flame className="h-4 w-4" />
-            <span>5</span>
+            <span>5w</span>
           </div>
         </div>
       )}
@@ -244,9 +244,9 @@ function ProfileWidget({ collapsed }: { collapsed: boolean }) {
             <Flame className="h-3.5 w-3.5" />
           </span>
           <div className="leading-tight">
-            <div className="text-[0.95rem] font-bold text-foreground">5d</div>
+            <div className="text-[0.95rem] font-bold text-foreground">5w</div>
             <div className="text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground">
-              Streak
+              Weekly streak
             </div>
           </div>
         </div>

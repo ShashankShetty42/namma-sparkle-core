@@ -56,7 +56,7 @@ export const Route = createFileRoute("/rewards")({
 /*                          DATA                                  */
 /* -------------------------------------------------------------- */
 
-const CURRENT_STREAK = 5;
+const CURRENT_STREAK = 5; // weeks
 const TOTAL_XP = 1280;
 
 type Tone = "story" | "explore" | "decide" | "reflect" | "challenge" | "bonus" | "xp" | "success";
@@ -121,7 +121,7 @@ const toneSoft: Record<Tone, string> = {
 /* -------------------------------------------------------------- */
 
 type Streak = {
-  days: number;
+  weeks: number;
   title: string;
   reward: string;
   tone: Tone;
@@ -129,12 +129,12 @@ type Streak = {
 };
 
 const STREAKS: Streak[] = [
-  { days: 3, title: "Spark Lit", reward: "Neo Celebration Wallpaper", tone: "story", message: "Three days in. The fire is real." },
-  { days: 5, title: "Steady Flame", reward: "Bonus 100 XP Burst", tone: "decide", message: "Consistency is your superpower." },
-  { days: 7, title: "Week Hero", reward: "AI Explorer Certificate", tone: "explore", message: "A full week of magic. Incredible." },
-  { days: 14, title: "Fortnight Sage", reward: "Future Creator Frame", tone: "bonus", message: "Two weeks of pure dedication." },
-  { days: 21, title: "Mastermind", reward: "Holographic Avatar Aura", tone: "challenge", message: "You've built a real habit." },
-  { days: 30, title: "Legendary", reward: "Legendary Streak Aura", tone: "xp", message: "A whole month of brilliance." },
+  { weeks: 2, title: "Spark Lit", reward: "Neo Celebration Wallpaper", tone: "story", message: "Two weeks in. The spark is real." },
+  { weeks: 4, title: "Steady Flame", reward: "Bonus 100 XP Burst", tone: "decide", message: "A whole month of weekly wins." },
+  { weeks: 6, title: "Weekly Champion", reward: "AI Explorer Certificate", tone: "explore", message: "Six weeks of magical learning." },
+  { weeks: 10, title: "Adventure Sage", reward: "Future Creator Frame", tone: "bonus", message: "Ten weeks of pure dedication." },
+  { weeks: 18, title: "Mastermind", reward: "Holographic Avatar Aura", tone: "challenge", message: "You've built a real learning rhythm." },
+  { weeks: 28, title: "Legendary", reward: "Legendary Streak Aura", tone: "xp", message: "Nearly a full course of brilliance." },
 ];
 
 /* -------------------------------------------------------------- */
@@ -154,7 +154,7 @@ type Memory = {
 const MEMORIES_BASE: Memory[] = [
   { id: "m1", title: "First Quiz Mastered", caption: "You aced your very first quiz.", tone: "decide", character: "dev", dialogue: "Logic level: rising fast. Well done!", unlocked: true },
   { id: "m2", title: "Week 1 Completed", caption: "Your adventure officially began.", tone: "story", character: "neo", dialogue: "You did it! Another adventure completed!", unlocked: true },
-  { id: "m3", title: "7-Day Streak Achieved", caption: "A whole week of magic.", tone: "explore", character: "anaya", dialogue: "Consistency makes creativity bloom.", unlocked: true },
+  { id: "m3", title: "6-Week Streak Achieved", caption: "Six weeks of magical learning.", tone: "explore", character: "anaya", dialogue: "Consistency makes creativity bloom.", unlocked: true },
   { id: "m4", title: "Ethics Champion", caption: "You made the wise choice.", tone: "reflect", character: "anaya", dialogue: "Kindness in code — beautifully done.", unlocked: false },
   { id: "m5", title: "Creative Spark", caption: "You built something one-of-a-kind.", tone: "bonus", character: "anaya", dialogue: "Creativity deserves rewards too!", unlocked: false },
   { id: "m6", title: "Speed Solver", caption: "Quick, sharp, brilliant.", tone: "challenge", character: "dev", dialogue: "You're leveling up fast!", unlocked: false },
@@ -248,7 +248,7 @@ function RewardsPage() {
     }));
   }, [completedCount]);
 
-  const nextStreak = STREAKS.find((s) => s.days > CURRENT_STREAK) ?? STREAKS[STREAKS.length - 1];
+  const nextStreak = STREAKS.find((s) => s.weeks > CURRENT_STREAK) ?? STREAKS[STREAKS.length - 1];
 
   const [openMemory, setOpenMemory] = React.useState<Memory | null>(null);
   const [openedCapsules, setOpenedCapsules] = React.useState<Record<string, boolean>>({});
@@ -261,7 +261,7 @@ function RewardsPage() {
           xp={TOTAL_XP}
           collected={collectedCount}
           nextLabel={nextStreak.reward}
-          nextIn={nextStreak.days - CURRENT_STREAK}
+          nextIn={nextStreak.weeks - CURRENT_STREAK}
         />
 
         <StreakSection current={CURRENT_STREAK} />
@@ -353,12 +353,12 @@ function Hero({
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <HeroStat icon={<Zap className="h-4 w-4" />} label="Total XP" value={xp.toLocaleString()} tone="xp" />
-            <HeroStat icon={<Flame className="h-4 w-4" />} label="Streak" value={`${streak}d`} tone="challenge" />
+            <HeroStat icon={<Flame className="h-4 w-4" />} label="Weekly streak" value={`${streak}w`} tone="challenge" />
             <HeroStat icon={<Gift className="h-4 w-4" />} label="Collected" value={String(collected)} tone="bonus" />
             <HeroStat
               icon={<Package className="h-4 w-4" />}
               label="Next Unlock"
-              value={nextIn > 0 ? `${nextIn}d` : "Ready!"}
+              value={nextIn > 0 ? `${nextIn}w` : "Ready!"}
               tone="explore"
               hint={nextLabel}
             />
@@ -527,9 +527,9 @@ function StreakSection({ current }: { current: number }) {
   return (
     <section className="space-y-6">
       <SectionHeader
-        eyebrow="Daily Streak Rewards"
-        title="Keep the flame alive."
-        subtitle="Every day you return, the magic grows. Walk the path and unlock collectible surprises."
+        eyebrow="Weekly Champion Rewards"
+        title="Keep your weekly streak alive."
+        subtitle="Finish every activity before the next week unlocks and collect cinematic surprises along the way."
         tone="challenge"
       />
 
@@ -546,10 +546,10 @@ function StreakSection({ current }: { current: number }) {
           </motion.div>
           <div>
             <div className="font-display text-2xl font-extrabold text-foreground">
-              {current}-day streak
+              {current}-week streak
             </div>
             <div className="text-sm text-foreground/70">
-              You're glowing. Keep going to ignite bigger rewards.
+              Complete this week before the next unlocks to grow your streak.
             </div>
           </div>
         </div>
@@ -560,12 +560,12 @@ function StreakSection({ current }: { current: number }) {
           <div className="absolute left-0 right-0 top-1/2 hidden h-1 -translate-y-1/2 rounded-full bg-gradient-to-r from-challenge/30 via-bonus/30 to-xp/30 md:block" />
           <div
             className="absolute left-0 top-1/2 hidden h-1 -translate-y-1/2 rounded-full bg-gradient-to-r from-challenge to-bonus md:block"
-            style={{ width: `${Math.min(100, (current / 30) * 100)}%` }}
+            style={{ width: `${Math.min(100, (current / 28) * 100)}%` }}
           />
           <div className="relative grid grid-cols-2 gap-4 md:grid-cols-6">
             {STREAKS.map((s) => {
-              const state = current >= s.days ? "done" : current >= s.days - 2 ? "current" : "locked";
-              return <StreakNode key={s.days} s={s} state={state} />;
+              const state = current >= s.weeks ? "done" : current >= s.weeks - 2 ? "current" : "locked";
+              return <StreakNode key={s.weeks} s={s} state={state} />;
             })}
           </div>
         </div>
@@ -609,7 +609,7 @@ function StreakNode({ s, state }: { s: Streak; state: "done" | "current" | "lock
         </div>
       </div>
       <div className="mt-3 font-display text-sm font-extrabold text-foreground">
-        {s.days} days
+        {s.weeks} weeks
       </div>
       <div className={cn("text-[0.66rem] font-bold uppercase tracking-[0.14em]", isDone ? toneText[s.tone] : "text-muted-foreground")}>
         {s.title}
