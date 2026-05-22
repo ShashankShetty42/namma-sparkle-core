@@ -724,8 +724,23 @@ function UnlockedHub({ tier, challenges, done, onOpen }: { tier: "advanced" | "e
 }
 
 /* Challenge flow */
-function ChallengeFlow({ challenge, isDone, onBack, onComplete }: { challenge: Challenge; isDone: boolean; onBack: () => void; onComplete: () => void }) {
-  const [values, setValues] = React.useState<Record<string, any>>({});
+function ChallengeFlow({
+  challenge,
+  isDone,
+  weekId,
+  onBack,
+  onComplete,
+}: {
+  challenge: Challenge;
+  isDone: boolean;
+  weekId: string;
+  onBack: () => void;
+  onComplete: (values: Record<string, unknown>) => void;
+}) {
+  const existing = React.useMemo(() => getSubmission(weekId, challenge.id), [weekId, challenge.id]);
+  const [values, setValues] = React.useState<Record<string, any>>(
+    (existing?.values as Record<string, any>) ?? {},
+  );
   const [submitted, setSubmitted] = React.useState(isDone);
   const set = (k: string, v: any) => setValues((p) => ({ ...p, [k]: v }));
 
@@ -782,7 +797,7 @@ function ChallengeFlow({ challenge, isDone, onBack, onComplete }: { challenge: C
           <Button
             variant="hero"
             size="lg"
-            onClick={() => { setSubmitted(true); onComplete(); }}
+            onClick={() => { setSubmitted(true); onComplete(values); }}
             disabled={filledCount === 0}
             className="w-full !rounded-2xl !py-6 text-base"
           >
