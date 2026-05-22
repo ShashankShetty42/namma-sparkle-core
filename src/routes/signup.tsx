@@ -258,12 +258,7 @@ function Field({ icon, label, children }: { icon: React.ReactNode; label: string
       <span className="mb-1.5 block text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">{label}</span>
       <div className="relative">
         <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{icon}</span>
-        {React.cloneElement(children as React.ReactElement, {
-          className: cn(
-            (children as React.ReactElement).props.className,
-            "h-12 rounded-2xl border-2 border-foreground/10 bg-white pl-10 text-sm font-semibold focus-visible:border-foreground/50",
-          ),
-        })}
+        {children}
       </div>
     </label>
   );
