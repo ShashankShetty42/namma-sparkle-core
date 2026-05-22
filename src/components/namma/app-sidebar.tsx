@@ -244,9 +244,9 @@ function ProfileWidget({ collapsed }: { collapsed: boolean }) {
             <Flame className="h-3.5 w-3.5" />
           </span>
           <div className="leading-tight">
-            <div className="text-[0.95rem] font-bold text-foreground">5d</div>
+            <div className="text-[0.95rem] font-bold text-foreground">5w</div>
             <div className="text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground">
-              Streak
+              Weekly streak
             </div>
           </div>
         </div>
