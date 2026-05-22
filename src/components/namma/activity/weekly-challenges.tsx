@@ -290,6 +290,27 @@ export function WeeklyChallenges({ weekId = "week-9" }: { weekId?: string }) {
         setShowUnlock(true);
         seenUnlockRef.current = true;
         window.localStorage.setItem(key, "1");
+
+        // Reward artifact for the unlock moment
+        const tierUnlockBadge =
+          tier === "advanced"
+            ? { name: "Advanced Portal Opened", desc: "Unlocked the Advanced Explorer track." }
+            : { name: "Expert Lab Opened", desc: "Unlocked the Expert Creator Lab." };
+        const awarded = awardBadge({
+          id: `tier-unlock:${weekId}:${tier}`,
+          name: tierUnlockBadge.name,
+          kind: "tier-unlock",
+          weekId,
+          tone: "bonus",
+          xp: 100,
+          description: tierUnlockBadge.desc,
+        });
+        if (awarded) {
+          addXP(100, `Portal unlocked · ${tier}`, weekId);
+          toast.success(`${tierUnlockBadge.name}`, {
+            description: "+100 bonus XP · new badge added to your vault",
+          });
+        }
       }
     }
   }, [weeklyDone, tier, weekId]);
