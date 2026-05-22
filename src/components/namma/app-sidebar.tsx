@@ -2,7 +2,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Award,
-  BookOpenText,
   ChevronLeft,
   Compass,
   Flame,
@@ -10,11 +9,10 @@ import {
   LayoutDashboard,
   LifeBuoy,
   Map,
-  Rocket,
   Shield,
   Sparkles,
   Star,
-  Trophy,
+  BookOpenText,
   Zap,
 } from "lucide-react";
 
