@@ -1,13 +1,14 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 
 import { AppShellProvider, useAppShell } from "@/components/namma/app-shell-context";
 import { AppSidebar } from "@/components/namma/app-sidebar";
 import { TopBar } from "@/components/namma/top-bar";
 import { OnboardingDialog } from "@/components/namma/onboarding-dialog";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { getProfile, onNammaState } from "@/lib/namma-progress";
+import { getAuth, getProfile, onNammaState } from "@/lib/namma-progress";
 
 const WELCOME_KEY = "namma:welcome:lastSession";
 
@@ -21,6 +22,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function ShellInner({ children }: { children: React.ReactNode }) {
   const { isMobile, mobileOpen, setMobileOpen } = useAppShell();
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [authed, setAuthed] = React.useState<boolean | null>(null);
+
+  // Auth gate: redirect unauthenticated users to /welcome.
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const check = () => {
+      const a = getAuth();
+      setAuthed(a.isAuthed);
+      if (!a.isAuthed) {
+        navigate({ to: "/welcome", replace: true });
+        return;
+      }
+      // Role-based redirect: keep teachers/admins on their dashboards.
+      if (a.role === "teacher" && pathname === "/") {
+        navigate({ to: "/teacher", replace: true });
+      } else if (a.role === "admin" && pathname === "/") {
+        navigate({ to: "/admin", replace: true });
+      }
+    };
+    check();
+    const off = onNammaState(check);
+    return () => off();
+  }, [navigate, pathname]);
 
   // Per-session welcome moment (after onboarding is done).
   React.useEffect(() => {
@@ -44,6 +70,17 @@ function ShellInner({ children }: { children: React.ReactNode }) {
     const off = onNammaState(fire);
     return () => off();
   }, []);
+
+  if (authed === null || authed === false) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-story-soft via-background to-explore-soft">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-foreground/10 border-t-foreground/60" />
+          <span className="text-xs font-bold uppercase tracking-[0.22em]">Opening portal…</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="namma-shell">
