@@ -353,12 +353,12 @@ function Hero({
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <HeroStat icon={<Zap className="h-4 w-4" />} label="Total XP" value={xp.toLocaleString()} tone="xp" />
-            <HeroStat icon={<Flame className="h-4 w-4" />} label="Streak" value={`${streak}d`} tone="challenge" />
+            <HeroStat icon={<Flame className="h-4 w-4" />} label="Weekly streak" value={`${streak}w`} tone="challenge" />
             <HeroStat icon={<Gift className="h-4 w-4" />} label="Collected" value={String(collected)} tone="bonus" />
             <HeroStat
               icon={<Package className="h-4 w-4" />}
               label="Next Unlock"
-              value={nextIn > 0 ? `${nextIn}d` : "Ready!"}
+              value={nextIn > 0 ? `${nextIn}w` : "Ready!"}
               tone="explore"
               hint={nextLabel}
             />
