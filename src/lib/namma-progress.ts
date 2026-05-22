@@ -22,6 +22,7 @@ const WEEKS_KEY = "namma:weeks:completed";
 const QUIZ_KEY = "namma:quiz:results";
 const ANSWERS_KEY = "namma:lesson:answers";
 const CLASSMATES_KEY = "namma:classmates";
+const AUTH_KEY = "namma:auth";
 
 const isBrowser = () => typeof window !== "undefined";
 
@@ -446,6 +447,61 @@ export function getClassmates(): Classmate[] {
 export function saveClassmates(list: Classmate[]) {
   if (!isBrowser()) return;
   window.localStorage.setItem(CLASSMATES_KEY, JSON.stringify(list));
+  emit();
+}
+
+/* ───────────── auth (frontend-only demo) ───────────── */
+
+export type UserRole = "student" | "teacher" | "admin";
+
+export type NammaAuth = {
+  isAuthed: boolean;
+  role: UserRole | null;
+  email: string | null;
+  schoolCode: string | null;
+  signedInAt: number | null;
+};
+
+export const DEFAULT_AUTH: NammaAuth = {
+  isAuthed: false,
+  role: null,
+  email: null,
+  schoolCode: null,
+  signedInAt: null,
+};
+
+export function getAuth(): NammaAuth {
+  if (!isBrowser()) return DEFAULT_AUTH;
+  try {
+    const raw = window.localStorage.getItem(AUTH_KEY);
+    if (!raw) return DEFAULT_AUTH;
+    return { ...DEFAULT_AUTH, ...(JSON.parse(raw) as Partial<NammaAuth>) };
+  } catch {
+    return DEFAULT_AUTH;
+  }
+}
+
+export function signIn(payload: {
+  role: UserRole;
+  email: string;
+  schoolCode?: string;
+}) {
+  if (!isBrowser()) return;
+  const next: NammaAuth = {
+    isAuthed: true,
+    role: payload.role,
+    email: payload.email,
+    schoolCode: payload.schoolCode ?? null,
+    signedInAt: Date.now(),
+  };
+  window.localStorage.setItem(AUTH_KEY, JSON.stringify(next));
+  emit();
+}
+
+export function signOut() {
+  if (!isBrowser()) return;
+  window.localStorage.removeItem(AUTH_KEY);
+  window.sessionStorage.removeItem("namma:welcome:lastSession");
   emit();
 }
 
