@@ -248,7 +248,7 @@ function DashboardPage() {
           className="grid grid-cols-2 gap-3 md:grid-cols-4"
         >
           <StatTile icon={<Star className="h-5 w-5" />} tone="xp" label="Total XP" value={String(liveXp)} sub={`+${earnedXp || 50} today`} />
-          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Streak" value="5 days" sub="Best yet!" />
+          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Weekly streak" value="5 weeks" sub="Champion run!" />
           <StatTile icon={<Trophy className="h-5 w-5" />} tone="bonus" label="Badges" value={`${earnedBadges}/${ACHIEVEMENTS.length}`} sub="2 new this week" />
           <StatTile icon={<Target className="h-5 w-5" />} tone="challenge" label="Rank" value="#2" sub="↑ 1 this week" />
         </motion.section>
