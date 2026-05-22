@@ -5,6 +5,7 @@ import {
   Award,
   Brush,
   Check,
+  Clock,
   Edit3,
   Flame,
   LogOut,
@@ -22,6 +23,7 @@ import {
   Wand2,
   Zap,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/namma/app-shell";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,21 @@ import { cn } from "@/lib/utils";
 import { nammaEase, fadeUp, floatY } from "@/components/namma/motion";
 import { getCompleted } from "@/components/namma/activity/progress";
 import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
+import {
+  DEFAULT_PROFILE,
+  getEarnedBadges,
+  getProfile,
+  getSubmissions,
+  getTimeline,
+  getTotalXP,
+  labelToBand,
+  onNammaState,
+  saveProfile,
+  type BadgeRecord,
+  type ChallengeSubmission,
+  type NammaProfile,
+  type TimelineEvent,
+} from "@/lib/namma-progress";
 
 import neoHappy from "@/assets/characters/neo-happy.png";
 import devHappy from "@/assets/characters/dev-happy.png";
@@ -102,30 +119,53 @@ const characters = [
 ] as const;
 
 const learningStyles = ["Visual", "Story", "Hands-on", "Curious"] as const;
+const gradeOptions = ["Grade 5", "Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10"];
 
 function ProfilePage() {
-  const [name, setName] = React.useState("Aarav K.");
-  const [grade, setGrade] = React.useState("Grade 7");
+  const [profile, setProfile] = React.useState<NammaProfile>(DEFAULT_PROFILE);
   const [editingName, setEditingName] = React.useState(false);
-  const [color, setColor] = React.useState(avatarColors[0]);
-  const [iconId, setIconId] = React.useState(avatarIcons[0].id);
-  const [favorite, setFavorite] = React.useState<(typeof characters)[number]["id"]>("neo");
-  const [style, setStyle] = React.useState<(typeof learningStyles)[number]>("Visual");
-  const [theme, setTheme] = React.useState<"light" | "dark">("light");
-  const [sound, setSound] = React.useState(true);
-  const [motionFx, setMotionFx] = React.useState(true);
+  const [completedSlugs, setCompletedSlugs] = React.useState<string[]>([]);
+  const [badges, setBadges] = React.useState<BadgeRecord[]>([]);
+  const [submissions, setSubmissions] = React.useState<ChallengeSubmission[]>([]);
+  const [xp, setXp] = React.useState(0);
 
-  const completed = getCompleted();
-  const completedCount = ACTIVITY_ORDER.filter((s) => completed.includes(s)).length;
-  const totalXP = 1620 + completedCount * 80;
+  React.useEffect(() => {
+    const refresh = () => {
+      setProfile(getProfile());
+      setCompletedSlugs(getCompleted());
+      setBadges(getEarnedBadges());
+      setSubmissions(getSubmissions());
+      setXp(getTotalXP());
+    };
+    refresh();
+    return onNammaState(refresh);
+  }, []);
+
+  const update = React.useCallback((patch: Partial<NammaProfile>, msg?: string) => {
+    saveProfile(patch);
+    setProfile((p) => ({ ...p, ...patch }));
+    if (msg) toast.success(msg);
+  }, []);
+
+  const completedCount = ACTIVITY_ORDER.filter((s) => completedSlugs.includes(s)).length;
+  const baseXP = 1620;
+  const totalXP = baseXP + completedCount * 80 + xp;
   const streak = 12;
-  const badges = 8 + completedCount;
+  const badgeCount = 8 + completedCount + badges.length;
   const weeks = Math.min(35, 4 + Math.floor(completedCount / 2));
   const level = Math.floor(totalXP / 500) + 1;
   const xpToNext = 500 - (totalXP % 500);
 
-  const ActiveIcon = avatarIcons.find((i) => i.id === iconId)?.icon ?? Sparkles;
-  const fav = characters.find((c) => c.id === favorite)!;
+  const color = avatarColors.find((c) => c.id === profile.avatarColorId) ?? avatarColors[0];
+  const ActiveIcon = avatarIcons.find((i) => i.id === profile.avatarIconId)?.icon ?? Sparkles;
+  const fav = characters.find((c) => c.id === profile.favorite) ?? characters[0];
+
+  const timeline = React.useMemo(
+    () => getTimeline(completedSlugs).slice(0, 12),
+    [completedSlugs, badges, submissions, xp], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+
 
   return (
     <AppShell>
