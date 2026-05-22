@@ -609,7 +609,7 @@ function StreakNode({ s, state }: { s: Streak; state: "done" | "current" | "lock
         </div>
       </div>
       <div className="mt-3 font-display text-sm font-extrabold text-foreground">
-        {s.days} days
+        {s.weeks} weeks
       </div>
       <div className={cn("text-[0.66rem] font-bold uppercase tracking-[0.14em]", isDone ? toneText[s.tone] : "text-muted-foreground")}>
         {s.title}
