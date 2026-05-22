@@ -392,7 +392,7 @@ function HeroStat({
     >
       <div className={cn("absolute -right-6 -top-6 h-20 w-20 rounded-full blur-2xl opacity-50", toneBg[tone])} />
       <div className="relative flex items-center gap-3">
-        <span className={cn("inline-flex h-9 w-9 items-center justify-center rounded-xl ring-1", toneText[tone], toneRing[tone], `bg-${tone}-soft`)}>
+        <span className={cn("inline-flex h-9 w-9 items-center justify-center rounded-xl ring-1", toneText[tone], toneRing[tone], toneSoft[tone])}>
           {icon}
         </span>
         <div className="min-w-0 leading-tight">
