@@ -156,7 +156,7 @@ export function OnboardingDialog() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -18 }}
               transition={{ duration: 0.35, ease: nammaEase }}
-              className="relative min-h-[340px]"
+              className="relative min-h-[260px] sm:min-h-[340px]"
             >
               {step === "welcome" && (
                 <StepWelcome onStart={goNext} />
