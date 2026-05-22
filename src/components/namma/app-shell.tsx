@@ -71,6 +71,17 @@ function ShellInner({ children }: { children: React.ReactNode }) {
     return () => off();
   }, []);
 
+  if (authed === null || authed === false) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-story-soft via-background to-explore-soft">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-foreground/10 border-t-foreground/60" />
+          <span className="text-xs font-bold uppercase tracking-[0.22em]">Opening portal…</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="namma-shell">
       {/* Desktop sidebar */}

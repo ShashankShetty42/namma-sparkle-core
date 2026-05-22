@@ -1,11 +1,19 @@
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Bell, Flame, Menu, Search, Sparkles, Star } from "lucide-react";
+import { Bell, Flame, LogOut, Menu, Search, Sparkles, Star } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
 import { useAppShell } from "@/components/namma/app-shell-context";
+import { signOut } from "@/lib/namma-progress";
 
 export function TopBar() {
   const { isMobile, setMobileOpen } = useAppShell();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    signOut();
+    navigate({ to: "/welcome", replace: true });
+  };
+
 
   return (
     <header className="namma-topbar">
@@ -52,6 +60,15 @@ export function TopBar() {
         <button type="button" aria-label="Notifications" className="namma-icon-btn relative">
           <Bell className="h-4 w-4" />
           <span className="namma-dot" />
+        </button>
+        <button
+          type="button"
+          aria-label="Sign out"
+          onClick={handleLogout}
+          className="namma-icon-btn"
+          title="Sign out"
+        >
+          <LogOut className="h-4 w-4" />
         </button>
         <button
           type="button"
