@@ -127,11 +127,11 @@ export function OnboardingDialog() {
       }}
     >
       <DialogContent
-        className="max-w-3xl overflow-hidden border-none bg-transparent p-0 shadow-none"
+        className="max-w-3xl max-h-[92dvh] overflow-y-auto overscroll-contain border-none bg-transparent p-0 shadow-none"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <div className="relative overflow-hidden rounded-[32px] border border-white/70 bg-gradient-to-br from-story-soft via-white to-explore-soft p-6 shadow-[0_40px_120px_-30px_rgba(80,40,180,0.45)] md:p-10">
+        <div className="relative overflow-hidden rounded-[28px] border border-white/70 bg-gradient-to-br from-story-soft via-white to-explore-soft p-5 shadow-[0_40px_120px_-30px_rgba(80,40,180,0.45)] sm:rounded-[32px] sm:p-6 md:p-10">
           {/* ambient glow */}
           <div className="pointer-events-none absolute -top-32 -left-20 h-72 w-72 rounded-full bg-bonus/30 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-32 -right-10 h-72 w-72 rounded-full bg-explore/30 blur-3xl" />
