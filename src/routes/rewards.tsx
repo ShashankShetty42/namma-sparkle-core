@@ -226,9 +226,9 @@ const XP_TIERS = [
 
 function RewardsPage() {
   const completed = getCompleted();
-  const completedCount = ACTIVITY_ORDER.filter((s) => completed[s]).length;
-  const collectedCount =
-    3 + completedCount; // base unlocks plus per-completion
+  const completedCount = ACTIVITY_ORDER.filter((s) => completed.includes(s)).length;
+  const collectedCount = 3 + completedCount;
+
 
   const memories = React.useMemo<Memory[]>(() => {
     return MEMORIES_BASE.map((m, i) => ({
