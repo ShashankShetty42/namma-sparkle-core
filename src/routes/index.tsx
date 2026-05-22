@@ -58,30 +58,33 @@ export const Route = createFileRoute("/")({
 
 /* ───────────────────────── data ───────────────────────── */
 
-type RoadmapDay = {
-  day: string;
+type FlowNode = {
+  key: string;
   label: string;
   tone: string;
+  icon: React.ComponentType<{ className?: string }>;
   done: boolean;
-  today?: boolean;
+  current?: boolean;
   locked?: boolean;
 };
-const WEEKLY_ROADMAP: RoadmapDay[] = [
-  { day: "Mon", label: "Kickoff", tone: "story", done: true },
-  { day: "Tue", label: "Explore", tone: "explore", done: true },
-  { day: "Wed", label: "Decide", tone: "decide", done: true },
-  { day: "Thu", label: "Reflect", tone: "reflect", done: false, today: true },
-  { day: "Fri", label: "Ethics", tone: "challenge", done: false },
-  { day: "Sat", label: "Quiz", tone: "xp", done: false },
-  { day: "Sun", label: "Reward", tone: "bonus", done: false, locked: true },
+
+// Weekly Adventure Flow — the 7-step sequence that repeats every week.
+const WEEKLY_FLOW: FlowNode[] = [
+  { key: "story", label: "Story & Concept", tone: "story", icon: BookOpen, done: true },
+  { key: "explore", label: "Explore & Observe", tone: "explore", icon: Compass, done: true },
+  { key: "decide", label: "Do & Decide", tone: "decide", icon: Target, done: true },
+  { key: "write", label: "Think & Write", tone: "reflect", icon: PenLine, done: false, current: true },
+  { key: "ethics", label: "Ethics Scenario", tone: "challenge", icon: Scale, done: false },
+  { key: "quiz", label: "Weekly Quiz", tone: "xp", icon: Brain, done: false },
+  { key: "reward", label: "Reward Unlock", tone: "bonus", icon: Gift, done: false, locked: true },
 ];
 
 const ACHIEVEMENTS = [
-  { name: "First Mission", tone: "story", icon: Rocket, earned: true, sub: "Sealed Day 1" },
-  { name: "3-Day Streak", tone: "decide", icon: Flame, earned: true, sub: "On fire 🔥" },
+  { name: "First Mission", tone: "story", icon: Rocket, earned: true, sub: "Sealed Week 1" },
+  { name: "3-Week Streak", tone: "decide", icon: Flame, earned: true, sub: "Three weeks strong" },
   { name: "AI Spotter", tone: "explore", icon: Compass, earned: true, sub: "10 examples found" },
   { name: "Ethics Hero", tone: "challenge", icon: Medal, earned: false, sub: "Finish ethics" },
-  { name: "Weekly Champ", tone: "xp", icon: Crown, earned: false, sub: "Complete week" },
+  { name: "Weekly Champion", tone: "xp", icon: Crown, earned: false, sub: "Complete this week" },
   { name: "Reward Hunter", tone: "bonus", icon: Gift, earned: false, sub: "Open 5 rewards" },
 ] as const;
 
@@ -94,8 +97,8 @@ const LEADERBOARD = [
 ] as const;
 
 const REWARDS = [
-  { title: "Daily login XP", sub: "+50 XP ready to claim", icon: Star, tone: "xp", cta: "Claim" },
-  { title: "Streak chest", sub: "Open after 5-day streak", icon: Gift, tone: "bonus", cta: "Open" },
+  { title: "Weekly Completion XP", sub: "+50 XP when this week's done", icon: Star, tone: "xp", cta: "View" },
+  { title: "Weekly Champion Chest", sub: "Unlocks after 5 completed weeks", icon: Gift, tone: "bonus", cta: "Open" },
   { title: "Mystery sticker", sub: "Earn 3 more badges", icon: Sparkles, tone: "reflect", cta: "Preview" },
 ] as const;
 
