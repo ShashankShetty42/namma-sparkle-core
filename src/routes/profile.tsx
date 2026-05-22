@@ -205,15 +205,15 @@ function ProfilePage() {
                 {editingName ? (
                   <input
                     autoFocus
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={profile.name}
+                    onChange={(e) => update({ name: e.target.value })}
                     onBlur={() => setEditingName(false)}
                     onKeyDown={(e) => e.key === "Enter" && setEditingName(false)}
                     className="w-full max-w-xs rounded-2xl border border-violet-200 bg-white/80 px-4 py-2 font-display text-3xl font-bold text-foreground outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-200/50"
                   />
                 ) : (
                   <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
-                    {name}
+                    {profile.name}
                   </h1>
                 )}
                 <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -221,7 +221,7 @@ function ProfilePage() {
                     Explorer
                   </span>
                   <span className="text-muted-foreground">•</span>
-                  <span className="font-medium text-muted-foreground">{grade}</span>
+                  <span className="font-medium text-muted-foreground">{profile.gradeLabel}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 text-sm font-bold text-white shadow-sm">
@@ -283,9 +283,18 @@ function ProfilePage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard icon={Flame} label="Weekly streak" value={`${streak} weeks`} gradient="from-orange-400 to-rose-400" />
             <StatCard icon={Zap} label="Total XP" value={totalXP.toLocaleString()} gradient="from-amber-400 to-yellow-400" />
-            <StatCard icon={Award} label="Badges earned" value={String(badges)} gradient="from-violet-400 to-fuchsia-400" />
+            <StatCard icon={Award} label="Badges earned" value={String(badgeCount)} gradient="from-violet-400 to-fuchsia-400" />
             <StatCard icon={Star} label="Weeks completed" value={`${weeks} / 35`} gradient="from-sky-400 to-cyan-400" />
           </div>
+        </Section>
+
+        {/* MY AI ADVENTURE TIMELINE */}
+        <Section title="My AI Adventure" subtitle="A live record of every activity, challenge, and badge.">
+          <TimelineCard
+            events={timeline}
+            empty={timeline.length === 0}
+            submissions={submissions.length}
+          />
         </Section>
 
         {/* PROFILE DETAILS */}
@@ -294,15 +303,19 @@ function ProfilePage() {
             <Card>
               <Field label="Your name">
                 <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={profile.name}
+                  onChange={(e) => update({ name: e.target.value })}
                   className="w-full rounded-2xl border border-border/60 bg-white/60 px-4 py-3 text-base font-medium text-foreground outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
                 />
               </Field>
               <Field label="Your grade">
                 <div className="flex flex-wrap gap-2">
-                  {["Grade 5", "Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10"].map((g) => (
-                    <Chip key={g} active={grade === g} onClick={() => setGrade(g)}>
+                  {gradeOptions.map((g) => (
+                    <Chip
+                      key={g}
+                      active={profile.gradeLabel === g}
+                      onClick={() => update({ gradeLabel: g, gradeBand: labelToBand(g) }, `Grade set to ${g}`)}
+                    >
                       {g}
                     </Chip>
                   ))}
@@ -311,7 +324,7 @@ function ProfilePage() {
               <Field label="Learning style">
                 <div className="flex flex-wrap gap-2">
                   {learningStyles.map((s) => (
-                    <Chip key={s} active={style === s} onClick={() => setStyle(s)}>
+                    <Chip key={s} active={profile.learningStyle === s} onClick={() => update({ learningStyle: s })}>
                       {s}
                     </Chip>
                   ))}
@@ -325,15 +338,15 @@ function ProfilePage() {
                   {avatarColors.map((c) => (
                     <button
                       key={c.id}
-                      onClick={() => setColor(c)}
+                      onClick={() => update({ avatarColorId: c.id })}
                       title={c.label}
                       className={cn(
                         "relative h-11 w-11 rounded-full bg-gradient-to-br ring-offset-2 transition-all hover:scale-110",
                         c.gradient,
-                        color.id === c.id ? "ring-2 ring-foreground/60 scale-110" : "ring-0",
+                        profile.avatarColorId === c.id ? "ring-2 ring-foreground/60 scale-110" : "ring-0",
                       )}
                     >
-                      {color.id === c.id && (
+                      {profile.avatarColorId === c.id && (
                         <Check className="absolute inset-0 m-auto h-5 w-5 text-white drop-shadow" />
                       )}
                     </button>
@@ -345,11 +358,11 @@ function ProfilePage() {
                   {avatarIcons.map(({ id, icon: Icon, label }) => (
                     <button
                       key={id}
-                      onClick={() => setIconId(id)}
+                      onClick={() => update({ avatarIconId: id })}
                       title={label}
                       className={cn(
                         "grid h-12 w-12 place-items-center rounded-2xl border transition-all hover:-translate-y-0.5",
-                        iconId === id
+                        profile.avatarIconId === id
                           ? "border-violet-400 bg-violet-50 text-violet-600 shadow-md"
                           : "border-border/60 bg-white/60 text-muted-foreground hover:text-foreground",
                       )}
@@ -367,12 +380,12 @@ function ProfilePage() {
         <Section title="Favorite guide" subtitle="Choose who greets you across your adventure.">
           <div className="grid gap-4 md:grid-cols-3">
             {characters.map((c) => {
-              const active = favorite === c.id;
+              const active = profile.favorite === c.id;
               return (
                 <motion.button
                   key={c.id}
                   whileHover={{ y: -4 }}
-                  onClick={() => setFavorite(c.id)}
+                  onClick={() => update({ favorite: c.id })}
                   className={cn(
                     "relative overflow-hidden rounded-[28px] border bg-white/70 p-6 text-left backdrop-blur-xl transition-all",
                     active
@@ -443,37 +456,37 @@ function ProfilePage() {
           <Card>
             <div className="divide-y divide-border/40">
               <SettingRow
-                icon={sound ? Volume2 : VolumeX}
+                icon={profile.sound ? Volume2 : VolumeX}
                 title="Sound effects"
                 description="Little chimes and celebrations."
-                control={<Toggle value={sound} onChange={setSound} />}
+                control={<Toggle value={profile.sound} onChange={(v) => update({ sound: v })} />}
               />
               <SettingRow
                 icon={Wand2}
                 title="Animation magic"
                 description="Soft motion across the portal."
-                control={<Toggle value={motionFx} onChange={setMotionFx} />}
+                control={<Toggle value={profile.motionFx} onChange={(v) => update({ motionFx: v })} />}
               />
               <SettingRow
-                icon={theme === "light" ? Sun : Moon}
+                icon={profile.theme === "light" ? Sun : Moon}
                 title="Theme mode"
                 description="Pick your vibe."
                 control={
                   <div className="flex rounded-full bg-muted p-1">
                     <button
-                      onClick={() => setTheme("light")}
+                      onClick={() => update({ theme: "light" })}
                       className={cn(
                         "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                        theme === "light" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground",
+                        profile.theme === "light" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground",
                       )}
                     >
                       <Sun className="h-3.5 w-3.5" /> Light
                     </button>
                     <button
-                      onClick={() => setTheme("dark")}
+                      onClick={() => update({ theme: "dark" })}
                       className={cn(
                         "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                        theme === "dark" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground",
+                        profile.theme === "dark" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground",
                       )}
                     >
                       <Moon className="h-3.5 w-3.5" /> Dark
