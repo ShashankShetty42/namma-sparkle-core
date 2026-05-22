@@ -13,6 +13,7 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MissionsRouteImport } from './routes/missions'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as JourneyRouteImport } from './routes/journey'
@@ -40,6 +41,11 @@ const RewardsRoute = RewardsRouteImport.update({
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MissionsRoute = MissionsRouteImport.update({
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/journey': typeof JourneyRoute
   '/leaderboard': typeof LeaderboardRoute
   '/missions': typeof MissionsRoute
+  '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/journey': typeof JourneyRoute
   '/leaderboard': typeof LeaderboardRoute
   '/missions': typeof MissionsRoute
+  '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/journey': typeof JourneyRoute
   '/leaderboard': typeof LeaderboardRoute
   '/missions': typeof MissionsRoute
+  '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/journey'
     | '/leaderboard'
     | '/missions'
+    | '/profile'
     | '/resources'
     | '/rewards'
     | '/sitemap.xml'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/journey'
     | '/leaderboard'
     | '/missions'
+    | '/profile'
     | '/resources'
     | '/rewards'
     | '/sitemap.xml'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/journey'
     | '/leaderboard'
     | '/missions'
+    | '/profile'
     | '/resources'
     | '/rewards'
     | '/sitemap.xml'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   JourneyRoute: typeof JourneyRoute
   LeaderboardRoute: typeof LeaderboardRoute
   MissionsRoute: typeof MissionsRoute
+  ProfileRoute: typeof ProfileRoute
   ResourcesRoute: typeof ResourcesRoute
   RewardsRoute: typeof RewardsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -213,6 +226,13 @@ declare module '@tanstack/react-router' {
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/missions': {
@@ -294,6 +314,7 @@ const rootRouteChildren: RootRouteChildren = {
   JourneyRoute: JourneyRoute,
   LeaderboardRoute: LeaderboardRoute,
   MissionsRoute: MissionsRoute,
+  ProfileRoute: ProfileRoute,
   ResourcesRoute: ResourcesRoute,
   RewardsRoute: RewardsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
