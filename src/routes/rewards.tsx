@@ -238,10 +238,27 @@ const XP_TIERS = [
 /* -------------------------------------------------------------- */
 
 function RewardsPage() {
-  const completed = getCompleted();
+  const [completed, setCompleted] = React.useState<string[]>([]);
+  const [streak, setStreak] = React.useState(DEFAULT_STREAK);
+  const [xp, setXp] = React.useState(DEFAULT_XP);
+
+  React.useEffect(() => {
+    const load = () => {
+      setCompleted(getCompleted());
+      setStreak(getWeeklyStreak());
+      setXp(getTotalXP());
+    };
+    load();
+    const off = onNammaState(load);
+    window.addEventListener("namma:progress", load);
+    return () => {
+      off();
+      window.removeEventListener("namma:progress", load);
+    };
+  }, []);
+
   const completedCount = ACTIVITY_ORDER.filter((s) => completed.includes(s)).length;
   const collectedCount = 3 + completedCount;
-
 
   const memories = React.useMemo<Memory[]>(() => {
     return MEMORIES_BASE.map((m, i) => ({
@@ -250,7 +267,7 @@ function RewardsPage() {
     }));
   }, [completedCount]);
 
-  const nextStreak = STREAKS.find((s) => s.weeks > CURRENT_STREAK) ?? STREAKS[STREAKS.length - 1];
+  const nextStreak = STREAKS.find((s) => s.weeks > streak) ?? STREAKS[STREAKS.length - 1];
 
   const [openMemory, setOpenMemory] = React.useState<Memory | null>(null);
   const [openedCapsules, setOpenedCapsules] = React.useState<Record<string, boolean>>({});
@@ -259,14 +276,14 @@ function RewardsPage() {
     <AppShell>
       <div className="namma-page space-y-12 pb-20">
         <Hero
-          streak={CURRENT_STREAK}
-          xp={TOTAL_XP}
+          streak={streak}
+          xp={xp}
           collected={collectedCount}
           nextLabel={nextStreak.reward}
-          nextIn={nextStreak.weeks - CURRENT_STREAK}
+          nextIn={Math.max(0, nextStreak.weeks - streak)}
         />
 
-        <StreakSection current={CURRENT_STREAK} />
+        <StreakSection current={streak} />
 
         <VaultSection memories={memories} onOpen={setOpenMemory} />
 
@@ -279,7 +296,7 @@ function RewardsPage() {
           onOpen={(id) => setOpenedCapsules((p) => ({ ...p, [id]: true }))}
         />
 
-        <XPMilestoneSection xp={TOTAL_XP} />
+        <XPMilestoneSection xp={xp} />
 
         <ClosingMoment />
       </div>
