@@ -248,7 +248,7 @@ function RewardsPage() {
     }));
   }, [completedCount]);
 
-  const nextStreak = STREAKS.find((s) => s.days > CURRENT_STREAK) ?? STREAKS[STREAKS.length - 1];
+  const nextStreak = STREAKS.find((s) => s.weeks > CURRENT_STREAK) ?? STREAKS[STREAKS.length - 1];
 
   const [openMemory, setOpenMemory] = React.useState<Memory | null>(null);
   const [openedCapsules, setOpenedCapsules] = React.useState<Record<string, boolean>>({});
