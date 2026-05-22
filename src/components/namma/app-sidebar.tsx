@@ -79,9 +79,7 @@ export function AppSidebar() {
           onClick={() => isMobile && setMobileOpen(false)}
           className="flex items-center gap-3 group"
         >
-          <div className="namma-brand-mark">
-            <Sparkles className="h-5 w-5" />
-          </div>
+          <BrandMark size={40} />
           {!isCollapsed && (
             <div className="flex flex-col leading-tight">
               <span className="font-display text-lg font-extrabold text-foreground tracking-tight">
