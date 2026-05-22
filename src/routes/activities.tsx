@@ -174,6 +174,9 @@ function ActivitiesHub() {
             })}
           </div>
         </section>
+
+        {/* BONUS LAYER — inline Advanced/Expert challenges for this week */}
+        <WeeklyChallenges weekId="week-9" />
       </div>
     </AppShell>
   );
