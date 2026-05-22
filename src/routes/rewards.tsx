@@ -56,7 +56,7 @@ export const Route = createFileRoute("/rewards")({
 /*                          DATA                                  */
 /* -------------------------------------------------------------- */
 
-const CURRENT_STREAK = 5;
+const CURRENT_STREAK = 5; // weeks
 const TOTAL_XP = 1280;
 
 type Tone = "story" | "explore" | "decide" | "reflect" | "challenge" | "bonus" | "xp" | "success";
