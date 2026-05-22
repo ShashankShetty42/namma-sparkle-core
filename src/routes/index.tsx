@@ -159,7 +159,7 @@ function DashboardPage() {
                 is one tap away.
               </h1>
               <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                Continue Week 9 with Dev, Neo & Anaya. Earn XP, light up your streak,
+                Continue Week 9 with Dev, Neo & Anaya. Earn XP, grow your weekly streak,
                 and unlock the legendary Weekly Champion badge.
               </p>
 
