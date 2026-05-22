@@ -1,13 +1,14 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 
 import { AppShellProvider, useAppShell } from "@/components/namma/app-shell-context";
 import { AppSidebar } from "@/components/namma/app-sidebar";
 import { TopBar } from "@/components/namma/top-bar";
 import { OnboardingDialog } from "@/components/namma/onboarding-dialog";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { getProfile, onNammaState } from "@/lib/namma-progress";
+import { getAuth, getProfile, onNammaState } from "@/lib/namma-progress";
 
 const WELCOME_KEY = "namma:welcome:lastSession";
 
@@ -21,6 +22,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function ShellInner({ children }: { children: React.ReactNode }) {
   const { isMobile, mobileOpen, setMobileOpen } = useAppShell();
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [authed, setAuthed] = React.useState<boolean | null>(null);
+
+  // Auth gate: redirect unauthenticated users to /welcome.
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const check = () => {
+      const a = getAuth();
+      setAuthed(a.isAuthed);
+      if (!a.isAuthed) {
+        navigate({ to: "/welcome", replace: true });
+        return;
+      }
+      // Role-based redirect: keep teachers/admins on their dashboards.
+      if (a.role === "teacher" && pathname === "/") {
+        navigate({ to: "/teacher", replace: true });
+      } else if (a.role === "admin" && pathname === "/") {
+        navigate({ to: "/admin", replace: true });
+      }
+    };
+    check();
+    const off = onNammaState(check);
+    return () => off();
+  }, [navigate, pathname]);
 
   // Per-session welcome moment (after onboarding is done).
   React.useEffect(() => {

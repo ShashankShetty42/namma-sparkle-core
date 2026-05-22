@@ -123,16 +123,16 @@ function SignupPage() {
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
             <div className="grid gap-3 sm:grid-cols-2">
               <Field icon={<User className="h-4 w-4" />} label="First name">
-                <Input value={first} onChange={(e) => setFirst(e.target.value)} className="signup-input" />
+                <Input value={first} onChange={(e) => setFirst(e.target.value)} className="h-12 rounded-2xl border-2 border-foreground/10 bg-white pl-10 text-sm font-semibold focus-visible:border-foreground/50" />
               </Field>
               <Field icon={<User className="h-4 w-4" />} label="Last name">
-                <Input value={last} onChange={(e) => setLast(e.target.value)} className="signup-input" />
+                <Input value={last} onChange={(e) => setLast(e.target.value)} className="h-12 rounded-2xl border-2 border-foreground/10 bg-white pl-10 text-sm font-semibold focus-visible:border-foreground/50" />
               </Field>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <Field icon={<School className="h-4 w-4" />} label="School name">
-                <Input value={school} onChange={(e) => setSchool(e.target.value)} className="signup-input" />
+                <Input value={school} onChange={(e) => setSchool(e.target.value)} className="h-12 rounded-2xl border-2 border-foreground/10 bg-white pl-10 text-sm font-semibold focus-visible:border-foreground/50" />
               </Field>
               <div>
                 <span className="mb-1.5 block text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
@@ -160,15 +160,15 @@ function SignupPage() {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <Field icon={<Mail className="h-4 w-4" />} label="Student email">
-                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="signup-input" />
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 rounded-2xl border-2 border-foreground/10 bg-white pl-10 text-sm font-semibold focus-visible:border-foreground/50" />
               </Field>
               <Field icon={<Mail className="h-4 w-4" />} label="Parent email">
-                <Input type="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} className="signup-input" />
+                <Input type="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} className="h-12 rounded-2xl border-2 border-foreground/10 bg-white pl-10 text-sm font-semibold focus-visible:border-foreground/50" />
               </Field>
             </div>
 
             <Field icon={<Sparkles className="h-4 w-4" />} label="Password">
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="signup-input" />
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 rounded-2xl border-2 border-foreground/10 bg-white pl-10 text-sm font-semibold focus-visible:border-foreground/50" />
             </Field>
 
             <div>
