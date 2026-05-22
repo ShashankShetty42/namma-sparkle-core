@@ -458,13 +458,3 @@ function MissionsPage() {
   );
 }
 
-function _Page() {
-  return (
-    <AppShell>
-      <MissionsPage />
-    </AppShell>
-  );
-}
-
-// Wrap with AppShell at the route boundary so the page-level layout matches other routes.
-Route.update({ component: () => <AppShell><MissionsPage /></AppShell> });
