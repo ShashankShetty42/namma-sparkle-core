@@ -645,9 +645,9 @@ function DashboardPage() {
           <ProgressWidget
             tone="decide"
             icon={<Flame className="h-5 w-5" />}
-            label="Streak goal · 7 days"
-            percent={Math.round((5 / 7) * 100)}
-            caption="5 / 7 days · keep going!"
+            label="Weekly completion goal"
+            percent={weekPercent}
+            caption={`${completed.size} / ${ACTIVITY_ORDER.length} activities this week`}
           />
         </motion.section>
       </div>
