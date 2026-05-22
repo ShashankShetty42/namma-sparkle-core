@@ -239,7 +239,8 @@ function MissionsPage() {
           </div>
           <div className="relative mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {ACTIVITY_ORDER.map((slug) => {
-              const meta = ACTIVITIES[slug];
+              const def = ACTIVITIES[slug];
+              const m = def.meta;
               const done = completed.has(slug);
               return (
                 <Link
@@ -248,29 +249,29 @@ function MissionsPage() {
                   params={{ slug }}
                   className={cn(
                     "group rounded-2xl border bg-white/85 p-4 transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]",
-                    done ? "border-success/40" : `border-${meta.tone}/25`,
+                    done ? "border-success/40" : `border-${m.tone}/25`,
                   )}
                 >
                   <div className="flex items-start justify-between">
                     <span
                       className={cn(
                         "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.18em]",
-                        `bg-${meta.tone}-soft text-${meta.tone}`,
+                        `bg-${m.tone}-soft text-${m.tone}`,
                       )}
                     >
-                      {meta.eyebrow}
+                      <span className="mr-0.5">{def.emoji}</span> {m.weekLabel}
                     </span>
                     {done ? (
                       <CheckCircle2 className="h-4 w-4 text-success" />
                     ) : (
-                      <span className={cn("h-2 w-2 rounded-full", `bg-${meta.tone}`)} />
+                      <span className={cn("h-2 w-2 rounded-full", `bg-${m.tone}`)} />
                     )}
                   </div>
                   <div className="mt-2 font-display text-sm font-bold text-foreground">
-                    {meta.title}
+                    {m.title}
                   </div>
                   <div className="mt-3 flex items-center justify-between text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                    <span>{meta.totalXp} XP</span>
+                    <span>{m.totalXp} XP</span>
                     <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </Link>
