@@ -356,7 +356,32 @@ export function LessonFrame({
           <RewardModal
             meta={meta}
             onContinue={() => {
-              if (slug) markCompleted(slug);
+              if (slug) {
+                const isNew = rewardActivity(slug, {
+                  title: meta.title,
+                  badge: meta.badge,
+                  xp: meta.totalXp,
+                  tone: meta.tone,
+                  weekId: "week-9",
+                });
+                markCompleted(slug);
+                if (isNew) {
+                  toast.success(`+${meta.totalXp} XP`, {
+                    description: `${meta.badge} unlocked`,
+                  });
+                }
+                // Weekly completion check
+                const done = new Set(getCompleted());
+                done.add(slug);
+                if (ACTIVITY_ORDER.every((s) => done.has(s))) {
+                  const newWeek = markWeekComplete("week-9");
+                  if (newWeek) {
+                    toast.success("Week 9 complete!", {
+                      description: "+1 to your weekly streak · keep the momentum",
+                    });
+                  }
+                }
+              }
               setShowReward(false);
               if (meta.nextHref) navigate({ to: meta.nextHref });
               else navigate({ to: "/activities" });
