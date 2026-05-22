@@ -57,8 +57,9 @@ export const Route = createFileRoute("/rewards")({
 /*                          DATA                                  */
 /* -------------------------------------------------------------- */
 
-const CURRENT_STREAK = 5; // weeks
-const TOTAL_XP = 1280;
+// Dynamic streak + XP read in RewardsPage; these defaults are fallbacks.
+const DEFAULT_STREAK = 0;
+const DEFAULT_XP = 0;
 
 type Tone = "story" | "explore" | "decide" | "reflect" | "challenge" | "bonus" | "xp" | "success";
 
