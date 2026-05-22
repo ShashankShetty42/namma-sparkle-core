@@ -736,3 +736,84 @@ function FloatingParticles() {
     </div>
   );
 }
+
+function timeAgo(at: number): string {
+  const s = Math.max(1, Math.floor((Date.now() - at) / 1000));
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
+function TimelineCard({
+  events,
+  empty,
+  submissions,
+}: {
+  events: TimelineEvent[];
+  empty: boolean;
+  submissions: number;
+}) {
+  if (empty) {
+    return (
+      <div className="rounded-[28px] border border-white/60 bg-white/70 p-8 text-center shadow-[0_15px_45px_-25px_rgba(15,23,42,0.2)] backdrop-blur-xl">
+        <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-violet-100 to-sky-100 text-violet-600">
+          <Clock className="h-5 w-5" />
+        </div>
+        <h3 className="font-display text-lg font-bold">Your adventure starts soon</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Complete an activity or elite challenge to start your timeline.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-[28px] border border-white/60 bg-white/70 p-6 shadow-[0_15px_45px_-25px_rgba(15,23,42,0.2)] backdrop-blur-xl md:p-8">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+          Recent events
+        </div>
+        <div className="text-xs text-muted-foreground">{submissions} challenge submissions saved</div>
+      </div>
+      <ol className="relative space-y-4 border-l-2 border-violet-100 pl-5">
+        {events.map((e) => {
+          const meta =
+            e.kind === "activity"
+              ? { Icon: Star, color: "from-sky-400 to-cyan-400", label: "Activity completed" }
+              : e.kind === "challenge"
+                ? { Icon: Trophy, color: "from-amber-400 to-orange-400", label: `${e.tier === "advanced" ? "Advanced" : "Expert"} challenge` }
+                : { Icon: Award, color: "from-violet-500 to-fuchsia-500", label: "Badge earned" };
+          return (
+            <li key={e.id} className="relative">
+              <span
+                className={cn(
+                  "absolute -left-[27px] top-1 grid h-5 w-5 place-items-center rounded-full bg-gradient-to-br text-white shadow-md ring-4 ring-white",
+                  meta.color,
+                )}
+              >
+                <meta.Icon className="h-3 w-3" />
+              </span>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <div className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    {meta.label}
+                  </div>
+                  <div className="font-display text-base font-bold text-foreground">{e.title}</div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {"xp" in e && e.xp ? (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 font-bold text-amber-700">
+                      +{e.xp} XP
+                    </span>
+                  ) : null}
+                  <span>{timeAgo(e.at)}</span>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
