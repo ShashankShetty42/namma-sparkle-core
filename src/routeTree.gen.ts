@@ -18,6 +18,7 @@ import { Route as MissionsRouteImport } from './routes/missions'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
+import { Route as ChallengesRouteImport } from './routes/challenges'
 import { Route as BadgesRouteImport } from './routes/badges'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
@@ -68,6 +69,11 @@ const DesignSystemRoute = DesignSystemRouteImport.update({
   path: '/design-system',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChallengesRoute = ChallengesRouteImport.update({
+  id: '/challenges',
+  path: '/challenges',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BadgesRoute = BadgesRouteImport.update({
   id: '/badges',
   path: '/badges',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
   '/badges': typeof BadgesRoute
+  '/challenges': typeof ChallengesRoute
   '/design-system': typeof DesignSystemRoute
   '/journey': typeof JourneyRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
   '/badges': typeof BadgesRoute
+  '/challenges': typeof ChallengesRoute
   '/design-system': typeof DesignSystemRoute
   '/journey': typeof JourneyRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
   '/badges': typeof BadgesRoute
+  '/challenges': typeof ChallengesRoute
   '/design-system': typeof DesignSystemRoute
   '/journey': typeof JourneyRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activities'
     | '/badges'
+    | '/challenges'
     | '/design-system'
     | '/journey'
     | '/leaderboard'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activities'
     | '/badges'
+    | '/challenges'
     | '/design-system'
     | '/journey'
     | '/leaderboard'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activities'
     | '/badges'
+    | '/challenges'
     | '/design-system'
     | '/journey'
     | '/leaderboard'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivitiesRoute: typeof ActivitiesRouteWithChildren
   BadgesRoute: typeof BadgesRoute
+  ChallengesRoute: typeof ChallengesRoute
   DesignSystemRoute: typeof DesignSystemRoute
   JourneyRoute: typeof JourneyRoute
   LeaderboardRoute: typeof LeaderboardRoute
@@ -263,6 +276,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesignSystemRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/challenges': {
+      id: '/challenges'
+      path: '/challenges'
+      fullPath: '/challenges'
+      preLoaderRoute: typeof ChallengesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/badges': {
       id: '/badges'
       path: '/badges'
@@ -310,6 +330,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivitiesRoute: ActivitiesRouteWithChildren,
   BadgesRoute: BadgesRoute,
+  ChallengesRoute: ChallengesRoute,
   DesignSystemRoute: DesignSystemRoute,
   JourneyRoute: JourneyRoute,
   LeaderboardRoute: LeaderboardRoute,
