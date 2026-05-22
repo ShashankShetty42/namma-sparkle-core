@@ -125,10 +125,8 @@ function LoginPage() {
       <div className="pointer-events-none absolute bottom-[-12rem] right-[-10rem] h-[30rem] w-[30rem] rounded-full bg-reflect/25 blur-3xl" />
 
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-5 py-5 md:px-8">
-        <Link to="/welcome" className="inline-flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-bonus via-challenge to-explore shadow-[var(--shadow-glow)]">
-            <Sparkles className="h-4 w-4 text-white" />
-          </div>
+        <Link to="/welcome" className="inline-flex items-center gap-2.5">
+          <BrandMark size={40} />
           <span className="font-display text-lg font-extrabold tracking-tight text-foreground">
             Namma <span className="text-primary">AI</span>
           </span>
