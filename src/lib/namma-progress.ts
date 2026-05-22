@@ -18,6 +18,10 @@ const XP_KEY = "namma:xp";
 const XP_LOG_KEY = "namma:xp:log";
 const SUBMISSIONS_KEY = "namma:submissions";
 const GRADE_KEY = "namma:grade";
+const WEEKS_KEY = "namma:weeks:completed";
+const QUIZ_KEY = "namma:quiz:results";
+const ANSWERS_KEY = "namma:lesson:answers";
+const CLASSMATES_KEY = "namma:classmates";
 
 const isBrowser = () => typeof window !== "undefined";
 
