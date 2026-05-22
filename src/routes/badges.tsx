@@ -275,6 +275,7 @@ function BadgesPage() {
           rarest={rarestEarned}
           latest={latestEarned}
           nextUp={nextUp}
+          streak={streak}
         />
 
         <CollectionStrip
