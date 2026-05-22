@@ -154,7 +154,7 @@ type Memory = {
 const MEMORIES_BASE: Memory[] = [
   { id: "m1", title: "First Quiz Mastered", caption: "You aced your very first quiz.", tone: "decide", character: "dev", dialogue: "Logic level: rising fast. Well done!", unlocked: true },
   { id: "m2", title: "Week 1 Completed", caption: "Your adventure officially began.", tone: "story", character: "neo", dialogue: "You did it! Another adventure completed!", unlocked: true },
-  { id: "m3", title: "7-Day Streak Achieved", caption: "A whole week of magic.", tone: "explore", character: "anaya", dialogue: "Consistency makes creativity bloom.", unlocked: true },
+  { id: "m3", title: "6-Week Streak Achieved", caption: "Six weeks of magical learning.", tone: "explore", character: "anaya", dialogue: "Consistency makes creativity bloom.", unlocked: true },
   { id: "m4", title: "Ethics Champion", caption: "You made the wise choice.", tone: "reflect", character: "anaya", dialogue: "Kindness in code — beautifully done.", unlocked: false },
   { id: "m5", title: "Creative Spark", caption: "You built something one-of-a-kind.", tone: "bonus", character: "anaya", dialogue: "Creativity deserves rewards too!", unlocked: false },
   { id: "m6", title: "Speed Solver", caption: "Quick, sharp, brilliant.", tone: "challenge", character: "dev", dialogue: "You're leveling up fast!", unlocked: false },
