@@ -312,6 +312,7 @@ function Hero({
   rarest,
   latest,
   nextUp,
+  streak,
 }: {
   totalEarned: number;
   collectionPct: number;
@@ -319,6 +320,7 @@ function Hero({
   rarest: Badge | null;
   latest: Badge | null;
   nextUp: Badge;
+  streak: number;
 }) {
   return (
     <motion.section
