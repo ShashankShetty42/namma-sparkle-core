@@ -560,7 +560,7 @@ function StreakSection({ current }: { current: number }) {
           <div className="absolute left-0 right-0 top-1/2 hidden h-1 -translate-y-1/2 rounded-full bg-gradient-to-r from-challenge/30 via-bonus/30 to-xp/30 md:block" />
           <div
             className="absolute left-0 top-1/2 hidden h-1 -translate-y-1/2 rounded-full bg-gradient-to-r from-challenge to-bonus md:block"
-            style={{ width: `${Math.min(100, (current / 30) * 100)}%` }}
+            style={{ width: `${Math.min(100, (current / 28) * 100)}%` }}
           />
           <div className="relative grid grid-cols-2 gap-4 md:grid-cols-6">
             {STREAKS.map((s) => {
