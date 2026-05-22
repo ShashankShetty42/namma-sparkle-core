@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import neoHappy from "@/assets/characters/neo-happy.png";
+import { BrandMark } from "@/components/namma/brand-mark";
 import { cn } from "@/lib/utils";
 import { useAppShell } from "@/components/namma/app-shell-context";
 
