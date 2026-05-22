@@ -24,7 +24,7 @@ export function StreakBadge({
       >
         <Flame className={size === "md" ? "h-4 w-4" : "h-3 w-3"} />
       </motion.span>
-      <span>{days}-day streak</span>
+      <span>{days}-week streak</span>
     </motion.span>
   );
 }
