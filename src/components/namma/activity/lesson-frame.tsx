@@ -305,8 +305,16 @@ export function LessonFrame({
               card={card}
               quizState={quizState[card.id]}
               answer={ans}
-              onQuiz={(correct) => setQuizState((s) => ({ ...s, [card.id]: correct ? "correct" : "wrong" }))}
-              onAnswer={(patch) => setAnswers((a) => ({ ...a, [card.id]: { ...a[card.id], ...patch } }))}
+              onQuiz={(correct) => {
+                setQuizState((s) => ({ ...s, [card.id]: correct ? "correct" : "wrong" }));
+                if (slug) recordQuiz(slug, card.id, correct, 20);
+              }}
+              onAnswer={(patch) => {
+                setAnswers((a) => ({ ...a, [card.id]: { ...a[card.id], ...patch } }));
+                if (slug && patch.text && patch.text.trim().length > 3) {
+                  saveLessonAnswer(slug, card.id, patch.text.trim());
+                }
+              }}
             />
           </motion.div>
         </AnimatePresence>
