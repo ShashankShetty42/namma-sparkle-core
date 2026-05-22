@@ -253,24 +253,27 @@ function DashboardPage() {
           <StatTile icon={<Target className="h-5 w-5" />} tone="challenge" label="Rank" value="#2" sub="↑ 1 this week" />
         </motion.section>
 
-        {/* ───── WEEKLY ROADMAP ───── */}
+        {/* ───── WEEKLY ADVENTURE FLOW ───── */}
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5 }}
-          className="section-panel"
+          className="section-panel relative overflow-hidden"
         >
-          <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-story/15 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-xp/15 blur-3xl" />
+
+          <div className="relative flex flex-wrap items-end justify-between gap-3">
             <div>
               <div className="eyebrow">
-                <CalendarDays className="h-3.5 w-3.5" /> Weekly roadmap
+                <Compass className="h-3.5 w-3.5" /> Weekly Adventure Flow
               </div>
               <h2 className="mt-2 font-display text-2xl font-bold text-foreground md:text-3xl">
-                Your 7-day quest line
+                This week&apos;s magical journey
               </h2>
               <p className="text-sm text-muted-foreground">
-                Keep the chain alive — finish today to extend your streak.
+                Complete all activities before next week unlocks to grow your weekly streak.
               </p>
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-success/30 bg-success-soft/70 px-3 py-1.5 font-display text-sm font-bold text-success">
@@ -278,42 +281,77 @@ function DashboardPage() {
             </div>
           </div>
 
-          <div className="relative mt-6">
-            <div className="absolute top-7 right-4 left-4 h-1 rounded-full bg-secondary" />
+          <div className="relative mt-8">
+            {/* connecting rail */}
+            <div className="absolute top-9 right-6 left-6 h-1.5 rounded-full bg-secondary/70" />
             <motion.div
-              className="absolute top-7 left-4 h-1 rounded-full bg-gradient-to-r from-story via-decide to-xp"
+              className="absolute top-9 left-6 h-1.5 rounded-full bg-gradient-to-r from-story via-explore via-decide via-reflect via-challenge via-xp to-bonus shadow-[0_0_18px_rgba(120,80,200,0.35)]"
               initial={{ width: 0 }}
-              whileInView={{ width: `calc(${weekPercent}% - 2rem)` }}
+              whileInView={{ width: `calc(${weekPercent}% - 3rem)` }}
               viewport={{ once: true }}
-              transition={{ duration: 1, ease: "easeOut" }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
             />
-            <div className="relative grid grid-cols-7 gap-2">
-              {WEEKLY_ROADMAP.map((d, i) => (
-                <motion.div
-                  key={d.day}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                  className="flex flex-col items-center gap-2"
-                >
-                  <div
-                    className={cn(
-                      "flex h-14 w-14 items-center justify-center rounded-2xl border-2 text-sm font-display font-bold shadow-[var(--shadow-soft)] transition-all",
-                      d.done && `bg-${d.tone} text-white border-${d.tone}`,
-                      !d.done && d.today && `bg-white text-${d.tone} border-${d.tone} animate-[namma-pulse_2.4s_ease-in-out_infinite]`,
-                      !d.done && !d.today && !d.locked && "bg-white text-muted-foreground border-border",
-                      d.locked && "bg-muted text-locked border-locked/30",
-                    )}
+            <div className="relative grid grid-cols-4 gap-3 md:grid-cols-7">
+              {WEEKLY_FLOW.map((n, i) => {
+                const Icon = n.icon;
+                return (
+                  <motion.div
+                    key={n.key}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.06, type: "spring", stiffness: 220, damping: 22 }}
+                    whileHover={!n.locked ? { y: -4, scale: 1.04 } : undefined}
+                    className="group flex flex-col items-center gap-2"
                   >
-                    {d.done ? <CheckCircle2 className="h-6 w-6" /> : d.locked ? <Lock className="h-4 w-4" /> : d.day}
-                  </div>
-                  <div className="text-center leading-tight">
-                    <div className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">{d.day}</div>
-                    <div className={cn("text-xs font-bold", d.today ? `text-${d.tone}` : "text-foreground")}>{d.label}</div>
-                  </div>
-                </motion.div>
-              ))}
+                    <div className="relative">
+                      {n.current && (
+                        <span className={cn("absolute inset-0 rounded-2xl blur-md opacity-70", `bg-${n.tone}/60`)} />
+                      )}
+                      <div
+                        className={cn(
+                          "relative flex h-[72px] w-[72px] items-center justify-center rounded-2xl border-2 shadow-[var(--shadow-soft)] transition-all",
+                          n.done && `bg-gradient-to-br from-${n.tone} to-${n.tone}/70 text-white border-white/80 shadow-[0_12px_24px_-8px_rgba(0,0,0,0.25)]`,
+                          !n.done && n.current && `bg-white text-${n.tone} border-${n.tone} animate-[namma-pulse_2.4s_ease-in-out_infinite]`,
+                          !n.done && !n.current && !n.locked && `bg-white text-${n.tone}/80 border-${n.tone}/30`,
+                          n.locked && "bg-muted text-locked border-locked/30",
+                        )}
+                      >
+                        {n.done ? (
+                          <CheckCircle2 className="h-7 w-7" />
+                        ) : n.locked ? (
+                          <Lock className="h-5 w-5" />
+                        ) : (
+                          <Icon className="h-7 w-7" />
+                        )}
+                      </div>
+                      {n.current && (
+                        <span className="absolute -top-1.5 -right-1.5 inline-flex items-center gap-1 rounded-full bg-foreground px-1.5 py-0.5 text-[0.55rem] font-bold uppercase tracking-wider text-background shadow">
+                          Now
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-center leading-tight">
+                      <div className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                        Step {i + 1}
+                      </div>
+                      <div className={cn("text-[0.72rem] font-bold", n.current ? `text-${n.tone}` : n.locked ? "text-muted-foreground" : "text-foreground")}>
+                        {n.label}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <div className="relative mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-reflect/20 bg-reflect-soft/40 px-4 py-3">
+              <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
+                <Sparkles className="h-4 w-4 text-reflect" />
+                Finish this week&apos;s adventure to protect your streak and unlock rewards.
+              </div>
+              <div className="inline-flex items-center gap-1.5 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-reflect">
+                <HelpCircle className="h-3.5 w-3.5" /> 7-step weekly sequence
+              </div>
             </div>
           </div>
         </motion.section>
