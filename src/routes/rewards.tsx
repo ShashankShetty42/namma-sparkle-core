@@ -564,8 +564,8 @@ function StreakSection({ current }: { current: number }) {
           />
           <div className="relative grid grid-cols-2 gap-4 md:grid-cols-6">
             {STREAKS.map((s) => {
-              const state = current >= s.days ? "done" : current >= s.days - 2 ? "current" : "locked";
-              return <StreakNode key={s.days} s={s} state={state} />;
+              const state = current >= s.weeks ? "done" : current >= s.weeks - 2 ? "current" : "locked";
+              return <StreakNode key={s.weeks} s={s} state={state} />;
             })}
           </div>
         </div>
