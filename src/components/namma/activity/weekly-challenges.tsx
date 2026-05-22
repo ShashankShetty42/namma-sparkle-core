@@ -28,6 +28,8 @@ import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import { getCompleted } from "@/components/namma/activity/progress";
 import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
+import { addXP, awardBadge, getSubmission, hasBadge, saveSubmission } from "@/lib/namma-progress";
+import { toast } from "sonner";
 
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import neoHappy from "@/assets/characters/neo-happy.png";
@@ -292,8 +294,58 @@ export function WeeklyChallenges({ weekId = "week-9" }: { weekId?: string }) {
     }
   }, [weeklyDone, tier, weekId]);
 
-  const completeChallenge = (id: string) => {
+  const completeChallenge = (id: string, values: Record<string, unknown>) => {
+    const ch = challenges.find((c) => c.id === id);
+    if (!ch) return;
+    const already = !!getSubmission(weekId, id);
     markChallengeDone(weekId, id);
+    saveSubmission({
+      id,
+      weekId,
+      title: ch.title,
+      tier: ch.tier,
+      values,
+      xp: ch.xp,
+    });
+    if (!already) {
+      addXP(ch.xp, `Challenge · ${ch.title}`, weekId);
+      const newlyBadged = awardBadge({
+        id: `challenge:${weekId}:${id}`,
+        name: `${ch.title} Badge`,
+        kind: "challenge",
+        weekId,
+        tone: ch.tone,
+        xp: ch.xp,
+        description: ch.tagline,
+      });
+      toast.success(`+${ch.xp} XP earned`, {
+        description: newlyBadged ? `${ch.title} Badge unlocked` : `${ch.title} re-submitted`,
+      });
+
+      // Tier-completion master badge
+      const nextDone = new Set([...doneChallenges, id]);
+      const allTierDone = challenges.every((c) => nextDone.has(c.id));
+      if (allTierDone) {
+        const tierBadgeName =
+          ch.tier === "advanced" ? "Advanced Explorer Badge" : "Future Innovator Badge";
+        const awarded = awardBadge({
+          id: `tier-complete:${weekId}:${ch.tier}`,
+          name: tierBadgeName,
+          kind: "milestone",
+          weekId,
+          tone: "bonus",
+          xp: 200,
+        });
+        if (awarded) {
+          addXP(200, `Tier complete · ${ch.tier}`, weekId);
+          toast.success(`${tierBadgeName} unlocked!`, {
+            description: "+200 bonus XP · all 3 elite missions complete",
+          });
+        }
+      }
+    } else {
+      toast(`${ch.title} re-submitted`, { description: "Your latest answers are saved." });
+    }
     setDoneChallenges(new Set([...doneChallenges, id]));
   };
 
@@ -311,8 +363,9 @@ export function WeeklyChallenges({ weekId = "week-9" }: { weekId?: string }) {
         <ChallengeFlow
           challenge={active}
           isDone={doneChallenges.has(active.id)}
+          weekId={weekId}
           onBack={() => setActive(null)}
-          onComplete={() => completeChallenge(active.id)}
+          onComplete={(values) => completeChallenge(active.id, values)}
         />
       )}
 
