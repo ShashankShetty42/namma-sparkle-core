@@ -1112,7 +1112,7 @@ function QuizCardView({ card, state, attempts, onAnswer, onRetry }: { card: Quiz
               <Wand2 className="h-3 w-3" /> Try again
             </button>
           )}
-          {exhausted && state !== "correct" && (
+          {exhausted && (
             <div className="text-xs font-semibold text-muted-foreground">You've explored both tries — continue when ready, you can revisit this anytime.</div>
           )}
         </div>
