@@ -41,6 +41,18 @@ import {
   saveLessonAnswer,
 } from "@/lib/namma-progress";
 import { toast } from "sonner";
+import {
+  validateText,
+  submitToBackend,
+  WEEK_KEYWORDS,
+  type ValidationResult,
+  type ValidationTier,
+} from "@/lib/namma-validation";
+import {
+  WritingProgress,
+  NeoFeedback,
+  SubmissionOverlay,
+} from "@/components/namma/activity/writing-feedback";
 
 /* ============================================================ */
 /*  Types                                                        */
