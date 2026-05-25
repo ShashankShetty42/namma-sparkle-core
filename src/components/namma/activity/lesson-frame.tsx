@@ -651,23 +651,64 @@ function Eyebrow({ tone, icon, label }: { tone: Tone; icon: React.ReactNode; lab
 function CardRenderer(props: {
   card: LessonCard;
   quizState?: "correct" | "wrong";
+  quizAttempts: number;
   answer: { choice?: string; text?: string };
+  validation: ValidationResult | null;
+  readSeconds: number;
+  readyMarked: boolean;
+  onMarkReady: () => void;
   onQuiz: (correct: boolean) => void;
+  onQuizRetry: () => void;
   onAnswer: (patch: { choice?: string; text?: string }) => void;
 }) {
   const { card } = props;
   switch (card.kind) {
-    case "story": return <StoryCardView card={card} />;
-    case "concept": return <ConceptCardView card={card} />;
-    case "examples": return <ExamplesCardView card={card} />;
+    case "story": return <StoryCardView card={card} readSeconds={props.readSeconds} readyMarked={props.readyMarked} onMarkReady={props.onMarkReady} />;
+    case "concept": return <ConceptCardView card={card} readSeconds={props.readSeconds} readyMarked={props.readyMarked} onMarkReady={props.onMarkReady} />;
+    case "examples": return <ExamplesCardView card={card} readSeconds={props.readSeconds} readyMarked={props.readyMarked} onMarkReady={props.onMarkReady} />;
     case "spot": return <SpotCardView card={card} answer={props.answer} onAnswer={props.onAnswer} />;
-    case "decide": return <DecideCardView card={card} answer={props.answer} onAnswer={props.onAnswer} />;
-    case "reflect": return <ReflectCardView card={card} answer={props.answer} onAnswer={props.onAnswer} />;
-    case "dilemma": return <DilemmaCardView card={card} answer={props.answer} onAnswer={props.onAnswer} />;
-    case "quiz": return <QuizCardView card={card} state={props.quizState} onAnswer={props.onQuiz} />;
+    case "decide": return <DecideCardView card={card} answer={props.answer} onAnswer={props.onAnswer} validation={props.validation} />;
+    case "reflect": return <ReflectCardView card={card} answer={props.answer} onAnswer={props.onAnswer} validation={props.validation} />;
+    case "dilemma": return <DilemmaCardView card={card} answer={props.answer} onAnswer={props.onAnswer} validation={props.validation} />;
+    case "quiz": return <QuizCardView card={card} state={props.quizState} attempts={props.quizAttempts} onAnswer={props.onQuiz} onRetry={props.onQuizRetry} />;
     case "celebrate": return <CelebrateCardView card={card} />;
   }
 }
+
+/** Tiny reading-progress strip used on Story/Concept/Examples cards. */
+function ReadingPulse({ tone, seconds, readyMarked, onMarkReady }: { tone: Tone; seconds: number; readyMarked: boolean; onMarkReady: () => void }) {
+  const target = 12;
+  const pct = Math.min(100, Math.round((seconds / target) * 100));
+  const done = readyMarked || seconds >= target;
+  return (
+    <div className={cn("flex flex-wrap items-center gap-3 rounded-2xl border bg-white/80 px-4 py-2.5 shadow-[var(--shadow-soft)] backdrop-blur", `border-${tone}/25`)}>
+      <div className="flex items-center gap-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+        <span className={cn("inline-block h-1.5 w-1.5 animate-pulse rounded-full", `bg-${tone}`)} />
+        {done ? "Ready when you are" : "Reading along…"}
+      </div>
+      <div className="relative h-1.5 flex-1 min-w-[120px] overflow-hidden rounded-full bg-muted">
+        <motion.div
+          className={cn("absolute inset-y-0 left-0 rounded-full", `bg-${tone}`)}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.4, ease: nammaEase }}
+        />
+      </div>
+      <button
+        type="button"
+        onClick={onMarkReady}
+        className={cn(
+          "rounded-full border px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.16em] transition-all",
+          done
+            ? `border-${tone}/40 bg-${tone}-soft text-${tone}`
+            : "border-border/50 bg-white/70 text-muted-foreground hover:border-foreground/30 hover:text-foreground",
+        )}
+      >
+        {done ? "✓ I'm ready" : "I'm ready"}
+      </button>
+    </div>
+  );
+}
+
 
 function LessonIcon({ name, className = "h-4 w-4" }: { name?: LessonIconName; className?: string }) {
   const icons: Record<LessonIconName, React.ElementType> = {
