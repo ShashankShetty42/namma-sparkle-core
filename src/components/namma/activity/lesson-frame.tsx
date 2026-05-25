@@ -727,7 +727,7 @@ function LessonIcon({ name, className = "h-4 w-4" }: { name?: LessonIconName; cl
   return <Icon className={className} />;
 }
 
-function StoryCardView({ card }: { card: StoryCard }) {
+function StoryCardView({ card, readSeconds, readyMarked, onMarkReady }: { card: StoryCard; readSeconds: number; readyMarked: boolean; onMarkReady: () => void }) {
   return (
     <CardShell tone={card.tone}>
       <div className="grid items-center gap-8 md:grid-cols-[auto_1fr]">
@@ -736,13 +736,14 @@ function StoryCardView({ card }: { card: StoryCard }) {
           <Eyebrow tone={card.tone} icon={<Sparkles className="h-3 w-3" />} label={`${card.character.name} says`} />
           <h2 className="font-display text-2xl font-bold leading-snug text-foreground md:text-3xl">{card.message}</h2>
           {card.emphasis && <p className={cn("font-display text-lg font-semibold", `text-${card.tone}`)}>{card.emphasis}</p>}
+          <ReadingPulse tone={card.tone} seconds={readSeconds} readyMarked={readyMarked} onMarkReady={onMarkReady} />
         </div>
       </div>
     </CardShell>
   );
 }
 
-function ConceptCardView({ card }: { card: ConceptCard }) {
+function ConceptCardView({ card, readSeconds, readyMarked, onMarkReady }: { card: ConceptCard; readSeconds: number; readyMarked: boolean; onMarkReady: () => void }) {
   return (
     <CardShell tone={card.tone}>
       <div className="grid items-center gap-8 md:grid-cols-[auto_1fr]">
