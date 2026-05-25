@@ -761,13 +761,14 @@ function ConceptCardView({ card, readSeconds, readyMarked, onMarkReady }: { card
               </motion.div>
             ))}
           </div>
+          <ReadingPulse tone={card.tone} seconds={readSeconds} readyMarked={readyMarked} onMarkReady={onMarkReady} />
         </div>
       </div>
     </CardShell>
   );
 }
 
-function ExamplesCardView({ card }: { card: ExamplesCard }) {
+function ExamplesCardView({ card, readSeconds, readyMarked, onMarkReady }: { card: ExamplesCard; readSeconds: number; readyMarked: boolean; onMarkReady: () => void }) {
   return (
     <CardShell tone={card.tone}>
       <div className="grid items-center gap-8 md:grid-cols-[auto_1fr]">
@@ -787,11 +788,13 @@ function ExamplesCardView({ card }: { card: ExamplesCard }) {
               </motion.div>
             ))}
           </div>
+          <ReadingPulse tone={card.tone} seconds={readSeconds} readyMarked={readyMarked} onMarkReady={onMarkReady} />
         </div>
       </div>
     </CardShell>
   );
 }
+
 
 function SpotCardView({ card, answer, onAnswer }: { card: SpotCard; answer: { text?: string }; onAnswer: (p: { text?: string }) => void }) {
   const values = (answer.text ?? "").split("|");
