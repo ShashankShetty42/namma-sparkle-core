@@ -903,7 +903,7 @@ function OptionList({ options, picked, tone, onPick }: {
   );
 }
 
-function DecideCardView({ card, answer, onAnswer }: { card: DecideCard; answer: { choice?: string; text?: string }; onAnswer: (p: { choice?: string; text?: string }) => void }) {
+function DecideCardView({ card, answer, onAnswer, validation }: { card: DecideCard; answer: { choice?: string; text?: string }; onAnswer: (p: { choice?: string; text?: string }) => void; validation: ValidationResult | null }) {
   return (
     <CardShell tone={card.tone}>
       <div className="space-y-6">
@@ -926,7 +926,7 @@ function DecideCardView({ card, answer, onAnswer }: { card: DecideCard; answer: 
 
         <AnimatePresence>
           {answer.choice && (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-2 rounded-3xl border border-border/60 bg-white/80 p-5 shadow-[var(--shadow-soft)]">
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-3 rounded-3xl border border-border/60 bg-white/80 p-5 shadow-[var(--shadow-soft)]">
               <label className="flex items-center gap-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
                 <Feather className="h-3 w-3" /> {card.reasoningLabel ?? "Why did you choose this?"}
               </label>
@@ -938,6 +938,8 @@ function DecideCardView({ card, answer, onAnswer }: { card: DecideCard; answer: 
                 className={cn("w-full resize-none rounded-2xl border bg-white px-4 py-3 text-sm leading-6 text-foreground placeholder:text-muted-foreground/70 outline-none transition-all",
                   `border-border/60 focus:border-foreground/40`)}
               />
+              {validation && <WritingProgress result={validation} />}
+              {validation && <NeoFeedback result={validation} />}
             </motion.div>
           )}
         </AnimatePresence>
@@ -946,7 +948,7 @@ function DecideCardView({ card, answer, onAnswer }: { card: DecideCard; answer: 
   );
 }
 
-function DilemmaCardView({ card, answer, onAnswer }: { card: DilemmaCard; answer: { choice?: string; text?: string }; onAnswer: (p: { choice?: string; text?: string }) => void }) {
+function DilemmaCardView({ card, answer, onAnswer, validation }: { card: DilemmaCard; answer: { choice?: string; text?: string }; onAnswer: (p: { choice?: string; text?: string }) => void; validation: ValidationResult | null }) {
   return (
     <CardShell tone={card.tone}>
       <div className="space-y-6">
@@ -977,7 +979,7 @@ function DilemmaCardView({ card, answer, onAnswer }: { card: DilemmaCard; answer
 
         <AnimatePresence>
           {answer.choice && (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-2 rounded-3xl border border-border/60 bg-white/80 p-5 shadow-[var(--shadow-soft)]">
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-3 rounded-3xl border border-border/60 bg-white/80 p-5 shadow-[var(--shadow-soft)]">
               <label className="flex items-center gap-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
                 <Feather className="h-3 w-3" /> {card.reasoningLabel ?? "Why do you think so?"}
               </label>
@@ -989,6 +991,8 @@ function DilemmaCardView({ card, answer, onAnswer }: { card: DilemmaCard; answer
                 className={cn("w-full resize-none rounded-2xl border bg-white px-4 py-3 text-sm leading-6 text-foreground placeholder:text-muted-foreground/70 outline-none transition-all",
                   `border-border/60 focus:border-foreground/40`)}
               />
+              {validation && <WritingProgress result={validation} />}
+              {validation && <NeoFeedback result={validation} />}
             </motion.div>
           )}
         </AnimatePresence>
@@ -997,10 +1001,8 @@ function DilemmaCardView({ card, answer, onAnswer }: { card: DilemmaCard; answer
   );
 }
 
-function ReflectCardView({ card, answer, onAnswer }: { card: ReflectCard; answer: { text?: string }; onAnswer: (p: { text?: string }) => void }) {
+function ReflectCardView({ card, answer, onAnswer, validation }: { card: ReflectCard; answer: { text?: string }; onAnswer: (p: { text?: string }) => void; validation: ValidationResult | null }) {
   const text = answer.text ?? "";
-  const min = card.minLength ?? 12;
-  const count = text.trim().length;
   return (
     <CardShell tone={card.tone}>
       <div className="space-y-6">
@@ -1027,7 +1029,10 @@ function ReflectCardView({ card, answer, onAnswer }: { card: ReflectCard; answer
           </div>
         )}
 
-        <div className={cn("relative rounded-3xl border bg-gradient-to-br from-white via-white to-muted/20 p-1 shadow-[var(--shadow-soft)]", `border-${card.tone}/20`)}>
+        <div className={cn("relative rounded-3xl border bg-gradient-to-br from-white via-white to-muted/20 p-1 shadow-[var(--shadow-soft)] transition-shadow",
+          validation?.level === "excellent" && "shadow-[0_0_36px_rgba(255,180,80,0.25)]",
+          validation?.level === "ok" && "shadow-[0_0_28px_rgba(80,200,150,0.2)]",
+          `border-${card.tone}/20`)}>
           <textarea
             value={text}
             onChange={(e) => onAnswer({ text: e.target.value })}
@@ -1035,23 +1040,22 @@ function ReflectCardView({ card, answer, onAnswer }: { card: ReflectCard; answer
             placeholder={card.placeholder ?? "Start writing your thoughts…"}
             className="w-full resize-none rounded-[22px] bg-transparent px-5 py-4 font-body text-base leading-7 text-foreground placeholder:text-muted-foreground/60 outline-none"
           />
-          <div className="flex items-center justify-between border-t border-border/40 px-4 py-2">
-            <span className="text-[0.62rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
-              Anaya is reading along
-            </span>
-            <span className={cn("text-xs font-bold", count >= min ? `text-${card.tone}` : "text-muted-foreground")}>
-              {count} / {min}+ chars
-            </span>
-          </div>
+          {validation && (
+            <div className="border-t border-border/40 px-4 py-3">
+              <WritingProgress result={validation} minWords={45} />
+            </div>
+          )}
         </div>
+        {validation && <NeoFeedback result={validation} />}
       </div>
     </CardShell>
   );
 }
 
-function QuizCardView({ card, state, onAnswer }: { card: QuizCardData; state?: "correct" | "wrong"; onAnswer: (correct: boolean) => void }) {
+function QuizCardView({ card, state, attempts, onAnswer, onRetry }: { card: QuizCardData; state?: "correct" | "wrong"; attempts: number; onAnswer: (correct: boolean) => void; onRetry: () => void }) {
   const [picked, setPicked] = React.useState<string | null>(null);
   React.useEffect(() => { setPicked(null); }, [card.id]);
+  const exhausted = attempts >= 2 && state !== "correct";
   return (
     <CardShell tone={card.tone}>
       <div className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
@@ -1064,7 +1068,7 @@ function QuizCardView({ card, state, onAnswer }: { card: QuizCardData; state?: "
               const isPicked = picked === opt.id;
               const reveal = state !== undefined;
               const showCorrect = reveal && opt.correct;
-              const showWrong = reveal && isPicked && !opt.correct;
+              const showSoftMiss = reveal && isPicked && !opt.correct;
               return (
                 <motion.button
                   key={opt.id}
@@ -1079,15 +1083,15 @@ function QuizCardView({ card, state, onAnswer }: { card: QuizCardData; state?: "
                     "group flex items-center justify-between gap-3 rounded-2xl border bg-card/80 px-4 py-3 text-left text-sm font-semibold transition-all",
                     !reveal && "border-border/60 hover:border-foreground/30 hover:bg-white",
                     showCorrect && "border-success/50 bg-success-soft/60 text-success",
-                    showWrong && "border-destructive/50 bg-destructive/10 text-destructive",
+                    showSoftMiss && "border-decide/50 bg-decide-soft/60 text-decide",
                     reveal && !isPicked && !opt.correct && "opacity-60",
                   )}
                 >
                   <span className="flex items-center gap-3">
                     <span className={cn("flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold uppercase",
-                      showCorrect ? "bg-success text-white" : showWrong ? "bg-destructive text-white" : "bg-muted text-muted-foreground group-hover:bg-foreground/10",
+                      showCorrect ? "bg-success text-white" : showSoftMiss ? "bg-decide text-white" : "bg-muted text-muted-foreground group-hover:bg-foreground/10",
                     )}>
-                      {showCorrect ? <Check className="h-3.5 w-3.5" /> : showWrong ? <X className="h-3.5 w-3.5" /> : opt.id}
+                      {showCorrect ? <Check className="h-3.5 w-3.5" /> : opt.id}
                     </span>
                     {opt.text}
                   </span>
@@ -1098,16 +1102,25 @@ function QuizCardView({ card, state, onAnswer }: { card: QuizCardData; state?: "
           <AnimatePresence>
             {state && (
               <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className={cn("rounded-2xl border px-4 py-3 text-sm font-semibold",
-                state === "correct" ? "border-success/40 bg-success-soft/60 text-success" : "border-destructive/40 bg-destructive/10 text-destructive")}>
-                {state === "correct" ? card.correctMessage : card.wrongMessage}
+                state === "correct" ? "border-success/40 bg-success-soft/60 text-success" : "border-decide/40 bg-decide-soft/60 text-decide")}>
+                {state === "correct" ? `Nice thinking! ${card.correctMessage}` : `Good try — think carefully and try again.`}
               </motion.div>
             )}
           </AnimatePresence>
+          {state === "wrong" && !exhausted && (
+            <button onClick={() => { onRetry(); setPicked(null); }} className="inline-flex items-center gap-2 rounded-full border border-decide/30 bg-decide-soft/60 px-3 py-1.5 text-xs font-bold text-decide hover:bg-decide-soft">
+              <Wand2 className="h-3 w-3" /> Try again
+            </button>
+          )}
+          {exhausted && state !== "correct" && (
+            <div className="text-xs font-semibold text-muted-foreground">You've explored both tries — continue when ready, you can revisit this anytime.</div>
+          )}
         </div>
       </div>
     </CardShell>
   );
 }
+
 
 function CelebrateCardView({ card }: { card: CelebrateCard }) {
   return (
