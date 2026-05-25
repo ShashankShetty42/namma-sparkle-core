@@ -361,10 +361,19 @@ export function LessonFrame({
             <CardRenderer
               card={card}
               quizState={quizState[card.id]}
+              quizAttempts={quizAttempts[card.id] ?? 0}
               answer={ans}
+              validation={liveValidation}
+              readSeconds={readSeconds}
+              readyMarked={readingReady[card.id] === true}
+              onMarkReady={() => setReadingReady((r) => ({ ...r, [card.id]: true }))}
               onQuiz={(correct) => {
                 setQuizState((s) => ({ ...s, [card.id]: correct ? "correct" : "wrong" }));
+                setQuizAttempts((a) => ({ ...a, [card.id]: (a[card.id] ?? 0) + 1 }));
                 if (slug) recordQuiz(slug, card.id, correct, 20);
+              }}
+              onQuizRetry={() => {
+                setQuizState((s) => ({ ...s, [card.id]: undefined }));
               }}
               onAnswer={(patch) => {
                 setAnswers((a) => ({ ...a, [card.id]: { ...a[card.id], ...patch } }));
@@ -390,13 +399,39 @@ export function LessonFrame({
           variant="hero"
           size="lg"
           disabled={!canContinue}
-          onClick={() => go(1)}
+          onClick={async () => {
+            // For writing cards, run a fake backend submit cinematic
+            if (
+              (card.kind === "reflect" || card.kind === "decide" || card.kind === "dilemma") &&
+              liveValidation?.ok
+            ) {
+              setSubmission("reviewing");
+              setSubmissionMsg(undefined);
+              const res = await submitToBackend(
+                ans.text ?? "",
+                tierFor(card.kind),
+                WEEK_KEYWORDS["week-9"],
+              );
+              setSubmission(res.approved ? "approved" : "encourage");
+              setSubmissionMsg(res.encouragement);
+              setTimeout(() => {
+                setSubmission(null);
+                if (res.approved) go(1);
+              }, 1100);
+              return;
+            }
+            go(1);
+          }}
           className="w-full"
         >
           {isLast ? (
             <><PartyPopper className="h-5 w-5" /> Claim your reward</>
-          ) : card.kind === "quiz" && quizState[card.id] !== "correct" ? (
-            <>Pick the right answer to continue</>
+          ) : card.kind === "quiz" && quizState[card.id] !== "correct" && (quizAttempts[card.id] ?? 0) < 2 ? (
+            <>Try again — you've got this</>
+          ) : !canContinue && isReadingCard ? (
+            <>Read a moment longer…</>
+          ) : !canContinue && liveValidation ? (
+            <>{liveValidation.message}</>
           ) : !canContinue ? (
             <>Complete this step to continue</>
           ) : (
@@ -407,6 +442,9 @@ export function LessonFrame({
           Tip: swipe the card, or use the arrow keys.
         </p>
       </div>
+
+      <SubmissionOverlay open={!!submission} state={submission ?? "reviewing"} message={submissionMsg} />
+
 
       <AnimatePresence>
         {showReward && (
