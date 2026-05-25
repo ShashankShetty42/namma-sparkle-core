@@ -207,8 +207,14 @@ export function LessonFrame({
   const [index, setIndex] = React.useState(0);
   const [direction, setDirection] = React.useState<1 | -1>(1);
   const [quizState, setQuizState] = React.useState<Record<string, "correct" | "wrong" | undefined>>({});
+  const [quizAttempts, setQuizAttempts] = React.useState<Record<string, number>>({});
   const [answers, setAnswers] = React.useState<Record<string, { choice?: string; text?: string }>>({});
+  const [attemptCount, setAttemptCount] = React.useState<Record<string, number>>({});
   const [showReward, setShowReward] = React.useState(false);
+  const [submission, setSubmission] = React.useState<null | "reviewing" | "approved" | "encourage">(null);
+  const [submissionMsg, setSubmissionMsg] = React.useState<string | undefined>();
+  const [readingReady, setReadingReady] = React.useState<Record<string, boolean>>({});
+  const [readSeconds, setReadSeconds] = React.useState(0);
 
   const total = cards.length;
   const card = cards[index];
@@ -217,24 +223,63 @@ export function LessonFrame({
 
   const ans = answers[card.id] ?? {};
 
+  // Per-card validation tier
+  const tierFor = (k: LessonCard["kind"]): ValidationTier =>
+    k === "reflect" ? "reflect"
+    : k === "dilemma" ? "ethics"
+    : k === "decide" ? "decide"
+    : "explore";
+
+  const liveValidation: ValidationResult | null = React.useMemo(() => {
+    if (card.kind === "reflect" || card.kind === "decide" || card.kind === "dilemma") {
+      return validateText({
+        value: ans.text ?? "",
+        tier: tierFor(card.kind),
+        minWords: card.kind === "reflect" ? card.minLength ? Math.max(8, Math.round(card.minLength / 5)) : undefined : undefined,
+        keywords: WEEK_KEYWORDS["week-9"],
+        attempt: attemptCount[card.id] ?? 0,
+      });
+    }
+    return null;
+  }, [card, ans.text, attemptCount]);
+
+  // Story / concept / examples: reading timer (45s OR "I'm ready")
+  const isReadingCard = card.kind === "story" || card.kind === "concept" || card.kind === "examples";
+  React.useEffect(() => {
+    setReadSeconds(0);
+    if (!isReadingCard) return;
+    const t = setInterval(() => setReadSeconds((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [card.id, isReadingCard]);
+
   const canContinue = (() => {
     switch (card.kind) {
       case "quiz":
-        return quizState[card.id] === "correct";
+        return quizState[card.id] === "correct" || (quizAttempts[card.id] ?? 0) >= 2;
       case "decide":
       case "dilemma":
-        return !!ans.choice && (ans.text?.trim().length ?? 0) >= 4;
+        return !!ans.choice && !!liveValidation?.ok;
       case "reflect":
-        return (ans.text?.trim().length ?? 0) >= (card.minLength ?? 12);
+        return !!liveValidation?.ok;
       case "spot":
-        return (ans.text?.split("|").filter((s) => s.trim().length > 1).length ?? 0) >= Math.min(2, card.slots);
+        return (ans.text?.split("|").filter((s) => s.trim().length > 4).length ?? 0) >= Math.min(2, card.slots);
+      case "story":
+      case "concept":
+      case "examples":
+        return readSeconds >= 12 || readingReady[card.id] === true;
       default:
         return true;
     }
   })();
 
   const go = (delta: 1 | -1) => {
-    if (delta === 1 && !canContinue) return;
+    if (delta === 1 && !canContinue) {
+      // Bump attempt counter to escalate hints
+      if (card.kind === "reflect" || card.kind === "decide" || card.kind === "dilemma") {
+        setAttemptCount((a) => ({ ...a, [card.id]: (a[card.id] ?? 0) + 1 }));
+      }
+      return;
+    }
     setDirection(delta);
     if (isLast && delta === 1) {
       setShowReward(true);
