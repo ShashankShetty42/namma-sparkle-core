@@ -643,30 +643,24 @@ function DashboardPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="grid gap-4 md:grid-cols-3"
+          className="grid gap-4 md:grid-cols-2"
         >
           <ProgressWidget
             tone="story"
             icon={<Compass className="h-5 w-5" />}
-            label="Week 9 progress"
+            label={`Week ${currentWeek} progress`}
             percent={weekPercent}
             caption={`${completed.size}/${ACTIVITY_ORDER.length} activities`}
           />
           <ProgressWidget
-            tone="xp"
-            icon={<Star className="h-5 w-5" />}
-            label="XP to Level 8"
-            percent={xpPercent}
-            caption={`${liveXp} / ${xpToNext} XP`}
-          />
-          <ProgressWidget
             tone="decide"
             icon={<Flame className="h-5 w-5" />}
-            label="Weekly completion goal"
-            percent={weekPercent}
-            caption={`${completed.size} / ${ACTIVITY_ORDER.length} activities this week`}
+            label="Weekly streak"
+            percent={Math.round((weeksDone / totalWeeks) * 100)}
+            caption={`${weeksDone} of ${totalWeeks} weeks complete`}
           />
         </motion.section>
+
       </div>
     </AppShell>
   );
