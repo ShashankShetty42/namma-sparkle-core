@@ -9,6 +9,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
   DEFAULT_PROFILE,
+  getAuth,
   getProfile,
   labelToBand,
   saveProfile,
