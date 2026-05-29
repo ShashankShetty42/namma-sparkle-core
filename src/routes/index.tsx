@@ -32,7 +32,7 @@ import devHappy from "@/assets/characters/dev-happy.png";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import neoExplaining from "@/assets/characters/neo-explaining.png";
 import { AppShell } from "@/components/namma/app-shell";
-import { AppShell } from "@/components/namma/app-shell";
+
 import {
   ACTIVITIES,
   ACTIVITY_ORDER,
