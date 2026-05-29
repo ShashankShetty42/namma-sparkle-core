@@ -9,6 +9,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
   DEFAULT_PROFILE,
+  getAuth,
   getProfile,
   labelToBand,
   saveProfile,
@@ -76,6 +77,9 @@ export function OnboardingDialog() {
   React.useEffect(() => {
     // Small delay so it doesn't fight with first paint animations.
     const id = window.setTimeout(() => {
+      const auth = getAuth();
+      // Onboarding is only meant for students — admins and teachers skip it.
+      if (auth.role !== "student") return;
       const p = getProfile();
       if (!p.onboarded) setOpen(true);
     }, 600);
