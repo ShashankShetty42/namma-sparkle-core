@@ -27,9 +27,8 @@ import {
   type NammaProfile,
 } from "@/lib/namma-progress";
 
-import { BrandMark } from "@/components/namma/brand-mark";
-import { cn } from "@/lib/utils";
-import { useAppShell } from "@/components/namma/app-shell-context";
+
+
 
 type NavItem = {
   label: string;
