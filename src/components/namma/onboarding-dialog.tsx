@@ -511,7 +511,7 @@ function StepAvatar({
   );
 }
 
-function StepReady({ draft }: { draft: Draft }) {
+function StepReady({ draft, name, gradeLabel }: { draft: Draft; name: string; gradeLabel: string }) {
   const fav = CHARACTERS.find((c) => c.id === draft.favorite)!;
   const color = AVATAR_COLORS.find((c) => c.id === draft.avatarColorId) ?? AVATAR_COLORS[0];
   return (
@@ -523,13 +523,14 @@ function StepReady({ draft }: { draft: Draft }) {
         <h2 className="font-display text-3xl font-extrabold leading-tight text-foreground md:text-4xl">
           You&apos;re ready,{" "}
           <span className="bg-gradient-to-r from-bonus via-challenge to-explore bg-clip-text text-transparent">
-            {draft.name || "Explorer"}
+            {name}
           </span>
           !
         </h2>
         <div className="space-y-2 rounded-2xl border border-white/70 bg-white/70 p-4 text-sm">
-          <Row label="Name" value={draft.name || "Explorer"} />
-          <Row label="Grade" value={draft.gradeLabel} />
+          <Row label="Name" value={name} />
+          <Row label="Grade" value={gradeLabel} />
+
           <Row label="Buddy" value={fav.name} />
           <Row label="Avatar" value={`${AVATAR_EMOJI[draft.avatarIconId]} ${draft.avatarColorId}`} />
         </div>
