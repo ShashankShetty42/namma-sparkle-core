@@ -124,19 +124,19 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminTeachersRoute = AdminTeachersRouteImport.update({
-  id: '/teachers',
-  path: '/teachers',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/teachers',
+  path: '/admin/teachers',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminStudentsRoute = AdminStudentsRouteImport.update({
-  id: '/students',
-  path: '/students',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/students',
+  path: '/admin/students',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSchoolsRoute = AdminSchoolsRouteImport.update({
-  id: '/schools',
-  path: '/schools',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/schools',
+  path: '/admin/schools',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ActivitiesSlugRoute = ActivitiesSlugRouteImport.update({
   id: '/$slug',
@@ -321,6 +321,9 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   TeacherRoute: typeof TeacherRoute
   WelcomeRoute: typeof WelcomeRoute
+  AdminSchoolsRoute: typeof AdminSchoolsRouteWithChildren
+  AdminStudentsRoute: typeof AdminStudentsRoute
+  AdminTeachersRoute: typeof AdminTeachersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -454,24 +457,24 @@ declare module '@tanstack/react-router' {
     }
     '/admin/teachers': {
       id: '/admin/teachers'
-      path: '/teachers'
+      path: '/admin/teachers'
       fullPath: '/admin/teachers'
       preLoaderRoute: typeof AdminTeachersRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/students': {
       id: '/admin/students'
-      path: '/students'
+      path: '/admin/students'
       fullPath: '/admin/students'
       preLoaderRoute: typeof AdminStudentsRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/schools': {
       id: '/admin/schools'
-      path: '/schools'
+      path: '/admin/schools'
       fullPath: '/admin/schools'
       preLoaderRoute: typeof AdminSchoolsRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/activities/$slug': {
       id: '/activities/$slug'
@@ -502,6 +505,18 @@ const ActivitiesRouteWithChildren = ActivitiesRoute._addFileChildren(
   ActivitiesRouteChildren,
 )
 
+interface AdminSchoolsRouteChildren {
+  AdminSchoolsSchoolIdRoute: typeof AdminSchoolsSchoolIdRoute
+}
+
+const AdminSchoolsRouteChildren: AdminSchoolsRouteChildren = {
+  AdminSchoolsSchoolIdRoute: AdminSchoolsSchoolIdRoute,
+}
+
+const AdminSchoolsRouteWithChildren = AdminSchoolsRoute._addFileChildren(
+  AdminSchoolsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivitiesRoute: ActivitiesRouteWithChildren,
@@ -520,18 +535,11 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   TeacherRoute: TeacherRoute,
   WelcomeRoute: WelcomeRoute,
+  AdminSchoolsRoute: AdminSchoolsRouteWithChildren,
+  AdminStudentsRoute: AdminStudentsRoute,
+  AdminTeachersRoute: AdminTeachersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
