@@ -309,18 +309,17 @@ function ProfilePage() {
                 />
               </Field>
               <Field label="Your grade">
-                <div className="flex flex-wrap gap-2">
-                  {gradeOptions.map((g) => (
-                    <Chip
-                      key={g}
-                      active={profile.gradeLabel === g}
-                      onClick={() => update({ gradeLabel: g, gradeBand: labelToBand(g) }, `Grade set to ${g}`)}
-                    >
-                      {g}
-                    </Chip>
-                  ))}
+                <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-muted/30 px-4 py-3">
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-display text-base font-bold text-foreground">
+                    {profile.gradeLabel}
+                  </span>
+                  <span className="ml-auto text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    Set by your school
+                  </span>
                 </div>
               </Field>
+
               <Field label="Learning style">
                 <div className="flex flex-wrap gap-2">
                   {learningStyles.map((s) => (
