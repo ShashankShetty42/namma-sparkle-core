@@ -158,7 +158,7 @@ function DashboardPage() {
           <div className="relative grid items-center gap-8 md:grid-cols-[1.45fr_1fr]">
             <div className="space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full bg-story/10 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-story">
-                <Sparkles className="h-3 w-3" /> Welcome back, Aarav
+                <Sparkles className="h-3 w-3" /> Welcome back, {profile.name}
               </div>
               <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-foreground md:text-5xl">
                 Your next{" "}
@@ -168,31 +168,31 @@ function DashboardPage() {
                 is one tap away.
               </h1>
               <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                Continue Week 9 with Dev, Neo & Anaya. Earn XP, grow your weekly streak,
-                and unlock the legendary Weekly Champion badge.
+                Continue Week {currentWeek} with Dev, Neo & Anaya. Grow your weekly streak,
+                and unlock this week&apos;s badge.
               </p>
 
-              {/* XP rail */}
+              {/* Week progress rail */}
               <div className="rounded-[22px] border border-white/60 bg-white/70 p-4 backdrop-blur">
                 <div className="flex items-center justify-between text-[0.7rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                  <span className="inline-flex items-center gap-2 text-xp">
-                    <Star className="h-3.5 w-3.5" /> Level 7 · Explorer
+                  <span className="inline-flex items-center gap-2 text-story">
+                    <Compass className="h-3.5 w-3.5" /> Week {currentWeek} of {totalWeeks}
                   </span>
                   <span className="text-foreground">
-                    {liveXp} / {xpToNext} XP
+                    {completed.size} / {ACTIVITY_ORDER.length} activities
                   </span>
                 </div>
                 <div className="progress-shell mt-3 !h-3">
                   <motion.div
                     className="progress-fill"
                     initial={{ width: 0 }}
-                    animate={{ width: `${xpPercent}%` }}
+                    animate={{ width: `${weekPercent}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
                   />
                 </div>
                 <div className="mt-2 flex items-center justify-between text-[0.72rem] text-muted-foreground">
-                  <span>{xpToNext - liveXp} XP to Level 8</span>
-                  <span className="font-bold text-foreground">{xpPercent}%</span>
+                  <span>Finish all activities to earn this week&apos;s badge</span>
+                  <span className="font-bold text-foreground">{weekPercent}%</span>
                 </div>
               </div>
 
@@ -204,10 +204,9 @@ function DashboardPage() {
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
-                <Button variant="xp" size="lg">
-                  <Gift className="h-4 w-4" /> Claim +50 XP
-                </Button>
               </div>
+            </div>
+
             </div>
 
             {/* Character moment */}
@@ -256,9 +255,11 @@ function DashboardPage() {
           transition={{ duration: 0.5, delay: 0.05 }}
           className="grid grid-cols-2 gap-3 md:grid-cols-4"
         >
-          <StatTile icon={<Star className="h-5 w-5" />} tone="xp" label="Total XP" value={String(liveXp)} sub={`+${earnedXp || 50} today`} />
-          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Weekly streak" value="5 weeks" sub="Champion run!" />
-          <StatTile icon={<Trophy className="h-5 w-5" />} tone="bonus" label="Badges" value={`${earnedBadges}/${ACHIEVEMENTS.length}`} sub="2 new this week" />
+          <StatTile icon={<Compass className="h-5 w-5" />} tone="xp" label={`Week ${currentWeek}`} value={`${weekPercent}%`} sub={`${completed.size}/${ACTIVITY_ORDER.length} activities`} />
+          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Weekly streak" value={`${weeksDone} ${weeksDone === 1 ? "week" : "weeks"}`} sub={weeksDone === 0 ? "Start your streak!" : "Keep it going"} />
+          <StatTile icon={<Trophy className="h-5 w-5" />} tone="bonus" label="Badges" value={`${earnedBadges}/${totalWeeks}`} sub="1 badge per week" />
+
+
 
         </motion.section>
 
