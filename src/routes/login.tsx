@@ -25,7 +25,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import { BrandMark } from "@/components/namma/brand-mark";
-import { getProfile, saveProfile, signIn, type UserRole } from "@/lib/namma-progress";
+import { DEFAULT_PROFILE, getProfile, hasStudentOnboarded, labelToBand, saveProfile, signIn, type UserRole } from "@/lib/namma-progress";
+
 import { getStudents, getTeachers } from "@/lib/namma-admin";
 import neoExplaining from "@/assets/characters/neo-explaining.png";
 import devHappy from "@/assets/characters/dev-happy.png";
