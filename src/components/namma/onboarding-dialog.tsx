@@ -260,7 +260,6 @@ function StepWelcome({ name, gradeLabel }: { name: string; gradeLabel: string })
         </ul>
       </div>
 
-      </div>
       <div className="relative flex items-center justify-center">
         <div className="absolute h-64 w-64 rounded-full bg-gradient-to-br from-story/30 via-explore/20 to-bonus/30 blur-3xl" />
         <img
