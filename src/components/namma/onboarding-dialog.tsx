@@ -234,7 +234,7 @@ export function OnboardingDialog() {
 
 /* ────────────── Steps ────────────── */
 
-function StepWelcome({ onStart: _onStart }: { onStart: () => void }) {
+function StepWelcome({ name, gradeLabel }: { name: string; gradeLabel: string }) {
   return (
     <div className="grid items-center gap-6 md:grid-cols-[1fr_0.9fr]">
       <div className="space-y-4">
@@ -242,23 +242,24 @@ function StepWelcome({ onStart: _onStart }: { onStart: () => void }) {
           <Wand2 className="h-3.5 w-3.5" /> A magical beginning
         </span>
         <h2 className="font-display text-3xl font-extrabold leading-tight text-foreground md:text-4xl">
-          Hi! I&apos;m{" "}
+          Hi{" "}
           <span className="bg-gradient-to-r from-bonus via-challenge to-explore bg-clip-text text-transparent">
-            Neo
-          </span>{" "}
-          — and I&apos;ll be your guide.
+            {name}
+          </span>
+          ! I&apos;m Neo — your guide.
         </h2>
         <p className="text-base leading-relaxed text-muted-foreground">
-          Welcome to <strong className="text-foreground">Namma AI</strong> — a
-          weekly adventure into the world of artificial intelligence. Before we
-          fly, let&apos;s set up your explorer profile in 4 quick steps.
+          Welcome to <strong className="text-foreground">Namma AI</strong> — your
+          weekly adventure into artificial intelligence. Your school set you up
+          as a <strong className="text-foreground">{gradeLabel}</strong> explorer.
+          Let&apos;s personalize the rest in 2 quick steps.
         </p>
         <ul className="space-y-1.5 text-sm text-foreground/80">
-          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success" /> Pick your name</li>
-          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success" /> Choose your grade</li>
           <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success" /> Meet your favorite character</li>
           <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success" /> Design your avatar</li>
         </ul>
+      </div>
+
       </div>
       <div className="relative flex items-center justify-center">
         <div className="absolute h-64 w-64 rounded-full bg-gradient-to-br from-story/30 via-explore/20 to-bonus/30 blur-3xl" />
