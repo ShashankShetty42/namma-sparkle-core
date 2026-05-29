@@ -18,7 +18,7 @@ import {
   type School,
 } from "@/lib/namma-admin";
 
-export const Route = createFileRoute("/admin/schools/")({
+export const Route = createFileRoute("/admin/schools")({
   head: () => ({ meta: [{ title: "School Management · Namma AI" }] }),
   component: SchoolManagement,
 });
