@@ -25,7 +25,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import { BrandMark } from "@/components/namma/brand-mark";
-import { getProfile, signIn, type UserRole } from "@/lib/namma-progress";
+import { getProfile, saveProfile, signIn, type UserRole } from "@/lib/namma-progress";
+import { getStudents, getTeachers } from "@/lib/namma-admin";
 import neoExplaining from "@/assets/characters/neo-explaining.png";
 import devHappy from "@/assets/characters/dev-happy.png";
 import anayaHappy from "@/assets/characters/anaya-happy.png";
@@ -101,23 +102,63 @@ function LoginPage() {
       toast.error("Please fill in your email and password");
       return;
     }
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 700));
-    signIn({ role: activeRole, email: email.trim(), schoolCode: schoolCode.trim() || undefined });
-    setLoading(false);
 
+    const identifier = email.trim();
+    const pwd = password.trim();
+    const code = schoolCode.trim();
+
+    // Validate against admin-created accounts
     if (activeRole === "student") {
+      if (!code) {
+        toast.error("Please enter your school code");
+        return;
+      }
+      const match = getStudents(code).find(
+        (s) =>
+          s.password === pwd &&
+          (s.student_id.toLowerCase() === identifier.toLowerCase() ||
+            s.student_name.toLowerCase() === identifier.toLowerCase()),
+      );
+      if (!match) {
+        toast.error("Invalid student credentials. Ask your admin to create your account.");
+        return;
+      }
+      setLoading(true);
+      await new Promise((r) => setTimeout(r, 600));
+      saveProfile({ name: match.student_name, gradeLabel: match.grade });
+      signIn({ role: "student", email: match.student_id, schoolCode: code });
+      setLoading(false);
       setPortal(true);
-      window.setTimeout(() => {
-        navigate({ to: "/", replace: true });
-      }, 1600);
-    } else {
-      toast.success(`Welcome back, ${meta.title}!`);
-      navigate({
-        to: activeRole === "teacher" ? "/teacher" : "/admin",
-        replace: true,
-      });
+      window.setTimeout(() => navigate({ to: "/", replace: true }), 1600);
+      return;
     }
+
+    if (activeRole === "teacher") {
+      const match = getTeachers(code || undefined).find(
+        (t) =>
+          t.password === pwd &&
+          t.teacher_email.toLowerCase() === identifier.toLowerCase(),
+      );
+      if (!match) {
+        toast.error("Invalid teacher credentials. Ask your admin to create your account.");
+        return;
+      }
+      setLoading(true);
+      await new Promise((r) => setTimeout(r, 600));
+      signIn({ role: "teacher", email: match.teacher_email, schoolCode: match.school_id });
+      setLoading(false);
+      toast.success(`Welcome back, ${match.teacher_name}!`);
+      navigate({ to: "/teacher", replace: true });
+      return;
+    }
+
+    // Admin — bootstrapped account (not created via UI)
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 500));
+    signIn({ role: "admin", email: identifier, schoolCode: code || undefined });
+    setLoading(false);
+    toast.success("Welcome back, Admin!");
+    navigate({ to: "/admin", replace: true });
   };
 
   return (
