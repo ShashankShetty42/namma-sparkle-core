@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -5,18 +6,27 @@ import {
   ChevronLeft,
   Compass,
   Flame,
-  Gift,
   LayoutDashboard,
-  LifeBuoy,
   Map,
   Shield,
-  Sparkles,
-  Star,
-  BookOpenText,
   Zap,
 } from "lucide-react";
 
 import neoHappy from "@/assets/characters/neo-happy.png";
+import { BrandMark } from "@/components/namma/brand-mark";
+import { cn } from "@/lib/utils";
+import { useAppShell } from "@/components/namma/app-shell-context";
+import {
+  ACTIVITY_ORDER,
+} from "@/components/namma/activity/lesson-data";
+import { getCompleted } from "@/components/namma/activity/progress";
+import {
+  getCompletedWeeks,
+  getProfile,
+  onNammaState,
+  type NammaProfile,
+} from "@/lib/namma-progress";
+
 import { BrandMark } from "@/components/namma/brand-mark";
 import { cn } from "@/lib/utils";
 import { useAppShell } from "@/components/namma/app-shell-context";
