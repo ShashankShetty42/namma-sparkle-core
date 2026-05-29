@@ -30,7 +30,7 @@ type NavItem = {
 };
 
 const NAV: NavItem[] = [
-const NAV: NavItem[] = [
+
   { label: "Dashboard", to: "/", icon: LayoutDashboard, tone: "story" },
   { label: "My Journey", to: "/journey", icon: Map, tone: "explore" },
   { label: "Activities", to: "/activities", icon: Compass, tone: "decide" },
