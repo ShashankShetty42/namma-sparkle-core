@@ -27,6 +27,7 @@ import { Route as BadgesRouteImport } from './routes/badges'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminSchoolsRouteImport } from './routes/admin.schools'
 import { Route as ActivitiesSlugRouteImport } from './routes/activities.$slug'
 
 const WelcomeRoute = WelcomeRouteImport.update({
@@ -119,6 +120,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSchoolsRoute = AdminSchoolsRouteImport.update({
+  id: '/schools',
+  path: '/schools',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ActivitiesSlugRoute = ActivitiesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -128,7 +134,7 @@ const ActivitiesSlugRoute = ActivitiesSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -145,11 +151,12 @@ export interface FileRoutesByFullPath {
   '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
+  '/admin/schools': typeof AdminSchoolsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -166,12 +173,13 @@ export interface FileRoutesByTo {
   '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
+  '/admin/schools': typeof AdminSchoolsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
+  '/admin/schools': typeof AdminSchoolsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/welcome'
     | '/activities/$slug'
+    | '/admin/schools'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/welcome'
     | '/activities/$slug'
+    | '/admin/schools'
   id:
     | '__root__'
     | '/'
@@ -253,12 +264,13 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/welcome'
     | '/activities/$slug'
+    | '/admin/schools'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivitiesRoute: typeof ActivitiesRouteWithChildren
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BadgesRoute: typeof BadgesRoute
   DesignSystemRoute: typeof DesignSystemRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -404,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/schools': {
+      id: '/admin/schools'
+      path: '/schools'
+      fullPath: '/admin/schools'
+      preLoaderRoute: typeof AdminSchoolsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/activities/$slug': {
       id: '/activities/$slug'
       path: '/$slug'
@@ -426,10 +445,20 @@ const ActivitiesRouteWithChildren = ActivitiesRoute._addFileChildren(
   ActivitiesRouteChildren,
 )
 
+interface AdminRouteChildren {
+  AdminSchoolsRoute: typeof AdminSchoolsRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminSchoolsRoute: AdminSchoolsRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivitiesRoute: ActivitiesRouteWithChildren,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   BadgesRoute: BadgesRoute,
   DesignSystemRoute: DesignSystemRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
