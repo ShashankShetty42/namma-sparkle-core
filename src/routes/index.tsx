@@ -250,7 +250,7 @@ function DashboardPage() {
           <StatTile icon={<Star className="h-5 w-5" />} tone="xp" label="Total XP" value={String(liveXp)} sub={`+${earnedXp || 50} today`} />
           <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Weekly streak" value="5 weeks" sub="Champion run!" />
           <StatTile icon={<Trophy className="h-5 w-5" />} tone="bonus" label="Badges" value={`${earnedBadges}/${ACHIEVEMENTS.length}`} sub="2 new this week" />
-          <StatTile icon={<Target className="h-5 w-5" />} tone="challenge" label="Rank" value="#2" sub="↑ 1 this week" />
+
         </motion.section>
 
         {/* ───── WEEKLY ADVENTURE FLOW ───── */}
@@ -357,7 +357,8 @@ function DashboardPage() {
         </motion.section>
 
         {/* ───── CONTINUE JOURNEY + REWARDS ───── */}
-        <section className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+        <section className="grid gap-5">
+
           {/* Continue journey card */}
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -419,7 +420,8 @@ function DashboardPage() {
             </div>
           </motion.div>
 
-          {/* Rewards stack */}
+          {/* Rewards stack hidden in Phase 1 */}
+          {false && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -460,6 +462,8 @@ function DashboardPage() {
               ))}
             </div>
           </motion.div>
+          )}
+
         </section>
 
         {/* ───── ACHIEVEMENT CARDS ───── */}
@@ -515,8 +519,9 @@ function DashboardPage() {
           </div>
         </motion.section>
 
-        {/* ───── LEADERBOARD + CHARACTER MOMENT ───── */}
-        <section className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
+        {/* ───── CHARACTER MOMENT ───── */}
+        <section className="grid gap-5">
+          {false && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -574,6 +579,8 @@ function DashboardPage() {
               ))}
             </ul>
           </motion.div>
+          )}
+
 
           {/* Motivational character moment */}
           <motion.div

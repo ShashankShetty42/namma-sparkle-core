@@ -100,8 +100,6 @@ const CURRENT_WEEK = 9;
 
 function JourneyPage() {
   const [completed, setCompleted] = React.useState<Set<string>>(new Set());
-  const [query, setQuery] = React.useState("");
-  const [filter, setFilter] = React.useState<"all" | "done" | "current" | "locked">("all");
 
   React.useEffect(() => {
     const load = () => setCompleted(new Set(getCompleted()));
@@ -120,17 +118,8 @@ function JourneyPage() {
     return "locked";
   };
 
-  const filtered = WEEKS.filter((w) => {
-    const s = status(w.n);
-    if (filter !== "all" && s !== filter) return false;
-    if (!query.trim()) return true;
-    const q = query.toLowerCase();
-    return (
-      w.title.toLowerCase().includes(q) ||
-      w.theme.toLowerCase().includes(q) ||
-      `week ${w.n}`.includes(q)
-    );
-  });
+  const filtered = WEEKS;
+
 
   const doneCount = WEEKS.filter((w) => status(w.n) === "done").length;
   const progressPct = Math.round((doneCount / WEEKS.length) * 100);
@@ -210,34 +199,8 @@ function JourneyPage() {
           </div>
         </motion.section>
 
-        {/* FILTERS */}
-        <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2 rounded-2xl border border-white/70 bg-white/85 px-4 py-2.5 shadow-[var(--shadow-soft)] backdrop-blur md:w-80">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search weeks, themes…"
-              className="w-full bg-transparent text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none"
-            />
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {(["all", "done", "current", "locked"] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={cn(
-                  "rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition-all",
-                  filter === f
-                    ? "border-foreground/80 bg-foreground text-background shadow-[var(--shadow-soft)]"
-                    : "border-white/70 bg-white/70 text-muted-foreground hover:border-foreground/30 hover:text-foreground",
-                )}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-        </section>
+        {/* Filters hidden in Phase 1 */}
+
 
         {/* WEEKS GRID */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
