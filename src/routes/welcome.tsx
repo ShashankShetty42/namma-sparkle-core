@@ -110,11 +110,8 @@ function WelcomePage() {
               Sign in
             </Link>
           </Button>
-          <Button variant="hero" size="sm" asChild className="rounded-2xl">
-            <Link to="/signup">
-              Get started <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
+
+
         </div>
       </header>
 
