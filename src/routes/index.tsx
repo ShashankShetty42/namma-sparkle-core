@@ -207,7 +207,7 @@ function DashboardPage() {
               </div>
             </div>
 
-            </div>
+
 
             {/* Character moment */}
             <div className="relative hidden h-72 items-end justify-center md:flex">
