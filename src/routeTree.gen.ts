@@ -24,10 +24,14 @@ import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as BadgesRouteImport } from './routes/badges'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
+import { Route as AdminStudentsRouteImport } from './routes/admin.students'
+import { Route as AdminSchoolsRouteImport } from './routes/admin.schools'
 import { Route as ActivitiesSlugRouteImport } from './routes/activities.$slug'
+import { Route as AdminSchoolsSchoolIdRouteImport } from './routes/admin.schools.$schoolId'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -104,11 +108,6 @@ const BadgesRoute = BadgesRouteImport.update({
   path: '/badges',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ActivitiesRoute = ActivitiesRouteImport.update({
   id: '/activities',
   path: '/activities',
@@ -119,16 +118,40 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTeachersRoute = AdminTeachersRouteImport.update({
+  id: '/teachers',
+  path: '/teachers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStudentsRoute = AdminStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSchoolsRoute = AdminSchoolsRouteImport.update({
+  id: '/schools',
+  path: '/schools',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ActivitiesSlugRoute = ActivitiesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ActivitiesRoute,
 } as any)
+const AdminSchoolsSchoolIdRoute = AdminSchoolsSchoolIdRouteImport.update({
+  id: '/$schoolId',
+  path: '/$schoolId',
+  getParentRoute: () => AdminSchoolsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
-  '/admin': typeof AdminRoute
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -145,11 +168,15 @@ export interface FileRoutesByFullPath {
   '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
+  '/admin/schools': typeof AdminSchoolsRouteWithChildren
+  '/admin/students': typeof AdminStudentsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
-  '/admin': typeof AdminRoute
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -166,12 +193,16 @@ export interface FileRoutesByTo {
   '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
+  '/admin/schools': typeof AdminSchoolsRouteWithChildren
+  '/admin/students': typeof AdminStudentsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
-  '/admin': typeof AdminRoute
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -188,13 +219,17 @@ export interface FileRoutesById {
   '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
+  '/admin/schools': typeof AdminSchoolsRouteWithChildren
+  '/admin/students': typeof AdminStudentsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/activities'
-    | '/admin'
     | '/badges'
     | '/design-system'
     | '/forgot-password'
@@ -211,11 +246,15 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/welcome'
     | '/activities/$slug'
+    | '/admin/schools'
+    | '/admin/students'
+    | '/admin/teachers'
+    | '/admin/'
+    | '/admin/schools/$schoolId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/activities'
-    | '/admin'
     | '/badges'
     | '/design-system'
     | '/forgot-password'
@@ -232,11 +271,15 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/welcome'
     | '/activities/$slug'
+    | '/admin/schools'
+    | '/admin/students'
+    | '/admin/teachers'
+    | '/admin'
+    | '/admin/schools/$schoolId'
   id:
     | '__root__'
     | '/'
     | '/activities'
-    | '/admin'
     | '/badges'
     | '/design-system'
     | '/forgot-password'
@@ -253,12 +296,16 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/welcome'
     | '/activities/$slug'
+    | '/admin/schools'
+    | '/admin/students'
+    | '/admin/teachers'
+    | '/admin/'
+    | '/admin/schools/$schoolId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivitiesRoute: typeof ActivitiesRouteWithChildren
-  AdminRoute: typeof AdminRoute
   BadgesRoute: typeof BadgesRoute
   DesignSystemRoute: typeof DesignSystemRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -274,6 +321,7 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   TeacherRoute: typeof TeacherRoute
   WelcomeRoute: typeof WelcomeRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -383,13 +431,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BadgesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/activities': {
       id: '/activities'
       path: '/activities'
@@ -404,12 +445,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/teachers': {
+      id: '/admin/teachers'
+      path: '/teachers'
+      fullPath: '/admin/teachers'
+      preLoaderRoute: typeof AdminTeachersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/students': {
+      id: '/admin/students'
+      path: '/students'
+      fullPath: '/admin/students'
+      preLoaderRoute: typeof AdminStudentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/schools': {
+      id: '/admin/schools'
+      path: '/schools'
+      fullPath: '/admin/schools'
+      preLoaderRoute: typeof AdminSchoolsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/activities/$slug': {
       id: '/activities/$slug'
       path: '/$slug'
       fullPath: '/activities/$slug'
       preLoaderRoute: typeof ActivitiesSlugRouteImport
       parentRoute: typeof ActivitiesRoute
+    }
+    '/admin/schools/$schoolId': {
+      id: '/admin/schools/$schoolId'
+      path: '/$schoolId'
+      fullPath: '/admin/schools/$schoolId'
+      preLoaderRoute: typeof AdminSchoolsSchoolIdRouteImport
+      parentRoute: typeof AdminSchoolsRoute
     }
   }
 }
@@ -429,7 +505,6 @@ const ActivitiesRouteWithChildren = ActivitiesRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivitiesRoute: ActivitiesRouteWithChildren,
-  AdminRoute: AdminRoute,
   BadgesRoute: BadgesRoute,
   DesignSystemRoute: DesignSystemRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
@@ -445,7 +520,18 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   TeacherRoute: TeacherRoute,
   WelcomeRoute: WelcomeRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
