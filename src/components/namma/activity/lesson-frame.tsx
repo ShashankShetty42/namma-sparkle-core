@@ -35,11 +35,13 @@ import type { Tone } from "@/components/namma/activity";
 import { markCompleted, getCompleted } from "@/components/namma/activity/progress";
 import { ACTIVITY_ORDER } from "@/components/namma/activity/lesson-data";
 import {
+  addXP,
+  awardBadge,
   markWeekComplete,
   recordQuiz,
-  rewardActivity,
   saveLessonAnswer,
 } from "@/lib/namma-progress";
+
 import { toast } from "sonner";
 import {
   validateText,
