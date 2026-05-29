@@ -15,6 +15,7 @@ import {
   saveProfile,
   type NammaProfile,
 } from "@/lib/namma-progress";
+import { nammaEase } from "@/components/namma/motion";
 
 
 import neoExplaining from "@/assets/characters/neo-explaining.png";
