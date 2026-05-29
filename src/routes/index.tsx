@@ -86,14 +86,17 @@ const WEEKLY_FLOW: FlowNode[] = [
   { key: "reward", label: "Reward Unlock", tone: "bonus", icon: Gift, done: false, locked: true },
 ];
 
-const ACHIEVEMENTS = [
-  { name: "First Mission", tone: "story", icon: Rocket, earned: true, sub: "Sealed Week 1" },
-  { name: "3-Week Streak", tone: "decide", icon: Flame, earned: true, sub: "Three weeks strong" },
-  { name: "AI Spotter", tone: "explore", icon: Compass, earned: true, sub: "10 examples found" },
-  { name: "Ethics Hero", tone: "challenge", icon: Medal, earned: false, sub: "Finish ethics" },
-  { name: "Weekly Champion", tone: "xp", icon: Crown, earned: false, sub: "Complete this week" },
-  { name: "Reward Hunter", tone: "bonus", icon: Gift, earned: false, sub: "Open 5 rewards" },
+// First 6 weekly badges (1 per week) — shown as a preview on the dashboard.
+// The full 35-badge vault lives on the /badges page.
+const WEEKLY_BADGE_PREVIEW = [
+  { week: 1, name: "Spark Seeker", tone: "story", icon: Rocket },
+  { week: 2, name: "Curious Pathfinder", tone: "explore", icon: Compass },
+  { week: 3, name: "Idea Igniter", tone: "decide", icon: Sparkles },
+  { week: 4, name: "Prompt Pioneer", tone: "reflect", icon: PenLine },
+  { week: 5, name: "Logic Explorer", tone: "challenge", icon: Brain },
+  { week: 6, name: "Future Observer", tone: "xp", icon: Crown },
 ] as const;
+
 
 const LEADERBOARD = [
   { rank: 1, name: "Meera P.", xp: 1840, you: false },
@@ -487,49 +490,60 @@ function DashboardPage() {
           <div className="flex items-end justify-between">
             <div>
               <div className="eyebrow">
-                <Award className="h-3.5 w-3.5" /> Achievements
+                <Award className="h-3.5 w-3.5" /> Weekly badges
               </div>
               <h2 className="mt-2 font-display text-2xl font-bold text-foreground md:text-3xl">
                 Trophies in your case
               </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                One badge unlocks each week — earn it by finishing all 7 activities. {earnedBadges} of {totalWeeks} collected.
+              </p>
             </div>
             <Link to="/badges" className="hidden items-center gap-1 text-sm font-bold text-primary hover:underline md:inline-flex">
-              All badges <ChevronRight className="h-4 w-4" />
+              All {totalWeeks} badges <ChevronRight className="h-4 w-4" />
             </Link>
+          </div>
+
           </div>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
             {ACHIEVEMENTS.map((a, i) => (
               <motion.div
                 key={a.name}
-                initial={{ opacity: 0, scale: 0.94 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05, type: "spring", stiffness: 220, damping: 20 }}
-                whileHover={{ y: -4 }}
-                className={cn(
-                  "relative overflow-hidden rounded-[24px] border p-4 text-center shadow-[var(--shadow-soft)] backdrop-blur transition-all",
-                  a.earned ? `bg-${a.tone}-soft/60 border-${a.tone}/30` : "bg-white/70 border-border opacity-80",
-                )}
-              >
-                {a.earned && (
-                  <div className={cn("pointer-events-none absolute -top-10 -right-10 h-24 w-24 rounded-full blur-2xl", `bg-${a.tone}/40`)} />
-                )}
-                <div
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+            {WEEKLY_BADGE_PREVIEW.map((a, i) => {
+              const earned = weeksDone >= a.week;
+              const Icon = a.icon;
+              return (
+                <motion.div
+                  key={a.name}
+                  initial={{ opacity: 0, scale: 0.94 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05, type: "spring", stiffness: 220, damping: 20 }}
+                  whileHover={{ y: -4 }}
                   className={cn(
-                    "relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl shadow-[var(--shadow-soft)]",
-                    a.earned ? `bg-gradient-to-br from-${a.tone} to-${a.tone}/70 text-white` : "bg-muted text-locked",
+                    "relative overflow-hidden rounded-[24px] border p-4 text-center shadow-[var(--shadow-soft)] backdrop-blur transition-all",
+                    earned ? `bg-${a.tone}-soft/60 border-${a.tone}/30` : "bg-white/70 border-border opacity-80",
                   )}
                 >
-                  {a.earned ? <a.icon className="h-6 w-6" /> : <Lock className="h-5 w-5" />}
-                </div>
-                <div className="relative mt-3 font-display text-sm font-bold text-foreground">{a.name}</div>
-                <div className="relative text-[0.68rem] text-muted-foreground">{a.sub}</div>
-              </motion.div>
-            ))}
+                  {earned && (
+                    <div className={cn("pointer-events-none absolute -top-10 -right-10 h-24 w-24 rounded-full blur-2xl", `bg-${a.tone}/40`)} />
+                  )}
+                  <div
+                    className={cn(
+                      "relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl shadow-[var(--shadow-soft)]",
+                      earned ? `bg-gradient-to-br from-${a.tone} to-${a.tone}/70 text-white` : "bg-muted text-locked",
+                    )}
+                  >
+                    {earned ? <Icon className="h-6 w-6" /> : <Lock className="h-5 w-5" />}
+                  </div>
+                  <div className="relative mt-3 font-display text-sm font-bold text-foreground">{a.name}</div>
+                  <div className="relative text-[0.68rem] text-muted-foreground">Week {a.week}</div>
+                </motion.div>
+              );
+            })}
           </div>
-        </motion.section>
 
-        {/* ───── CHARACTER MOMENT ───── */}
         <section className="grid gap-5">
           {false && (
           <motion.div
