@@ -123,14 +123,23 @@ function LoginPage() {
       if (!match) {
         toast.error("Invalid student credentials. Ask your admin to create your account.");
         return;
-      }
       setLoading(true);
       await new Promise((r) => setTimeout(r, 600));
-      saveProfile({ name: match.student_name, gradeLabel: match.grade });
+      const alreadyOnboarded = hasStudentOnboarded(code, match.student_id);
+      // Reset profile to admin-set identity on every login; preserve onboarded state per-student.
+      saveProfile({
+        ...DEFAULT_PROFILE,
+        name: match.student_name,
+        gradeLabel: match.grade,
+        gradeBand: labelToBand(match.grade),
+        onboarded: alreadyOnboarded,
+      });
       signIn({ role: "student", email: match.student_id, schoolCode: code });
       setLoading(false);
       setPortal(true);
       window.setTimeout(() => navigate({ to: "/", replace: true }), 1600);
+      return;
+
       return;
     }
 
