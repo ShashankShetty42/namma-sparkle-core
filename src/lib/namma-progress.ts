@@ -505,3 +505,37 @@ export function signOut() {
   emit();
 }
 
+/* ───────────── per-student onboarding tracking ───────────── */
+
+const ONBOARDED_STUDENTS_KEY = "namma:onboarded:students";
+
+function readOnboardedSet(): string[] {
+  if (!isBrowser()) return [];
+  try {
+    const raw = window.localStorage.getItem(ONBOARDED_STUDENTS_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function studentOnboardKey(schoolCode: string, studentId: string) {
+  return `${schoolCode}:${studentId}`.toLowerCase();
+}
+
+export function hasStudentOnboarded(schoolCode: string, studentId: string): boolean {
+  return readOnboardedSet().includes(studentOnboardKey(schoolCode, studentId));
+}
+
+export function markStudentOnboarded(schoolCode: string, studentId: string) {
+  if (!isBrowser()) return;
+  const key = studentOnboardKey(schoolCode, studentId);
+  const list = readOnboardedSet();
+  if (list.includes(key)) return;
+  window.localStorage.setItem(
+    ONBOARDED_STUDENTS_KEY,
+    JSON.stringify([...list, key]),
+  );
+  emit();
+}
+
