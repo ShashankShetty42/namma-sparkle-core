@@ -32,15 +32,22 @@ import devHappy from "@/assets/characters/dev-happy.png";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import neoExplaining from "@/assets/characters/neo-explaining.png";
 import { AppShell } from "@/components/namma/app-shell";
+
 import {
   ACTIVITIES,
   ACTIVITY_ORDER,
   HUB_ICONS,
 } from "@/components/namma/activity/lesson-data";
 import { getCompleted } from "@/components/namma/activity/progress";
+import {
+  getCompletedWeeks,
+  getProfile,
+  onNammaState,
+} from "@/lib/namma-progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -79,14 +86,17 @@ const WEEKLY_FLOW: FlowNode[] = [
   { key: "reward", label: "Reward Unlock", tone: "bonus", icon: Gift, done: false, locked: true },
 ];
 
-const ACHIEVEMENTS = [
-  { name: "First Mission", tone: "story", icon: Rocket, earned: true, sub: "Sealed Week 1" },
-  { name: "3-Week Streak", tone: "decide", icon: Flame, earned: true, sub: "Three weeks strong" },
-  { name: "AI Spotter", tone: "explore", icon: Compass, earned: true, sub: "10 examples found" },
-  { name: "Ethics Hero", tone: "challenge", icon: Medal, earned: false, sub: "Finish ethics" },
-  { name: "Weekly Champion", tone: "xp", icon: Crown, earned: false, sub: "Complete this week" },
-  { name: "Reward Hunter", tone: "bonus", icon: Gift, earned: false, sub: "Open 5 rewards" },
+// First 6 weekly badges (1 per week) — shown as a preview on the dashboard.
+// The full 35-badge vault lives on the /badges page.
+const WEEKLY_BADGE_PREVIEW = [
+  { week: 1, name: "Spark Seeker", tone: "story", icon: Rocket },
+  { week: 2, name: "Curious Pathfinder", tone: "explore", icon: Compass },
+  { week: 3, name: "Idea Igniter", tone: "decide", icon: Sparkles },
+  { week: 4, name: "Prompt Pioneer", tone: "reflect", icon: PenLine },
+  { week: 5, name: "Logic Explorer", tone: "challenge", icon: Brain },
+  { week: 6, name: "Future Observer", tone: "xp", icon: Crown },
 ] as const;
+
 
 const LEADERBOARD = [
   { rank: 1, name: "Meera P.", xp: 1840, you: false },
@@ -106,31 +116,33 @@ const REWARDS = [
 
 function DashboardPage() {
   const [completed, setCompleted] = React.useState<Set<string>>(new Set());
+  const [profile, setProfile] = React.useState(() => getProfile());
+  const [weeksDone, setWeeksDone] = React.useState(0);
+
   React.useEffect(() => {
-    const load = () => setCompleted(new Set(getCompleted()));
+    const load = () => {
+      setCompleted(new Set(getCompleted()));
+      setProfile(getProfile());
+      setWeeksDone(getCompletedWeeks().length);
+    };
     load();
+    const off = onNammaState(load);
     window.addEventListener("namma:progress", load);
     window.addEventListener("storage", load);
     return () => {
+      off();
       window.removeEventListener("namma:progress", load);
       window.removeEventListener("storage", load);
     };
   }, []);
 
-  const totalXp = ACTIVITY_ORDER.reduce((s, k) => s + ACTIVITIES[k].meta.totalXp, 0);
-  const earnedXp = ACTIVITY_ORDER.filter((s) => completed.has(s)).reduce(
-    (s, k) => s + ACTIVITIES[k].meta.totalXp,
-    0,
-  );
-  const baseXp = 1620;
-  const liveXp = baseXp + earnedXp;
-  const xpToNext = 2000;
-  const xpPercent = Math.min(100, Math.round((liveXp / xpToNext) * 100));
+  const currentWeek = Math.max(1, weeksDone + 1);
+  const totalWeeks = 35;
   const weekPercent = Math.round((completed.size / ACTIVITY_ORDER.length) * 100);
   const nextSlug = ACTIVITY_ORDER.find((s) => !completed.has(s)) ?? ACTIVITY_ORDER[0];
   const next = ACTIVITIES[nextSlug];
   const NextIcon = HUB_ICONS[nextSlug];
-  const earnedBadges = ACHIEVEMENTS.filter((a) => a.earned).length;
+  const earnedBadges = weeksDone; // 1 badge per completed week
 
   return (
     <AppShell>
@@ -149,7 +161,7 @@ function DashboardPage() {
           <div className="relative grid items-center gap-8 md:grid-cols-[1.45fr_1fr]">
             <div className="space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full bg-story/10 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-story">
-                <Sparkles className="h-3 w-3" /> Welcome back, Aarav
+                <Sparkles className="h-3 w-3" /> Welcome back, {profile.name}
               </div>
               <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-foreground md:text-5xl">
                 Your next{" "}
@@ -159,31 +171,31 @@ function DashboardPage() {
                 is one tap away.
               </h1>
               <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                Continue Week 9 with Dev, Neo & Anaya. Earn XP, grow your weekly streak,
-                and unlock the legendary Weekly Champion badge.
+                Continue Week {currentWeek} with Dev, Neo & Anaya. Grow your weekly streak,
+                and unlock this week&apos;s badge.
               </p>
 
-              {/* XP rail */}
+              {/* Week progress rail */}
               <div className="rounded-[22px] border border-white/60 bg-white/70 p-4 backdrop-blur">
                 <div className="flex items-center justify-between text-[0.7rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                  <span className="inline-flex items-center gap-2 text-xp">
-                    <Star className="h-3.5 w-3.5" /> Level 7 · Explorer
+                  <span className="inline-flex items-center gap-2 text-story">
+                    <Compass className="h-3.5 w-3.5" /> Week {currentWeek} of {totalWeeks}
                   </span>
                   <span className="text-foreground">
-                    {liveXp} / {xpToNext} XP
+                    {completed.size} / {ACTIVITY_ORDER.length} activities
                   </span>
                 </div>
                 <div className="progress-shell mt-3 !h-3">
                   <motion.div
                     className="progress-fill"
                     initial={{ width: 0 }}
-                    animate={{ width: `${xpPercent}%` }}
+                    animate={{ width: `${weekPercent}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
                   />
                 </div>
                 <div className="mt-2 flex items-center justify-between text-[0.72rem] text-muted-foreground">
-                  <span>{xpToNext - liveXp} XP to Level 8</span>
-                  <span className="font-bold text-foreground">{xpPercent}%</span>
+                  <span>Finish all activities to earn this week&apos;s badge</span>
+                  <span className="font-bold text-foreground">{weekPercent}%</span>
                 </div>
               </div>
 
@@ -195,11 +207,10 @@ function DashboardPage() {
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
-                <Button variant="xp" size="lg">
-                  <Gift className="h-4 w-4" /> Claim +50 XP
-                </Button>
               </div>
             </div>
+
+
 
             {/* Character moment */}
             <div className="relative hidden h-72 items-end justify-center md:flex">
@@ -247,9 +258,11 @@ function DashboardPage() {
           transition={{ duration: 0.5, delay: 0.05 }}
           className="grid grid-cols-2 gap-3 md:grid-cols-4"
         >
-          <StatTile icon={<Star className="h-5 w-5" />} tone="xp" label="Total XP" value={String(liveXp)} sub={`+${earnedXp || 50} today`} />
-          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Weekly streak" value="5 weeks" sub="Champion run!" />
-          <StatTile icon={<Trophy className="h-5 w-5" />} tone="bonus" label="Badges" value={`${earnedBadges}/${ACHIEVEMENTS.length}`} sub="2 new this week" />
+          <StatTile icon={<Compass className="h-5 w-5" />} tone="xp" label={`Week ${currentWeek}`} value={`${weekPercent}%`} sub={`${completed.size}/${ACTIVITY_ORDER.length} activities`} />
+          <StatTile icon={<Flame className="h-5 w-5" />} tone="decide" label="Weekly streak" value={`${weeksDone} ${weeksDone === 1 ? "week" : "weeks"}`} sub={weeksDone === 0 ? "Start your streak!" : "Keep it going"} />
+          <StatTile icon={<Trophy className="h-5 w-5" />} tone="bonus" label="Badges" value={`${earnedBadges}/${totalWeeks}`} sub="1 badge per week" />
+
+
 
         </motion.section>
 
@@ -477,49 +490,56 @@ function DashboardPage() {
           <div className="flex items-end justify-between">
             <div>
               <div className="eyebrow">
-                <Award className="h-3.5 w-3.5" /> Achievements
+                <Award className="h-3.5 w-3.5" /> Weekly badges
               </div>
               <h2 className="mt-2 font-display text-2xl font-bold text-foreground md:text-3xl">
                 Trophies in your case
               </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                One badge unlocks each week — earn it by finishing all 7 activities. {earnedBadges} of {totalWeeks} collected.
+              </p>
             </div>
             <Link to="/badges" className="hidden items-center gap-1 text-sm font-bold text-primary hover:underline md:inline-flex">
-              All badges <ChevronRight className="h-4 w-4" />
+              All {totalWeeks} badges <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
+
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-            {ACHIEVEMENTS.map((a, i) => (
-              <motion.div
-                key={a.name}
-                initial={{ opacity: 0, scale: 0.94 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05, type: "spring", stiffness: 220, damping: 20 }}
-                whileHover={{ y: -4 }}
-                className={cn(
-                  "relative overflow-hidden rounded-[24px] border p-4 text-center shadow-[var(--shadow-soft)] backdrop-blur transition-all",
-                  a.earned ? `bg-${a.tone}-soft/60 border-${a.tone}/30` : "bg-white/70 border-border opacity-80",
-                )}
-              >
-                {a.earned && (
-                  <div className={cn("pointer-events-none absolute -top-10 -right-10 h-24 w-24 rounded-full blur-2xl", `bg-${a.tone}/40`)} />
-                )}
-                <div
+            {WEEKLY_BADGE_PREVIEW.map((a, i) => {
+              const earned = weeksDone >= a.week;
+              const Icon = a.icon;
+              return (
+                <motion.div
+                  key={a.name}
+                  initial={{ opacity: 0, scale: 0.94 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05, type: "spring", stiffness: 220, damping: 20 }}
+                  whileHover={{ y: -4 }}
                   className={cn(
-                    "relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl shadow-[var(--shadow-soft)]",
-                    a.earned ? `bg-gradient-to-br from-${a.tone} to-${a.tone}/70 text-white` : "bg-muted text-locked",
+                    "relative overflow-hidden rounded-[24px] border p-4 text-center shadow-[var(--shadow-soft)] backdrop-blur transition-all",
+                    earned ? `bg-${a.tone}-soft/60 border-${a.tone}/30` : "bg-white/70 border-border opacity-80",
                   )}
                 >
-                  {a.earned ? <a.icon className="h-6 w-6" /> : <Lock className="h-5 w-5" />}
-                </div>
-                <div className="relative mt-3 font-display text-sm font-bold text-foreground">{a.name}</div>
-                <div className="relative text-[0.68rem] text-muted-foreground">{a.sub}</div>
-              </motion.div>
-            ))}
+                  {earned && (
+                    <div className={cn("pointer-events-none absolute -top-10 -right-10 h-24 w-24 rounded-full blur-2xl", `bg-${a.tone}/40`)} />
+                  )}
+                  <div
+                    className={cn(
+                      "relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl shadow-[var(--shadow-soft)]",
+                      earned ? `bg-gradient-to-br from-${a.tone} to-${a.tone}/70 text-white` : "bg-muted text-locked",
+                    )}
+                  >
+                    {earned ? <Icon className="h-6 w-6" /> : <Lock className="h-5 w-5" />}
+                  </div>
+                  <div className="relative mt-3 font-display text-sm font-bold text-foreground">{a.name}</div>
+                  <div className="relative text-[0.68rem] text-muted-foreground">Week {a.week}</div>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.section>
 
-        {/* ───── CHARACTER MOMENT ───── */}
         <section className="grid gap-5">
           {false && (
           <motion.div
@@ -633,30 +653,24 @@ function DashboardPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="grid gap-4 md:grid-cols-3"
+          className="grid gap-4 md:grid-cols-2"
         >
           <ProgressWidget
             tone="story"
             icon={<Compass className="h-5 w-5" />}
-            label="Week 9 progress"
+            label={`Week ${currentWeek} progress`}
             percent={weekPercent}
             caption={`${completed.size}/${ACTIVITY_ORDER.length} activities`}
           />
           <ProgressWidget
-            tone="xp"
-            icon={<Star className="h-5 w-5" />}
-            label="XP to Level 8"
-            percent={xpPercent}
-            caption={`${liveXp} / ${xpToNext} XP`}
-          />
-          <ProgressWidget
             tone="decide"
             icon={<Flame className="h-5 w-5" />}
-            label="Weekly completion goal"
-            percent={weekPercent}
-            caption={`${completed.size} / ${ACTIVITY_ORDER.length} activities this week`}
+            label="Weekly streak"
+            percent={Math.round((weeksDone / totalWeeks) * 100)}
+            caption={`${weeksDone} of ${totalWeeks} weeks complete`}
           />
         </motion.section>
+
       </div>
     </AppShell>
   );

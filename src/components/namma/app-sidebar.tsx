@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -5,14 +6,9 @@ import {
   ChevronLeft,
   Compass,
   Flame,
-  Gift,
   LayoutDashboard,
-  LifeBuoy,
   Map,
   Shield,
-  Sparkles,
-  Star,
-  BookOpenText,
   Zap,
 } from "lucide-react";
 
@@ -20,6 +16,19 @@ import neoHappy from "@/assets/characters/neo-happy.png";
 import { BrandMark } from "@/components/namma/brand-mark";
 import { cn } from "@/lib/utils";
 import { useAppShell } from "@/components/namma/app-shell-context";
+import {
+  ACTIVITY_ORDER,
+} from "@/components/namma/activity/lesson-data";
+import { getCompleted } from "@/components/namma/activity/progress";
+import {
+  getCompletedWeeks,
+  getProfile,
+  onNammaState,
+  type NammaProfile,
+} from "@/lib/namma-progress";
+
+
+
 
 type NavItem = {
   label: string;
@@ -180,25 +189,64 @@ export function AppSidebar() {
       </AnimatePresence>
 
       {isCollapsed && (
-        <div className="flex flex-col items-center gap-2">
-          <div className="namma-streak-mini" aria-label="5 week streak">
-            <Flame className="h-4 w-4" />
-            <span>5w</span>
-          </div>
-        </div>
+        <CollapsedStreak />
       )}
+
     </aside>
   );
 }
 
+function useNammaSnapshot() {
+  const [profile, setProfile] = React.useState<NammaProfile>(() => getProfile());
+  const [weeksDone, setWeeksDone] = React.useState(0);
+  const [activitiesDone, setActivitiesDone] = React.useState(0);
+
+  React.useEffect(() => {
+    const load = () => {
+      setProfile(getProfile());
+      setWeeksDone(getCompletedWeeks().length);
+      setActivitiesDone(getCompleted().length);
+    };
+    load();
+    const off = onNammaState(load);
+    window.addEventListener("namma:progress", load);
+    window.addEventListener("storage", load);
+    return () => {
+      off();
+      window.removeEventListener("namma:progress", load);
+      window.removeEventListener("storage", load);
+    };
+  }, []);
+
+  const currentWeek = Math.max(1, weeksDone + 1);
+  const weekPercent = Math.round((activitiesDone / ACTIVITY_ORDER.length) * 100);
+  return { profile, weeksDone, activitiesDone, currentWeek, weekPercent };
+}
+
+function CollapsedStreak() {
+  const { weeksDone } = useNammaSnapshot();
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="namma-streak-mini" aria-label={`${weeksDone} week streak`}>
+        <Flame className="h-4 w-4" />
+        <span>{weeksDone}w</span>
+      </div>
+    </div>
+  );
+}
+
 function ProfileWidget({ collapsed }: { collapsed: boolean }) {
+  const { profile, weeksDone, currentWeek, weekPercent } = useNammaSnapshot();
+  const initial = (profile.name || "Explorer").trim().charAt(0).toUpperCase() || "E";
+  const level = 1; // Phase 1: every learner is Level 1
+
   if (collapsed) {
     return (
       <div className="flex flex-col items-center gap-3 py-2">
-        <div className="namma-avatar">A</div>
-        <div className="namma-level-pill-mini" title="Level 2">
+        <div className="namma-avatar">{initial}</div>
+        <div className="namma-level-pill-mini" title={`Level ${level}`}>
           <Shield className="h-3.5 w-3.5" />
-          <span>2</span>
+          <span>{level}</span>
         </div>
       </div>
     );
@@ -206,32 +254,32 @@ function ProfileWidget({ collapsed }: { collapsed: boolean }) {
   return (
     <div className="namma-profile-card">
       <div className="flex items-center gap-3">
-        <div className="namma-avatar">A</div>
+        <div className="namma-avatar">{initial}</div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate font-display text-[0.95rem] font-bold text-foreground">
-              Aarav K.
+              {profile.name || "Explorer"}
             </span>
             <span className="namma-level-pill">
               <Shield className="h-3 w-3" />
-              Lv 2
+              Lv {level}
             </span>
           </div>
           <div className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            Explorer · Grade 7
+            Explorer · {profile.gradeLabel}
           </div>
         </div>
       </div>
 
       <div className="mt-3">
         <div className="flex items-center justify-between text-[0.7rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5 text-xp">
-            <Star className="h-3.5 w-3.5" /> 320 XP
+          <span className="inline-flex items-center gap-1.5 text-story">
+            <Compass className="h-3.5 w-3.5" /> Week {currentWeek}
           </span>
-          <span>180 to Lv 3</span>
+          <span>{weekPercent}% done</span>
         </div>
         <div className="namma-xp-rail mt-1.5">
-          <div className="namma-xp-fill" style={{ width: "62%" }} />
+          <div className="namma-xp-fill" style={{ width: `${weekPercent}%` }} />
         </div>
       </div>
 
@@ -241,7 +289,7 @@ function ProfileWidget({ collapsed }: { collapsed: boolean }) {
             <Flame className="h-3.5 w-3.5" />
           </span>
           <div className="leading-tight">
-            <div className="text-[0.95rem] font-bold text-foreground">5w</div>
+            <div className="text-[0.95rem] font-bold text-foreground">{weeksDone}w</div>
             <div className="text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground">
               Weekly streak
             </div>
@@ -252,7 +300,7 @@ function ProfileWidget({ collapsed }: { collapsed: boolean }) {
             <Zap className="h-3.5 w-3.5" />
           </span>
           <div className="leading-tight">
-            <div className="text-[0.95rem] font-bold text-foreground">12</div>
+            <div className="text-[0.95rem] font-bold text-foreground">{weeksDone}/35</div>
             <div className="text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground">
               Badges
             </div>
@@ -262,3 +310,6 @@ function ProfileWidget({ collapsed }: { collapsed: boolean }) {
     </div>
   );
 }
+
+
+
