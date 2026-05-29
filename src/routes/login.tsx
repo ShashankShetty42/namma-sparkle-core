@@ -123,6 +123,7 @@ function LoginPage() {
       if (!match) {
         toast.error("Invalid student credentials. Ask your admin to create your account.");
         return;
+      }
       setLoading(true);
       await new Promise((r) => setTimeout(r, 600));
       const alreadyOnboarded = hasStudentOnboarded(code, match.student_id);
@@ -139,9 +140,8 @@ function LoginPage() {
       setPortal(true);
       window.setTimeout(() => navigate({ to: "/", replace: true }), 1600);
       return;
-
-      return;
     }
+
 
     if (activeRole === "teacher") {
       const match = getTeachers(code || undefined).find(
