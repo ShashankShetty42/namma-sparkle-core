@@ -171,20 +171,7 @@ export function OnboardingDialog() {
               className="relative min-h-[260px] sm:min-h-[340px]"
             >
               {step === "welcome" && (
-                <StepWelcome onStart={goNext} />
-              )}
-              {step === "name" && (
-                <StepName
-                  value={draft.name}
-                  onChange={(v) => setDraft((d) => ({ ...d, name: v }))}
-                  onEnter={goNext}
-                />
-              )}
-              {step === "grade" && (
-                <StepGrade
-                  value={draft.gradeLabel}
-                  onChange={(v) => setDraft((d) => ({ ...d, gradeLabel: v }))}
-                />
+                <StepWelcome name={studentName} gradeLabel={gradeLabel} />
               )}
               {step === "character" && (
                 <StepCharacter
@@ -196,14 +183,15 @@ export function OnboardingDialog() {
                 <StepAvatar
                   colorId={draft.avatarColorId}
                   iconId={draft.avatarIconId}
-                  name={draft.name || "Explorer"}
+                  name={studentName}
                   onColor={(v) => setDraft((d) => ({ ...d, avatarColorId: v }))}
                   onIcon={(v) => setDraft((d) => ({ ...d, avatarIconId: v }))}
                 />
               )}
               {step === "ready" && (
-                <StepReady draft={draft} />
+                <StepReady draft={draft} name={studentName} gradeLabel={gradeLabel} />
               )}
+
             </motion.div>
           </AnimatePresence>
 
