@@ -25,7 +25,7 @@ import {
 } from "@/lib/namma-admin";
 import neoExplaining from "@/assets/characters/neo-explaining.png";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/admin/")({
   head: () => ({ meta: [{ title: "Admin dashboard · Namma AI" }] }),
   component: AdminDashboard,
 });

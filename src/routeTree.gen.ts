@@ -24,9 +24,9 @@ import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as BadgesRouteImport } from './routes/badges'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
 import { Route as AdminStudentsRouteImport } from './routes/admin.students'
 import { Route as AdminSchoolsRouteImport } from './routes/admin.schools'
@@ -108,11 +108,6 @@ const BadgesRoute = BadgesRouteImport.update({
   path: '/badges',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ActivitiesRoute = ActivitiesRouteImport.update({
   id: '/activities',
   path: '/activities',
@@ -121,6 +116,11 @@ const ActivitiesRoute = ActivitiesRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminTeachersRoute = AdminTeachersRouteImport.update({
@@ -152,7 +152,6 @@ const AdminSchoolsSchoolIdRoute = AdminSchoolsSchoolIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
-  '/admin': typeof AdminRouteWithChildren
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -172,12 +171,12 @@ export interface FileRoutesByFullPath {
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
   '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/': typeof AdminIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
-  '/admin': typeof AdminRouteWithChildren
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -197,13 +196,13 @@ export interface FileRoutesByTo {
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
   '/admin/teachers': typeof AdminTeachersRoute
+  '/admin': typeof AdminIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRouteWithChildren
-  '/admin': typeof AdminRouteWithChildren
   '/badges': typeof BadgesRoute
   '/design-system': typeof DesignSystemRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -223,6 +222,7 @@ export interface FileRoutesById {
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
   '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/': typeof AdminIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRouteTypes {
@@ -230,7 +230,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/activities'
-    | '/admin'
     | '/badges'
     | '/design-system'
     | '/forgot-password'
@@ -250,12 +249,12 @@ export interface FileRouteTypes {
     | '/admin/schools'
     | '/admin/students'
     | '/admin/teachers'
+    | '/admin/'
     | '/admin/schools/$schoolId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/activities'
-    | '/admin'
     | '/badges'
     | '/design-system'
     | '/forgot-password'
@@ -275,12 +274,12 @@ export interface FileRouteTypes {
     | '/admin/schools'
     | '/admin/students'
     | '/admin/teachers'
+    | '/admin'
     | '/admin/schools/$schoolId'
   id:
     | '__root__'
     | '/'
     | '/activities'
-    | '/admin'
     | '/badges'
     | '/design-system'
     | '/forgot-password'
@@ -300,13 +299,13 @@ export interface FileRouteTypes {
     | '/admin/schools'
     | '/admin/students'
     | '/admin/teachers'
+    | '/admin/'
     | '/admin/schools/$schoolId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivitiesRoute: typeof ActivitiesRouteWithChildren
-  AdminRoute: typeof AdminRouteWithChildren
   BadgesRoute: typeof BadgesRoute
   DesignSystemRoute: typeof DesignSystemRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -322,6 +321,7 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   TeacherRoute: typeof TeacherRoute
   WelcomeRoute: typeof WelcomeRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -431,13 +431,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BadgesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/activities': {
       id: '/activities'
       path: '/activities'
@@ -450,6 +443,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/teachers': {
@@ -502,36 +502,9 @@ const ActivitiesRouteWithChildren = ActivitiesRoute._addFileChildren(
   ActivitiesRouteChildren,
 )
 
-interface AdminSchoolsRouteChildren {
-  AdminSchoolsSchoolIdRoute: typeof AdminSchoolsSchoolIdRoute
-}
-
-const AdminSchoolsRouteChildren: AdminSchoolsRouteChildren = {
-  AdminSchoolsSchoolIdRoute: AdminSchoolsSchoolIdRoute,
-}
-
-const AdminSchoolsRouteWithChildren = AdminSchoolsRoute._addFileChildren(
-  AdminSchoolsRouteChildren,
-)
-
-interface AdminRouteChildren {
-  AdminSchoolsRoute: typeof AdminSchoolsRouteWithChildren
-  AdminStudentsRoute: typeof AdminStudentsRoute
-  AdminTeachersRoute: typeof AdminTeachersRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminSchoolsRoute: AdminSchoolsRouteWithChildren,
-  AdminStudentsRoute: AdminStudentsRoute,
-  AdminTeachersRoute: AdminTeachersRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivitiesRoute: ActivitiesRouteWithChildren,
-  AdminRoute: AdminRouteWithChildren,
   BadgesRoute: BadgesRoute,
   DesignSystemRoute: DesignSystemRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
@@ -547,7 +520,18 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   TeacherRoute: TeacherRoute,
   WelcomeRoute: WelcomeRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
