@@ -27,8 +27,11 @@ import { Route as BadgesRouteImport } from './routes/badges'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
+import { Route as AdminStudentsRouteImport } from './routes/admin.students'
 import { Route as AdminSchoolsRouteImport } from './routes/admin.schools'
 import { Route as ActivitiesSlugRouteImport } from './routes/activities.$slug'
+import { Route as AdminSchoolsSchoolIdRouteImport } from './routes/admin.schools.$schoolId'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -120,6 +123,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTeachersRoute = AdminTeachersRouteImport.update({
+  id: '/teachers',
+  path: '/teachers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStudentsRoute = AdminStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSchoolsRoute = AdminSchoolsRouteImport.update({
   id: '/schools',
   path: '/schools',
@@ -129,6 +142,11 @@ const ActivitiesSlugRoute = ActivitiesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ActivitiesRoute,
+} as any)
+const AdminSchoolsSchoolIdRoute = AdminSchoolsSchoolIdRouteImport.update({
+  id: '/$schoolId',
+  path: '/$schoolId',
+  getParentRoute: () => AdminSchoolsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -151,7 +169,10 @@ export interface FileRoutesByFullPath {
   '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
-  '/admin/schools': typeof AdminSchoolsRoute
+  '/admin/schools': typeof AdminSchoolsRouteWithChildren
+  '/admin/students': typeof AdminStudentsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -173,7 +194,10 @@ export interface FileRoutesByTo {
   '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
-  '/admin/schools': typeof AdminSchoolsRoute
+  '/admin/schools': typeof AdminSchoolsRouteWithChildren
+  '/admin/students': typeof AdminStudentsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -196,7 +220,10 @@ export interface FileRoutesById {
   '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
-  '/admin/schools': typeof AdminSchoolsRoute
+  '/admin/schools': typeof AdminSchoolsRouteWithChildren
+  '/admin/students': typeof AdminStudentsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -221,6 +248,9 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/activities/$slug'
     | '/admin/schools'
+    | '/admin/students'
+    | '/admin/teachers'
+    | '/admin/schools/$schoolId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -243,6 +273,9 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/activities/$slug'
     | '/admin/schools'
+    | '/admin/students'
+    | '/admin/teachers'
+    | '/admin/schools/$schoolId'
   id:
     | '__root__'
     | '/'
@@ -265,6 +298,9 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/activities/$slug'
     | '/admin/schools'
+    | '/admin/students'
+    | '/admin/teachers'
+    | '/admin/schools/$schoolId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -416,6 +452,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/teachers': {
+      id: '/admin/teachers'
+      path: '/teachers'
+      fullPath: '/admin/teachers'
+      preLoaderRoute: typeof AdminTeachersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/students': {
+      id: '/admin/students'
+      path: '/students'
+      fullPath: '/admin/students'
+      preLoaderRoute: typeof AdminStudentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/schools': {
       id: '/admin/schools'
       path: '/schools'
@@ -429,6 +479,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/activities/$slug'
       preLoaderRoute: typeof ActivitiesSlugRouteImport
       parentRoute: typeof ActivitiesRoute
+    }
+    '/admin/schools/$schoolId': {
+      id: '/admin/schools/$schoolId'
+      path: '/$schoolId'
+      fullPath: '/admin/schools/$schoolId'
+      preLoaderRoute: typeof AdminSchoolsSchoolIdRouteImport
+      parentRoute: typeof AdminSchoolsRoute
     }
   }
 }
@@ -445,12 +502,28 @@ const ActivitiesRouteWithChildren = ActivitiesRoute._addFileChildren(
   ActivitiesRouteChildren,
 )
 
+interface AdminSchoolsRouteChildren {
+  AdminSchoolsSchoolIdRoute: typeof AdminSchoolsSchoolIdRoute
+}
+
+const AdminSchoolsRouteChildren: AdminSchoolsRouteChildren = {
+  AdminSchoolsSchoolIdRoute: AdminSchoolsSchoolIdRoute,
+}
+
+const AdminSchoolsRouteWithChildren = AdminSchoolsRoute._addFileChildren(
+  AdminSchoolsRouteChildren,
+)
+
 interface AdminRouteChildren {
-  AdminSchoolsRoute: typeof AdminSchoolsRoute
+  AdminSchoolsRoute: typeof AdminSchoolsRouteWithChildren
+  AdminStudentsRoute: typeof AdminStudentsRoute
+  AdminTeachersRoute: typeof AdminTeachersRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminSchoolsRoute: AdminSchoolsRoute,
+  AdminSchoolsRoute: AdminSchoolsRouteWithChildren,
+  AdminStudentsRoute: AdminStudentsRoute,
+  AdminTeachersRoute: AdminTeachersRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
