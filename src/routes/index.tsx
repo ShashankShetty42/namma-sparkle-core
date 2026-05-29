@@ -504,12 +504,7 @@ function DashboardPage() {
             </Link>
           </div>
 
-          </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-            {ACHIEVEMENTS.map((a, i) => (
-              <motion.div
-                key={a.name}
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+
             {WEEKLY_BADGE_PREVIEW.map((a, i) => {
               const earned = weeksDone >= a.week;
               const Icon = a.icon;
