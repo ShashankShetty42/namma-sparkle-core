@@ -452,27 +452,32 @@ export function LessonFrame({
             meta={meta}
             onContinue={() => {
               if (slug) {
-                const isNew = rewardActivity(slug, {
-                  title: meta.title,
-                  badge: meta.badge,
-                  xp: meta.totalXp,
-                  tone: meta.tone,
-                  weekId: "week-9",
-                });
+                const isNewActivity = !getCompleted().includes(slug);
                 markCompleted(slug);
-                if (isNew) {
+                if (isNewActivity) {
+                  addXP(meta.totalXp, `Activity · ${meta.title}`, "week-9");
                   toast.success(`+${meta.totalXp} XP`, {
-                    description: `${meta.badge} unlocked`,
+                    description: `${meta.title} complete · keep going`,
                   });
                 }
-                // Weekly completion check
+                // Weekly completion check — single badge per week
                 const done = new Set(getCompleted());
                 done.add(slug);
                 if (ACTIVITY_ORDER.every((s) => done.has(s))) {
                   const newWeek = markWeekComplete("week-9");
                   if (newWeek) {
+                    awardBadge({
+                      id: "weekly:week-9",
+                      name: "Story Architect",
+                      kind: "weekly",
+                      weekId: "week-9",
+                      tone: "story",
+                      xp: 200,
+                      description: "Completed all Week 9 activities",
+                    });
+                    addXP(200, "Weekly badge · Week 9", "week-9");
                     toast.success("Week 9 complete!", {
-                      description: "+1 to your weekly streak · keep the momentum",
+                      description: "Story Architect badge unlocked · +1 weekly streak",
                     });
                   }
                 }
@@ -485,6 +490,7 @@ export function LessonFrame({
           />
         )}
       </AnimatePresence>
+
     </div>
   );
 }
