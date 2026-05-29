@@ -9,13 +9,14 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
   DEFAULT_PROFILE,
+import {
+  DEFAULT_PROFILE,
   getAuth,
   getProfile,
-  labelToBand,
+  markStudentOnboarded,
   saveProfile,
   type NammaProfile,
 } from "@/lib/namma-progress";
-import { nammaEase } from "@/components/namma/motion";
 
 import neoExplaining from "@/assets/characters/neo-explaining.png";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
