@@ -58,18 +58,18 @@ const AVATAR_EMOJI: Record<string, string> = {
 
 type Draft = Pick<
   NammaProfile,
-  "name" | "gradeLabel" | "favorite" | "avatarColorId" | "avatarIconId"
+  "favorite" | "avatarColorId" | "avatarIconId"
 >;
 
-const STEPS = ["welcome", "name", "grade", "character", "avatar", "ready"] as const;
+const STEPS = ["welcome", "character", "avatar", "ready"] as const;
 type Step = (typeof STEPS)[number];
 
 export function OnboardingDialog() {
   const [open, setOpen] = React.useState(false);
   const [step, setStep] = React.useState<Step>("welcome");
+  const [studentName, setStudentName] = React.useState<string>("Explorer");
+  const [gradeLabel, setGradeLabel] = React.useState<string>(DEFAULT_PROFILE.gradeLabel);
   const [draft, setDraft] = React.useState<Draft>({
-    name: "",
-    gradeLabel: DEFAULT_PROFILE.gradeLabel,
     favorite: DEFAULT_PROFILE.favorite,
     avatarColorId: DEFAULT_PROFILE.avatarColorId,
     avatarIconId: DEFAULT_PROFILE.avatarIconId,
@@ -82,17 +82,22 @@ export function OnboardingDialog() {
       // Onboarding is only meant for students — admins and teachers skip it.
       if (auth.role !== "student") return;
       const p = getProfile();
-      if (!p.onboarded) setOpen(true);
+      if (p.onboarded) return;
+      setStudentName(p.name || "Explorer");
+      setGradeLabel(p.gradeLabel);
+      setDraft({
+        favorite: p.favorite,
+        avatarColorId: p.avatarColorId,
+        avatarIconId: p.avatarIconId,
+      });
+      setOpen(true);
     }, 600);
     return () => window.clearTimeout(id);
   }, []);
 
   const idx = STEPS.indexOf(step);
   const total = STEPS.length;
-  const canNext = (() => {
-    if (step === "name") return draft.name.trim().length > 0;
-    return true;
-  })();
+  const canNext = true;
 
   const goNext = () => {
     if (!canNext) return;
@@ -105,23 +110,25 @@ export function OnboardingDialog() {
   const goBack = () => setStep(STEPS[Math.max(idx - 1, 0)]);
 
   const finish = () => {
-    const name = draft.name.trim() || "Explorer";
     saveProfile({
-      name,
-      gradeLabel: draft.gradeLabel,
-      gradeBand: labelToBand(draft.gradeLabel),
       favorite: draft.favorite,
       avatarColorId: draft.avatarColorId,
       avatarIconId: draft.avatarIconId,
       onboarded: true,
     });
+    // Persist per-student onboarded flag so it never re-opens on later logins.
+    const auth = getAuth();
+    if (auth.role === "student" && auth.schoolCode && auth.email) {
+      markStudentOnboarded(auth.schoolCode, auth.email);
+    }
     setOpen(false);
     const fav = CHARACTERS.find((c) => c.id === draft.favorite)!;
-    toast.success(`Welcome aboard, ${name}!`, {
+    toast.success(`Welcome aboard, ${studentName}!`, {
       description: `${fav.name} can't wait to start this adventure with you. ✨`,
       duration: 5000,
     });
   };
+
 
   return (
     <Dialog
