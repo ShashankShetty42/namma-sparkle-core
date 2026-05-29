@@ -11,11 +11,12 @@ import {
   DEFAULT_PROFILE,
   getAuth,
   getProfile,
-  labelToBand,
+  markStudentOnboarded,
   saveProfile,
   type NammaProfile,
 } from "@/lib/namma-progress";
 import { nammaEase } from "@/components/namma/motion";
+
 
 import neoExplaining from "@/assets/characters/neo-explaining.png";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
@@ -57,18 +58,18 @@ const AVATAR_EMOJI: Record<string, string> = {
 
 type Draft = Pick<
   NammaProfile,
-  "name" | "gradeLabel" | "favorite" | "avatarColorId" | "avatarIconId"
+  "favorite" | "avatarColorId" | "avatarIconId"
 >;
 
-const STEPS = ["welcome", "name", "grade", "character", "avatar", "ready"] as const;
+const STEPS = ["welcome", "character", "avatar", "ready"] as const;
 type Step = (typeof STEPS)[number];
 
 export function OnboardingDialog() {
   const [open, setOpen] = React.useState(false);
   const [step, setStep] = React.useState<Step>("welcome");
+  const [studentName, setStudentName] = React.useState<string>("Explorer");
+  const [gradeLabel, setGradeLabel] = React.useState<string>(DEFAULT_PROFILE.gradeLabel);
   const [draft, setDraft] = React.useState<Draft>({
-    name: "",
-    gradeLabel: DEFAULT_PROFILE.gradeLabel,
     favorite: DEFAULT_PROFILE.favorite,
     avatarColorId: DEFAULT_PROFILE.avatarColorId,
     avatarIconId: DEFAULT_PROFILE.avatarIconId,
@@ -81,17 +82,22 @@ export function OnboardingDialog() {
       // Onboarding is only meant for students — admins and teachers skip it.
       if (auth.role !== "student") return;
       const p = getProfile();
-      if (!p.onboarded) setOpen(true);
+      if (p.onboarded) return;
+      setStudentName(p.name || "Explorer");
+      setGradeLabel(p.gradeLabel);
+      setDraft({
+        favorite: p.favorite,
+        avatarColorId: p.avatarColorId,
+        avatarIconId: p.avatarIconId,
+      });
+      setOpen(true);
     }, 600);
     return () => window.clearTimeout(id);
   }, []);
 
   const idx = STEPS.indexOf(step);
   const total = STEPS.length;
-  const canNext = (() => {
-    if (step === "name") return draft.name.trim().length > 0;
-    return true;
-  })();
+  const canNext = true;
 
   const goNext = () => {
     if (!canNext) return;
@@ -104,23 +110,25 @@ export function OnboardingDialog() {
   const goBack = () => setStep(STEPS[Math.max(idx - 1, 0)]);
 
   const finish = () => {
-    const name = draft.name.trim() || "Explorer";
     saveProfile({
-      name,
-      gradeLabel: draft.gradeLabel,
-      gradeBand: labelToBand(draft.gradeLabel),
       favorite: draft.favorite,
       avatarColorId: draft.avatarColorId,
       avatarIconId: draft.avatarIconId,
       onboarded: true,
     });
+    // Persist per-student onboarded flag so it never re-opens on later logins.
+    const auth = getAuth();
+    if (auth.role === "student" && auth.schoolCode && auth.email) {
+      markStudentOnboarded(auth.schoolCode, auth.email);
+    }
     setOpen(false);
     const fav = CHARACTERS.find((c) => c.id === draft.favorite)!;
-    toast.success(`Welcome aboard, ${name}!`, {
+    toast.success(`Welcome aboard, ${studentName}!`, {
       description: `${fav.name} can't wait to start this adventure with you. ✨`,
       duration: 5000,
     });
   };
+
 
   return (
     <Dialog
@@ -163,20 +171,7 @@ export function OnboardingDialog() {
               className="relative min-h-[260px] sm:min-h-[340px]"
             >
               {step === "welcome" && (
-                <StepWelcome onStart={goNext} />
-              )}
-              {step === "name" && (
-                <StepName
-                  value={draft.name}
-                  onChange={(v) => setDraft((d) => ({ ...d, name: v }))}
-                  onEnter={goNext}
-                />
-              )}
-              {step === "grade" && (
-                <StepGrade
-                  value={draft.gradeLabel}
-                  onChange={(v) => setDraft((d) => ({ ...d, gradeLabel: v }))}
-                />
+                <StepWelcome name={studentName} gradeLabel={gradeLabel} />
               )}
               {step === "character" && (
                 <StepCharacter
@@ -188,14 +183,15 @@ export function OnboardingDialog() {
                 <StepAvatar
                   colorId={draft.avatarColorId}
                   iconId={draft.avatarIconId}
-                  name={draft.name || "Explorer"}
+                  name={studentName}
                   onColor={(v) => setDraft((d) => ({ ...d, avatarColorId: v }))}
                   onIcon={(v) => setDraft((d) => ({ ...d, avatarIconId: v }))}
                 />
               )}
               {step === "ready" && (
-                <StepReady draft={draft} />
+                <StepReady draft={draft} name={studentName} gradeLabel={gradeLabel} />
               )}
+
             </motion.div>
           </AnimatePresence>
 
@@ -238,7 +234,7 @@ export function OnboardingDialog() {
 
 /* ────────────── Steps ────────────── */
 
-function StepWelcome({ onStart: _onStart }: { onStart: () => void }) {
+function StepWelcome({ name, gradeLabel }: { name: string; gradeLabel: string }) {
   return (
     <div className="grid items-center gap-6 md:grid-cols-[1fr_0.9fr]">
       <div className="space-y-4">
@@ -246,24 +242,24 @@ function StepWelcome({ onStart: _onStart }: { onStart: () => void }) {
           <Wand2 className="h-3.5 w-3.5" /> A magical beginning
         </span>
         <h2 className="font-display text-3xl font-extrabold leading-tight text-foreground md:text-4xl">
-          Hi! I&apos;m{" "}
+          Hi{" "}
           <span className="bg-gradient-to-r from-bonus via-challenge to-explore bg-clip-text text-transparent">
-            Neo
-          </span>{" "}
-          — and I&apos;ll be your guide.
+            {name}
+          </span>
+          ! I&apos;m Neo — your guide.
         </h2>
         <p className="text-base leading-relaxed text-muted-foreground">
-          Welcome to <strong className="text-foreground">Namma AI</strong> — a
-          weekly adventure into the world of artificial intelligence. Before we
-          fly, let&apos;s set up your explorer profile in 4 quick steps.
+          Welcome to <strong className="text-foreground">Namma AI</strong> — your
+          weekly adventure into artificial intelligence. Your school set you up
+          as a <strong className="text-foreground">{gradeLabel}</strong> explorer.
+          Let&apos;s personalize the rest in 2 quick steps.
         </p>
         <ul className="space-y-1.5 text-sm text-foreground/80">
-          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success" /> Pick your name</li>
-          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success" /> Choose your grade</li>
           <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success" /> Meet your favorite character</li>
           <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success" /> Design your avatar</li>
         </ul>
       </div>
+
       <div className="relative flex items-center justify-center">
         <div className="absolute h-64 w-64 rounded-full bg-gradient-to-br from-story/30 via-explore/20 to-bonus/30 blur-3xl" />
         <img
@@ -515,7 +511,7 @@ function StepAvatar({
   );
 }
 
-function StepReady({ draft }: { draft: Draft }) {
+function StepReady({ draft, name, gradeLabel }: { draft: Draft; name: string; gradeLabel: string }) {
   const fav = CHARACTERS.find((c) => c.id === draft.favorite)!;
   const color = AVATAR_COLORS.find((c) => c.id === draft.avatarColorId) ?? AVATAR_COLORS[0];
   return (
@@ -527,13 +523,14 @@ function StepReady({ draft }: { draft: Draft }) {
         <h2 className="font-display text-3xl font-extrabold leading-tight text-foreground md:text-4xl">
           You&apos;re ready,{" "}
           <span className="bg-gradient-to-r from-bonus via-challenge to-explore bg-clip-text text-transparent">
-            {draft.name || "Explorer"}
+            {name}
           </span>
           !
         </h2>
         <div className="space-y-2 rounded-2xl border border-white/70 bg-white/70 p-4 text-sm">
-          <Row label="Name" value={draft.name || "Explorer"} />
-          <Row label="Grade" value={draft.gradeLabel} />
+          <Row label="Name" value={name} />
+          <Row label="Grade" value={gradeLabel} />
+
           <Row label="Buddy" value={fav.name} />
           <Row label="Avatar" value={`${AVATAR_EMOJI[draft.avatarIconId]} ${draft.avatarColorId}`} />
         </div>

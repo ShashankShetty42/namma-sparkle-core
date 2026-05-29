@@ -25,7 +25,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
 import { BrandMark } from "@/components/namma/brand-mark";
-import { getProfile, saveProfile, signIn, type UserRole } from "@/lib/namma-progress";
+import { DEFAULT_PROFILE, getProfile, hasStudentOnboarded, labelToBand, saveProfile, signIn, type UserRole } from "@/lib/namma-progress";
+
 import { getStudents, getTeachers } from "@/lib/namma-admin";
 import neoExplaining from "@/assets/characters/neo-explaining.png";
 import devHappy from "@/assets/characters/dev-happy.png";
@@ -125,13 +126,22 @@ function LoginPage() {
       }
       setLoading(true);
       await new Promise((r) => setTimeout(r, 600));
-      saveProfile({ name: match.student_name, gradeLabel: match.grade });
+      const alreadyOnboarded = hasStudentOnboarded(code, match.student_id);
+      // Reset profile to admin-set identity on every login; preserve onboarded state per-student.
+      saveProfile({
+        ...DEFAULT_PROFILE,
+        name: match.student_name,
+        gradeLabel: match.grade,
+        gradeBand: labelToBand(match.grade),
+        onboarded: alreadyOnboarded,
+      });
       signIn({ role: "student", email: match.student_id, schoolCode: code });
       setLoading(false);
       setPortal(true);
       window.setTimeout(() => navigate({ to: "/", replace: true }), 1600);
       return;
     }
+
 
     if (activeRole === "teacher") {
       const match = getTeachers(code || undefined).find(
