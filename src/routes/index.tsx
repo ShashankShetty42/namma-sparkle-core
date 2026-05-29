@@ -32,15 +32,22 @@ import devHappy from "@/assets/characters/dev-happy.png";
 import neoCelebrating from "@/assets/characters/neo-celebrating.png";
 import neoExplaining from "@/assets/characters/neo-explaining.png";
 import { AppShell } from "@/components/namma/app-shell";
+import { AppShell } from "@/components/namma/app-shell";
 import {
   ACTIVITIES,
   ACTIVITY_ORDER,
   HUB_ICONS,
 } from "@/components/namma/activity/lesson-data";
 import { getCompleted } from "@/components/namma/activity/progress";
+import {
+  getCompletedWeeks,
+  getProfile,
+  onNammaState,
+} from "@/lib/namma-progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nammaEase } from "@/components/namma/motion";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -106,31 +113,33 @@ const REWARDS = [
 
 function DashboardPage() {
   const [completed, setCompleted] = React.useState<Set<string>>(new Set());
+  const [profile, setProfile] = React.useState(() => getProfile());
+  const [weeksDone, setWeeksDone] = React.useState(0);
+
   React.useEffect(() => {
-    const load = () => setCompleted(new Set(getCompleted()));
+    const load = () => {
+      setCompleted(new Set(getCompleted()));
+      setProfile(getProfile());
+      setWeeksDone(getCompletedWeeks().length);
+    };
     load();
+    const off = onNammaState(load);
     window.addEventListener("namma:progress", load);
     window.addEventListener("storage", load);
     return () => {
+      off();
       window.removeEventListener("namma:progress", load);
       window.removeEventListener("storage", load);
     };
   }, []);
 
-  const totalXp = ACTIVITY_ORDER.reduce((s, k) => s + ACTIVITIES[k].meta.totalXp, 0);
-  const earnedXp = ACTIVITY_ORDER.filter((s) => completed.has(s)).reduce(
-    (s, k) => s + ACTIVITIES[k].meta.totalXp,
-    0,
-  );
-  const baseXp = 1620;
-  const liveXp = baseXp + earnedXp;
-  const xpToNext = 2000;
-  const xpPercent = Math.min(100, Math.round((liveXp / xpToNext) * 100));
+  const currentWeek = Math.max(1, weeksDone + 1);
+  const totalWeeks = 35;
   const weekPercent = Math.round((completed.size / ACTIVITY_ORDER.length) * 100);
   const nextSlug = ACTIVITY_ORDER.find((s) => !completed.has(s)) ?? ACTIVITY_ORDER[0];
   const next = ACTIVITIES[nextSlug];
   const NextIcon = HUB_ICONS[nextSlug];
-  const earnedBadges = ACHIEVEMENTS.filter((a) => a.earned).length;
+  const earnedBadges = weeksDone; // 1 badge per completed week
 
   return (
     <AppShell>
