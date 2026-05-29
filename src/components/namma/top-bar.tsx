@@ -37,17 +37,8 @@ export function TopBar() {
         </h1>
       </div>
 
-      <div className="hidden flex-1 max-w-md md:flex">
-        <label className="namma-search">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <input
-            type="search"
-            placeholder="Search missions, badges, lessons..."
-            className="bg-transparent outline-none placeholder:text-muted-foreground/70 w-full text-sm"
-          />
-          <kbd className="namma-kbd">⌘K</kbd>
-        </label>
-      </div>
+      <div className="hidden flex-1 md:block" />
+
 
       <div className="flex items-center gap-2 md:gap-3">
         <AnimatedCounter
