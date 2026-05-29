@@ -4,15 +4,24 @@ import { Bell, Flame, LogOut, Menu, Search, Sparkles, Star } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router";
 
 import { useAppShell } from "@/components/namma/app-shell-context";
-import { signOut } from "@/lib/namma-progress";
+import { getProfile, onNammaState, signOut } from "@/lib/namma-progress";
 
 export function TopBar() {
   const { isMobile, setMobileOpen } = useAppShell();
   const navigate = useNavigate();
+  const [profile, setProfile] = React.useState(() => getProfile());
+  React.useEffect(() => {
+    const refresh = () => setProfile(getProfile());
+    refresh();
+    return onNammaState(refresh);
+  }, []);
+  const displayName = profile.name || "Explorer";
+  const initial = displayName.trim().charAt(0).toUpperCase() || "E";
   const handleLogout = () => {
     signOut();
     navigate({ to: "/welcome", replace: true });
   };
+
 
 
   return (
@@ -33,8 +42,9 @@ export function TopBar() {
           <span>Today&apos;s adventure</span>
         </div>
         <h1 className="hidden font-display text-base font-bold text-foreground md:block">
-          Welcome back, Aarav
+          Welcome back, {displayName}
         </h1>
+
       </div>
 
       <div className="hidden flex-1 md:block" />
@@ -65,10 +75,11 @@ export function TopBar() {
           type="button"
           aria-label="Profile"
           className="namma-avatar-sm shrink-0"
-          title="Aarav K."
+          title={displayName}
         >
-          A
+          {initial}
         </button>
+
       </div>
     </header>
   );
