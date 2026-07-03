@@ -27,6 +27,7 @@ import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as BadgesRouteImport } from './routes/badges'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PrincipalIndexRouteImport } from './routes/principal.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
 import { Route as AdminStudentsRouteImport } from './routes/admin.students'
@@ -124,6 +125,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrincipalIndexRoute = PrincipalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PrincipalRoute,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -165,7 +171,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/missions': typeof MissionsRoute
-  '/principal': typeof PrincipalRoute
+  '/principal': typeof PrincipalRouteWithChildren
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/admin/students': typeof AdminStudentsRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/admin/': typeof AdminIndexRoute
+  '/principal/': typeof PrincipalIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesByTo {
@@ -191,7 +198,6 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/missions': typeof MissionsRoute
-  '/principal': typeof PrincipalRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
@@ -205,6 +211,7 @@ export interface FileRoutesByTo {
   '/admin/students': typeof AdminStudentsRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/admin': typeof AdminIndexRoute
+  '/principal': typeof PrincipalIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesById {
@@ -218,7 +225,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/missions': typeof MissionsRoute
-  '/principal': typeof PrincipalRoute
+  '/principal': typeof PrincipalRouteWithChildren
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
@@ -232,6 +239,7 @@ export interface FileRoutesById {
   '/admin/students': typeof AdminStudentsRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/admin/': typeof AdminIndexRoute
+  '/principal/': typeof PrincipalIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRouteTypes {
@@ -260,6 +268,7 @@ export interface FileRouteTypes {
     | '/admin/students'
     | '/admin/teachers'
     | '/admin/'
+    | '/principal/'
     | '/admin/schools/$schoolId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -272,7 +281,6 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/missions'
-    | '/principal'
     | '/profile'
     | '/resources'
     | '/rewards'
@@ -286,6 +294,7 @@ export interface FileRouteTypes {
     | '/admin/students'
     | '/admin/teachers'
     | '/admin'
+    | '/principal'
     | '/admin/schools/$schoolId'
   id:
     | '__root__'
@@ -312,6 +321,7 @@ export interface FileRouteTypes {
     | '/admin/students'
     | '/admin/teachers'
     | '/admin/'
+    | '/principal/'
     | '/admin/schools/$schoolId'
   fileRoutesById: FileRoutesById
 }
@@ -325,7 +335,7 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MissionsRoute: typeof MissionsRoute
-  PrincipalRoute: typeof PrincipalRoute
+  PrincipalRoute: typeof PrincipalRouteWithChildren
   ProfileRoute: typeof ProfileRoute
   ResourcesRoute: typeof ResourcesRoute
   RewardsRoute: typeof RewardsRoute
@@ -468,6 +478,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/principal/': {
+      id: '/principal/'
+      path: '/'
+      fullPath: '/principal/'
+      preLoaderRoute: typeof PrincipalIndexRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
     '/admin/': {
       id: '/admin/'
       path: '/admin'
@@ -525,6 +542,18 @@ const ActivitiesRouteWithChildren = ActivitiesRoute._addFileChildren(
   ActivitiesRouteChildren,
 )
 
+interface PrincipalRouteChildren {
+  PrincipalIndexRoute: typeof PrincipalIndexRoute
+}
+
+const PrincipalRouteChildren: PrincipalRouteChildren = {
+  PrincipalIndexRoute: PrincipalIndexRoute,
+}
+
+const PrincipalRouteWithChildren = PrincipalRoute._addFileChildren(
+  PrincipalRouteChildren,
+)
+
 interface AdminSchoolsRouteChildren {
   AdminSchoolsSchoolIdRoute: typeof AdminSchoolsSchoolIdRoute
 }
@@ -547,7 +576,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MissionsRoute: MissionsRoute,
-  PrincipalRoute: PrincipalRoute,
+  PrincipalRoute: PrincipalRouteWithChildren,
   ProfileRoute: ProfileRoute,
   ResourcesRoute: ResourcesRoute,
   RewardsRoute: RewardsRoute,
