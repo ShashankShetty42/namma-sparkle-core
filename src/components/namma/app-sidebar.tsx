@@ -2,12 +2,10 @@ import * as React from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Award,
   ChevronLeft,
   Compass,
   Flame,
   LayoutDashboard,
-  Map,
   Shield,
   Zap,
 } from "lucide-react";
@@ -21,31 +19,20 @@ import {
 } from "@/components/namma/activity/lesson-data";
 import { getCompleted } from "@/components/namma/activity/progress";
 import {
+  getAuth,
   getCompletedWeeks,
   getProfile,
   onNammaState,
   type NammaProfile,
+  type UserRole,
 } from "@/lib/namma-progress";
+import { navForRole, type RoleNavItem } from "@/lib/namma-roles";
 
 
 
 
-type NavItem = {
-  label: string;
-  to: string;
-  icon: typeof LayoutDashboard;
-  tone: "story" | "explore" | "decide" | "reflect" | "challenge" | "bonus" | "xp" | "success";
-  badge?: string;
-};
+type NavItem = RoleNavItem;
 
-const NAV: NavItem[] = [
-
-  { label: "Dashboard", to: "/", icon: LayoutDashboard, tone: "story" },
-  { label: "My Journey", to: "/journey", icon: Map, tone: "explore" },
-  { label: "Activities", to: "/activities", icon: Compass, tone: "decide" },
-  { label: "Badges", to: "/badges", icon: Award, tone: "bonus" },
-  { label: "Profile", to: "/profile", icon: Shield, tone: "story" },
-];
 
 const toneText: Record<NavItem["tone"], string> = {
   story: "text-story",
