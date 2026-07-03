@@ -21,7 +21,7 @@ import { nammaEase } from "@/components/namma/motion";
 import devExplaining from "@/assets/characters/dev-explaining.png";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/teacher")({
+export const Route = createFileRoute("/teacher/")({
   head: () => ({ meta: [{ title: "Teacher dashboard · Namma AI" }] }),
   component: TeacherDashboard,
 });
