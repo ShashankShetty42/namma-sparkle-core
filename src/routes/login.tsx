@@ -33,7 +33,7 @@ import devHappy from "@/assets/characters/dev-happy.png";
 import anayaHappy from "@/assets/characters/anaya-happy.png";
 
 const searchSchema = z.object({
-  role: z.enum(["student", "teacher", "admin"]).optional(),
+  role: z.enum(["student", "teacher", "principal", "admin"]).optional(),
 });
 
 export const Route = createFileRoute("/login")({
