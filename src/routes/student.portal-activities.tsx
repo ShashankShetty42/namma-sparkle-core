@@ -7,9 +7,9 @@ export const Route = createFileRoute("/student/portal-activities")({
     <RoleShellPlaceholder
       eyebrow="Student · Portal Activities"
       title="Interactive CT & AI activities linked to your workbook missions."
-      description="This screen is part of the platform structure and will be built out in the next build step."
+      description="Scan a workbook QR code to launch the matching portal activity, earn badges and unlock the next mission."
       tone="challenge"
-      step: "Coming in Namma AI Learning Pack · 2027–28",
+      step="Coming in Namma AI Learning Pack · 2027–28"
     />
   ),
 });
