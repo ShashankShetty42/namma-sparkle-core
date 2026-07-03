@@ -37,9 +37,11 @@ function ShellInner({ children }: { children: React.ReactNode }) {
         navigate({ to: "/welcome", replace: true });
         return;
       }
-      // Role-based redirect: keep teachers/admins on their dashboards.
+      // Role-based redirect: keep teachers/principals/admins on their dashboards.
       if (a.role === "teacher" && pathname === "/") {
         navigate({ to: "/teacher", replace: true });
+      } else if (a.role === "principal" && pathname === "/") {
+        navigate({ to: "/principal", replace: true });
       } else if (a.role === "admin" && pathname === "/") {
         navigate({ to: "/admin", replace: true });
       }
