@@ -32,6 +32,7 @@ import { Route as PrincipalIndexRouteImport } from './routes/principal.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as TeacherWorkbookRouteImport } from './routes/teacher.workbook'
+import { Route as TeacherVerifyRouteImport } from './routes/teacher.verify'
 import { Route as TeacherResourcesRouteImport } from './routes/teacher.resources'
 import { Route as TeacherReportsRouteImport } from './routes/teacher.reports'
 import { Route as TeacherProjectsRouteImport } from './routes/teacher.projects'
@@ -186,6 +187,11 @@ const VerifyCodeRoute = VerifyCodeRouteImport.update({
 const TeacherWorkbookRoute = TeacherWorkbookRouteImport.update({
   id: '/workbook',
   path: '/workbook',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherVerifyRoute = TeacherVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => TeacherRoute,
 } as any)
 const TeacherResourcesRoute = TeacherResourcesRouteImport.update({
@@ -447,6 +453,7 @@ export interface FileRoutesByFullPath {
   '/teacher/projects': typeof TeacherProjectsRoute
   '/teacher/reports': typeof TeacherReportsRoute
   '/teacher/resources': typeof TeacherResourcesRoute
+  '/teacher/verify': typeof TeacherVerifyRoute
   '/teacher/workbook': typeof TeacherWorkbookRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/admin/': typeof AdminIndexRoute
@@ -510,6 +517,7 @@ export interface FileRoutesByTo {
   '/teacher/projects': typeof TeacherProjectsRoute
   '/teacher/reports': typeof TeacherReportsRoute
   '/teacher/resources': typeof TeacherResourcesRoute
+  '/teacher/verify': typeof TeacherVerifyRoute
   '/teacher/workbook': typeof TeacherWorkbookRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/admin': typeof AdminIndexRoute
@@ -576,6 +584,7 @@ export interface FileRoutesById {
   '/teacher/projects': typeof TeacherProjectsRoute
   '/teacher/reports': typeof TeacherReportsRoute
   '/teacher/resources': typeof TeacherResourcesRoute
+  '/teacher/verify': typeof TeacherVerifyRoute
   '/teacher/workbook': typeof TeacherWorkbookRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/admin/': typeof AdminIndexRoute
@@ -643,6 +652,7 @@ export interface FileRouteTypes {
     | '/teacher/projects'
     | '/teacher/reports'
     | '/teacher/resources'
+    | '/teacher/verify'
     | '/teacher/workbook'
     | '/verify/$code'
     | '/admin/'
@@ -706,6 +716,7 @@ export interface FileRouteTypes {
     | '/teacher/projects'
     | '/teacher/reports'
     | '/teacher/resources'
+    | '/teacher/verify'
     | '/teacher/workbook'
     | '/verify/$code'
     | '/admin'
@@ -771,6 +782,7 @@ export interface FileRouteTypes {
     | '/teacher/projects'
     | '/teacher/reports'
     | '/teacher/resources'
+    | '/teacher/verify'
     | '/teacher/workbook'
     | '/verify/$code'
     | '/admin/'
@@ -983,6 +995,13 @@ declare module '@tanstack/react-router' {
       path: '/workbook'
       fullPath: '/teacher/workbook'
       preLoaderRoute: typeof TeacherWorkbookRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/verify': {
+      id: '/teacher/verify'
+      path: '/verify'
+      fullPath: '/teacher/verify'
+      preLoaderRoute: typeof TeacherVerifyRouteImport
       parentRoute: typeof TeacherRoute
     }
     '/teacher/resources': {
@@ -1323,6 +1342,7 @@ interface TeacherRouteChildren {
   TeacherProjectsRoute: typeof TeacherProjectsRoute
   TeacherReportsRoute: typeof TeacherReportsRoute
   TeacherResourcesRoute: typeof TeacherResourcesRoute
+  TeacherVerifyRoute: typeof TeacherVerifyRoute
   TeacherWorkbookRoute: typeof TeacherWorkbookRoute
   TeacherIndexRoute: typeof TeacherIndexRoute
 }
@@ -1336,6 +1356,7 @@ const TeacherRouteChildren: TeacherRouteChildren = {
   TeacherProjectsRoute: TeacherProjectsRoute,
   TeacherReportsRoute: TeacherReportsRoute,
   TeacherResourcesRoute: TeacherResourcesRoute,
+  TeacherVerifyRoute: TeacherVerifyRoute,
   TeacherWorkbookRoute: TeacherWorkbookRoute,
   TeacherIndexRoute: TeacherIndexRoute,
 }
