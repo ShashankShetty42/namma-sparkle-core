@@ -44,6 +44,7 @@ import { Route as StudentWeeklyTasksRouteImport } from './routes/student.weekly-
 import { Route as StudentProjectsRouteImport } from './routes/student.projects'
 import { Route as StudentPortfolioRouteImport } from './routes/student.portfolio'
 import { Route as StudentPortalActivitiesRouteImport } from './routes/student.portal-activities'
+import { Route as StudentGradeJourneyRouteImport } from './routes/student.grade-journey'
 import { Route as StudentCertificatesRouteImport } from './routes/student.certificates'
 import { Route as PrincipalTeachersRouteImport } from './routes/principal.teachers'
 import { Route as PrincipalStudentsRouteImport } from './routes/principal.students'
@@ -68,6 +69,7 @@ import { Route as AdminGradeTemplatesRouteImport } from './routes/admin.grade-te
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminActivityLibraryRouteImport } from './routes/admin.activity-library'
 import { Route as ActivitiesSlugRouteImport } from './routes/activities.$slug'
+import { Route as StudentMissionMissionIndexRouteImport } from './routes/student.mission.$missionIndex'
 import { Route as AdminSchoolsSchoolIdRouteImport } from './routes/admin.schools.$schoolId'
 
 const WelcomeRoute = WelcomeRouteImport.update({
@@ -245,6 +247,11 @@ const StudentPortalActivitiesRoute = StudentPortalActivitiesRouteImport.update({
   path: '/student/portal-activities',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentGradeJourneyRoute = StudentGradeJourneyRouteImport.update({
+  id: '/student/grade-journey',
+  path: '/student/grade-journey',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudentCertificatesRoute = StudentCertificatesRouteImport.update({
   id: '/student/certificates',
   path: '/student/certificates',
@@ -365,6 +372,12 @@ const ActivitiesSlugRoute = ActivitiesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ActivitiesRoute,
 } as any)
+const StudentMissionMissionIndexRoute =
+  StudentMissionMissionIndexRouteImport.update({
+    id: '/student/mission/$missionIndex',
+    path: '/student/mission/$missionIndex',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminSchoolsSchoolIdRoute = AdminSchoolsSchoolIdRouteImport.update({
   id: '/$schoolId',
   path: '/$schoolId',
@@ -414,6 +427,7 @@ export interface FileRoutesByFullPath {
   '/principal/students': typeof PrincipalStudentsRoute
   '/principal/teachers': typeof PrincipalTeachersRoute
   '/student/certificates': typeof StudentCertificatesRoute
+  '/student/grade-journey': typeof StudentGradeJourneyRoute
   '/student/portal-activities': typeof StudentPortalActivitiesRoute
   '/student/portfolio': typeof StudentPortfolioRoute
   '/student/projects': typeof StudentProjectsRoute
@@ -432,6 +446,7 @@ export interface FileRoutesByFullPath {
   '/principal/': typeof PrincipalIndexRoute
   '/teacher/': typeof TeacherIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
+  '/student/mission/$missionIndex': typeof StudentMissionMissionIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -474,6 +489,7 @@ export interface FileRoutesByTo {
   '/principal/students': typeof PrincipalStudentsRoute
   '/principal/teachers': typeof PrincipalTeachersRoute
   '/student/certificates': typeof StudentCertificatesRoute
+  '/student/grade-journey': typeof StudentGradeJourneyRoute
   '/student/portal-activities': typeof StudentPortalActivitiesRoute
   '/student/portfolio': typeof StudentPortfolioRoute
   '/student/projects': typeof StudentProjectsRoute
@@ -492,6 +508,7 @@ export interface FileRoutesByTo {
   '/principal': typeof PrincipalIndexRoute
   '/teacher': typeof TeacherIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
+  '/student/mission/$missionIndex': typeof StudentMissionMissionIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -537,6 +554,7 @@ export interface FileRoutesById {
   '/principal/students': typeof PrincipalStudentsRoute
   '/principal/teachers': typeof PrincipalTeachersRoute
   '/student/certificates': typeof StudentCertificatesRoute
+  '/student/grade-journey': typeof StudentGradeJourneyRoute
   '/student/portal-activities': typeof StudentPortalActivitiesRoute
   '/student/portfolio': typeof StudentPortfolioRoute
   '/student/projects': typeof StudentProjectsRoute
@@ -555,6 +573,7 @@ export interface FileRoutesById {
   '/principal/': typeof PrincipalIndexRoute
   '/teacher/': typeof TeacherIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
+  '/student/mission/$missionIndex': typeof StudentMissionMissionIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -601,6 +620,7 @@ export interface FileRouteTypes {
     | '/principal/students'
     | '/principal/teachers'
     | '/student/certificates'
+    | '/student/grade-journey'
     | '/student/portal-activities'
     | '/student/portfolio'
     | '/student/projects'
@@ -619,6 +639,7 @@ export interface FileRouteTypes {
     | '/principal/'
     | '/teacher/'
     | '/admin/schools/$schoolId'
+    | '/student/mission/$missionIndex'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -661,6 +682,7 @@ export interface FileRouteTypes {
     | '/principal/students'
     | '/principal/teachers'
     | '/student/certificates'
+    | '/student/grade-journey'
     | '/student/portal-activities'
     | '/student/portfolio'
     | '/student/projects'
@@ -679,6 +701,7 @@ export interface FileRouteTypes {
     | '/principal'
     | '/teacher'
     | '/admin/schools/$schoolId'
+    | '/student/mission/$missionIndex'
   id:
     | '__root__'
     | '/'
@@ -723,6 +746,7 @@ export interface FileRouteTypes {
     | '/principal/students'
     | '/principal/teachers'
     | '/student/certificates'
+    | '/student/grade-journey'
     | '/student/portal-activities'
     | '/student/portfolio'
     | '/student/projects'
@@ -741,6 +765,7 @@ export interface FileRouteTypes {
     | '/principal/'
     | '/teacher/'
     | '/admin/schools/$schoolId'
+    | '/student/mission/$missionIndex'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -774,12 +799,14 @@ export interface RootRouteChildren {
   AdminTeachersRoute: typeof AdminTeachersRoute
   AdminUsersRoute: typeof AdminUsersRoute
   StudentCertificatesRoute: typeof StudentCertificatesRoute
+  StudentGradeJourneyRoute: typeof StudentGradeJourneyRoute
   StudentPortalActivitiesRoute: typeof StudentPortalActivitiesRoute
   StudentPortfolioRoute: typeof StudentPortfolioRoute
   StudentProjectsRoute: typeof StudentProjectsRoute
   StudentWeeklyTasksRoute: typeof StudentWeeklyTasksRoute
   StudentWorkbookRoute: typeof StudentWorkbookRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  StudentMissionMissionIndexRoute: typeof StudentMissionMissionIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1029,6 +1056,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentPortalActivitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student/grade-journey': {
+      id: '/student/grade-journey'
+      path: '/student/grade-journey'
+      fullPath: '/student/grade-journey'
+      preLoaderRoute: typeof StudentGradeJourneyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/student/certificates': {
       id: '/student/certificates'
       path: '/student/certificates'
@@ -1197,6 +1231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActivitiesSlugRouteImport
       parentRoute: typeof ActivitiesRoute
     }
+    '/student/mission/$missionIndex': {
+      id: '/student/mission/$missionIndex'
+      path: '/student/mission/$missionIndex'
+      fullPath: '/student/mission/$missionIndex'
+      preLoaderRoute: typeof StudentMissionMissionIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/schools/$schoolId': {
       id: '/admin/schools/$schoolId'
       path: '/$schoolId'
@@ -1325,12 +1366,14 @@ const rootRouteChildren: RootRouteChildren = {
   AdminTeachersRoute: AdminTeachersRoute,
   AdminUsersRoute: AdminUsersRoute,
   StudentCertificatesRoute: StudentCertificatesRoute,
+  StudentGradeJourneyRoute: StudentGradeJourneyRoute,
   StudentPortalActivitiesRoute: StudentPortalActivitiesRoute,
   StudentPortfolioRoute: StudentPortfolioRoute,
   StudentProjectsRoute: StudentProjectsRoute,
   StudentWeeklyTasksRoute: StudentWeeklyTasksRoute,
   StudentWorkbookRoute: StudentWorkbookRoute,
   AdminIndexRoute: AdminIndexRoute,
+  StudentMissionMissionIndexRoute: StudentMissionMissionIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

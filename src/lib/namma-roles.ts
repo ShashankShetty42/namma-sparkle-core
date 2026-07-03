@@ -100,7 +100,7 @@ export const TEACHER_NAV: RoleNavItem[] = [
 
 export const STUDENT_NAV: RoleNavItem[] = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard, tone: "story" },
-  { label: "My Grade Journey", to: "/journey", icon: Map, tone: "explore" },
+  { label: "My Grade Journey", to: "/student/grade-journey", icon: Map, tone: "explore" },
   { label: "Weekly Tasks", to: "/student/weekly-tasks", icon: ClipboardList, tone: "decide" },
   { label: "Workbook Check-ins", to: "/student/workbook", icon: BookOpen, tone: "reflect" },
   { label: "Portal Activities", to: "/student/portal-activities", icon: Compass, tone: "challenge" },
