@@ -352,35 +352,59 @@ function MissionDetail() {
             className="relative overflow-hidden rounded-[28px] border border-success/30 bg-gradient-to-br from-success-soft via-white to-story-soft p-6 shadow-[var(--shadow-float)]"
           >
             <div className="pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-success/25 blur-3xl" />
-            <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
+            <div className="relative grid gap-4 md:grid-cols-[1.4fr_auto] md:items-center">
+              <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-success">
                   <Trophy className="h-3 w-3" /> Mission complete
                 </div>
-                <h3 className="mt-2 font-display text-2xl font-extrabold text-foreground">
+                <h3 className="font-display text-2xl font-extrabold text-foreground">
                   Your completion code
                 </h3>
-                <p className="mt-1 max-w-lg text-sm text-muted-foreground">
-                  Save this code — it's proof you finished mission {parsed}. Your teacher already
-                  has it too.
+                <p className="max-w-lg text-sm text-muted-foreground">
+                  Save this code — it's proof you finished mission {parsed}. Anyone can scan the QR
+                  to open your verification page.
                 </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <code className="rounded-2xl border border-success/30 bg-white/95 px-4 py-3 font-mono text-base font-bold tracking-wider text-foreground shadow-[var(--shadow-soft)]">
+                    {code}
+                  </code>
+                  <Button
+                    variant="soft"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(code);
+                      toast.success("Copied!");
+                    }}
+                  >
+                    <Copy className="h-3.5 w-3.5" /> Copy
+                  </Button>
+                  <Button asChild variant="hero" size="sm">
+                    <Link to="/verify/$code" params={{ code }}>
+                      Open verify page
+                    </Link>
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <code className="rounded-2xl border border-success/30 bg-white/95 px-4 py-3 font-mono text-base font-bold tracking-wider text-foreground shadow-[var(--shadow-soft)]">
-                  {code}
-                </code>
-                <Button
-                  variant="soft"
-                  size="sm"
-                  onClick={() => {
-                    navigator.clipboard?.writeText(code);
-                    toast.success("Copied!");
-                  }}
-                >
-                  <Copy className="h-3.5 w-3.5" /> Copy
-                </Button>
+              <div className="flex justify-center md:justify-end">
+                <div className="rounded-[20px] border border-white/70 bg-white p-3 shadow-[var(--shadow-soft)]">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=4&data=${encodeURIComponent(
+                      typeof window !== "undefined"
+                        ? `${window.location.origin}/verify/${code}`
+                        : `/verify/${code}`,
+                    )}`}
+                    alt={`QR for ${code}`}
+                    width={144}
+                    height={144}
+                    className="h-36 w-36 rounded-xl"
+                  />
+                  <div className="mt-1 text-center text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    Scan to verify
+                  </div>
+                </div>
               </div>
             </div>
+
           </motion.section>
         ) : null}
 

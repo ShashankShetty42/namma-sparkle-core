@@ -121,3 +121,25 @@ export function getOrCreateCompletionCode(
 /* Student identity used by Phase-2 student journey (local demo). */
 export const SELF_SCHOOL = "self";
 export const SELF_STUDENT = "me";
+
+/** Parse a code like "NAI-G6-M03-ARAV-4821" into its parts. */
+export function parseCompletionCode(code: string):
+  | { ok: true; grade: GradeNumber; missionIndex: number; initials: string; suffix: string }
+  | { ok: false; error: string } {
+  const trimmed = code.trim().toUpperCase();
+  const m = trimmed.match(/^NAI-G([3-8])-M(\d{1,2})-([A-Z]{1,4})-(\d{4})$/);
+  if (!m) return { ok: false, error: "Not a Namma AI completion code." };
+  const grade = parseInt(m[1], 10) as GradeNumber;
+  const missionIndex = parseInt(m[2], 10);
+  if (missionIndex < 1 || missionIndex > MISSIONS_PER_GRADE) {
+    return { ok: false, error: "Mission number is out of range." };
+  }
+  return { ok: true, grade, missionIndex, initials: m[3], suffix: m[4] };
+}
+
+/** True when this code has been issued through getOrCreateCompletionCode. */
+export function codeIsIssued(code: string): boolean {
+  const codes = readCodes();
+  return Object.values(codes).includes(code.trim().toUpperCase());
+}
+

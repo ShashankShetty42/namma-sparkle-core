@@ -88,6 +88,8 @@ export const TEACHER_NAV: RoleNavItem[] = [
   { label: "My Classes", to: "/teacher/classes", icon: Users, tone: "explore" },
   { label: "Weekly Planner", to: "/teacher/planner", icon: Calendar, tone: "decide" },
   { label: "Student Completion", to: "/teacher/completion", icon: ListChecks, tone: "reflect" },
+  { label: "Verify Code", to: "/teacher/verify", icon: ShieldCheck, tone: "success" },
+
   { label: "Workbook Tracker", to: "/teacher/workbook", icon: BookText, tone: "challenge" },
   { label: "Projects", to: "/teacher/projects", icon: FolderKanban, tone: "bonus" },
   { label: "Assessments", to: "/teacher/assessments", icon: ClipboardCheck, tone: "success" },

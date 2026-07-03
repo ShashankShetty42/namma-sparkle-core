@@ -30,7 +30,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TeacherIndexRouteImport } from './routes/teacher.index'
 import { Route as PrincipalIndexRouteImport } from './routes/principal.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as TeacherWorkbookRouteImport } from './routes/teacher.workbook'
+import { Route as TeacherVerifyRouteImport } from './routes/teacher.verify'
 import { Route as TeacherResourcesRouteImport } from './routes/teacher.resources'
 import { Route as TeacherReportsRouteImport } from './routes/teacher.reports'
 import { Route as TeacherProjectsRouteImport } from './routes/teacher.projects'
@@ -177,9 +179,19 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerifyCodeRoute = VerifyCodeRouteImport.update({
+  id: '/verify/$code',
+  path: '/verify/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeacherWorkbookRoute = TeacherWorkbookRouteImport.update({
   id: '/workbook',
   path: '/workbook',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherVerifyRoute = TeacherVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => TeacherRoute,
 } as any)
 const TeacherResourcesRoute = TeacherResourcesRouteImport.update({
@@ -441,7 +453,9 @@ export interface FileRoutesByFullPath {
   '/teacher/projects': typeof TeacherProjectsRoute
   '/teacher/reports': typeof TeacherReportsRoute
   '/teacher/resources': typeof TeacherResourcesRoute
+  '/teacher/verify': typeof TeacherVerifyRoute
   '/teacher/workbook': typeof TeacherWorkbookRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/admin/': typeof AdminIndexRoute
   '/principal/': typeof PrincipalIndexRoute
   '/teacher/': typeof TeacherIndexRoute
@@ -503,7 +517,9 @@ export interface FileRoutesByTo {
   '/teacher/projects': typeof TeacherProjectsRoute
   '/teacher/reports': typeof TeacherReportsRoute
   '/teacher/resources': typeof TeacherResourcesRoute
+  '/teacher/verify': typeof TeacherVerifyRoute
   '/teacher/workbook': typeof TeacherWorkbookRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/admin': typeof AdminIndexRoute
   '/principal': typeof PrincipalIndexRoute
   '/teacher': typeof TeacherIndexRoute
@@ -568,7 +584,9 @@ export interface FileRoutesById {
   '/teacher/projects': typeof TeacherProjectsRoute
   '/teacher/reports': typeof TeacherReportsRoute
   '/teacher/resources': typeof TeacherResourcesRoute
+  '/teacher/verify': typeof TeacherVerifyRoute
   '/teacher/workbook': typeof TeacherWorkbookRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/admin/': typeof AdminIndexRoute
   '/principal/': typeof PrincipalIndexRoute
   '/teacher/': typeof TeacherIndexRoute
@@ -634,7 +652,9 @@ export interface FileRouteTypes {
     | '/teacher/projects'
     | '/teacher/reports'
     | '/teacher/resources'
+    | '/teacher/verify'
     | '/teacher/workbook'
+    | '/verify/$code'
     | '/admin/'
     | '/principal/'
     | '/teacher/'
@@ -696,7 +716,9 @@ export interface FileRouteTypes {
     | '/teacher/projects'
     | '/teacher/reports'
     | '/teacher/resources'
+    | '/teacher/verify'
     | '/teacher/workbook'
+    | '/verify/$code'
     | '/admin'
     | '/principal'
     | '/teacher'
@@ -760,7 +782,9 @@ export interface FileRouteTypes {
     | '/teacher/projects'
     | '/teacher/reports'
     | '/teacher/resources'
+    | '/teacher/verify'
     | '/teacher/workbook'
+    | '/verify/$code'
     | '/admin/'
     | '/principal/'
     | '/teacher/'
@@ -805,6 +829,7 @@ export interface RootRouteChildren {
   StudentProjectsRoute: typeof StudentProjectsRoute
   StudentWeeklyTasksRoute: typeof StudentWeeklyTasksRoute
   StudentWorkbookRoute: typeof StudentWorkbookRoute
+  VerifyCodeRoute: typeof VerifyCodeRoute
   AdminIndexRoute: typeof AdminIndexRoute
   StudentMissionMissionIndexRoute: typeof StudentMissionMissionIndexRoute
 }
@@ -958,11 +983,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verify/$code': {
+      id: '/verify/$code'
+      path: '/verify/$code'
+      fullPath: '/verify/$code'
+      preLoaderRoute: typeof VerifyCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/teacher/workbook': {
       id: '/teacher/workbook'
       path: '/workbook'
       fullPath: '/teacher/workbook'
       preLoaderRoute: typeof TeacherWorkbookRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/verify': {
+      id: '/teacher/verify'
+      path: '/verify'
+      fullPath: '/teacher/verify'
+      preLoaderRoute: typeof TeacherVerifyRouteImport
       parentRoute: typeof TeacherRoute
     }
     '/teacher/resources': {
@@ -1303,6 +1342,7 @@ interface TeacherRouteChildren {
   TeacherProjectsRoute: typeof TeacherProjectsRoute
   TeacherReportsRoute: typeof TeacherReportsRoute
   TeacherResourcesRoute: typeof TeacherResourcesRoute
+  TeacherVerifyRoute: typeof TeacherVerifyRoute
   TeacherWorkbookRoute: typeof TeacherWorkbookRoute
   TeacherIndexRoute: typeof TeacherIndexRoute
 }
@@ -1316,6 +1356,7 @@ const TeacherRouteChildren: TeacherRouteChildren = {
   TeacherProjectsRoute: TeacherProjectsRoute,
   TeacherReportsRoute: TeacherReportsRoute,
   TeacherResourcesRoute: TeacherResourcesRoute,
+  TeacherVerifyRoute: TeacherVerifyRoute,
   TeacherWorkbookRoute: TeacherWorkbookRoute,
   TeacherIndexRoute: TeacherIndexRoute,
 }
@@ -1372,6 +1413,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudentProjectsRoute: StudentProjectsRoute,
   StudentWeeklyTasksRoute: StudentWeeklyTasksRoute,
   StudentWorkbookRoute: StudentWorkbookRoute,
+  VerifyCodeRoute: VerifyCodeRoute,
   AdminIndexRoute: AdminIndexRoute,
   StudentMissionMissionIndexRoute: StudentMissionMissionIndexRoute,
 }
