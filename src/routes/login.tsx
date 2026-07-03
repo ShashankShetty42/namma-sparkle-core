@@ -170,6 +170,17 @@ function LoginPage() {
       return;
     }
 
+    if (activeRole === "principal") {
+      // Phase 1 demo: any principal with a school code signs in.
+      setLoading(true);
+      await new Promise((r) => setTimeout(r, 500));
+      signIn({ role: "principal", email: identifier, schoolCode: code || undefined });
+      setLoading(false);
+      toast.success("Welcome back, Principal!");
+      navigate({ to: "/principal", replace: true });
+      return;
+    }
+
     // Admin — bootstrapped account (not created via UI)
     setLoading(true);
     await new Promise((r) => setTimeout(r, 500));
