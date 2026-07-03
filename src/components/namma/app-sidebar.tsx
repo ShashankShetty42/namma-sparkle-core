@@ -110,19 +110,24 @@ export function AppSidebar() {
         )}
       </div>
 
-      {/* Profile widget */}
-      <ProfileWidget collapsed={isCollapsed} />
+      {/* Profile widget (student only; principal/teacher/admin get a compact identity strip) */}
+      {isStudent ? (
+        <ProfileWidget collapsed={isCollapsed} />
+      ) : (
+        <RoleIdentity role={role} collapsed={isCollapsed} />
+      )}
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-0.5">
         <ul className="flex flex-col gap-1">
           {NAV.map((item) => {
             const active =
-              item.to === "/" ? currentPath === "/" : currentPath.startsWith(item.to);
+              item.to === "/" ? currentPath === "/" :
+              currentPath === item.to || currentPath.startsWith(item.to + "/");
             return (
               <li key={item.to}>
                 <Link
-                  to={item.to}
+                  to={item.to as string}
                   onClick={() => isMobile && setMobileOpen(false)}
                   className={cn("namma-nav-item group", active && "namma-nav-item-active")}
                   data-active={active}
@@ -157,41 +162,75 @@ export function AppSidebar() {
         </ul>
       </nav>
 
-      {/* Streak + helper */}
-      <AnimatePresence initial={false}>
-        {!isCollapsed && (
-          <motion.div
-            key="helper"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.25 }}
-            className="namma-helper-card"
-          >
-            <img
-              src={neoHappy}
-              alt="Neo"
-              className="h-16 w-16 shrink-0 object-contain animate-[namma-float_5s_ease-in-out_infinite]"
-            />
-            <div className="min-w-0">
-              <div className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-explore">
-                Neo says
-              </div>
-              <p className="mt-1 text-xs leading-5 text-foreground/85">
-                You&apos;re 2 missions away from your next badge!
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Neo helper — student only. Principal/teacher/admin keep the ERP feel. */}
+      {isStudent && (
+        <>
+          <AnimatePresence initial={false}>
+            {!isCollapsed && (
+              <motion.div
+                key="helper"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.25 }}
+                className="namma-helper-card"
+              >
+                <img
+                  src={neoHappy}
+                  alt="Neo"
+                  className="h-16 w-16 shrink-0 object-contain animate-[namma-float_5s_ease-in-out_infinite]"
+                />
+                <div className="min-w-0">
+                  <div className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-explore">
+                    Neo says
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-foreground/85">
+                    You&apos;re 2 missions away from your next badge!
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-      {isCollapsed && (
-        <CollapsedStreak />
+          {isCollapsed && <CollapsedStreak />}
+        </>
       )}
 
     </aside>
   );
 }
+
+function RoleIdentity({ role, collapsed }: { role: UserRole | null; collapsed: boolean }) {
+  const auth = getAuth();
+  const label =
+    role === "principal" ? "Principal" :
+    role === "teacher" ? "Teacher" :
+    role === "admin" ? "Namma AI Admin" : "Guest";
+  const initial = (auth.email ?? label).charAt(0).toUpperCase();
+  if (collapsed) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-2">
+        <div className="namma-avatar">{initial}</div>
+      </div>
+    );
+  }
+  return (
+    <div className="namma-profile-card">
+      <div className="flex items-center gap-3">
+        <div className="namma-avatar">{initial}</div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate font-display text-[0.95rem] font-bold text-foreground">
+            {auth.email ?? label}
+          </div>
+          <div className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            {label}{auth.schoolCode ? ` · ${auth.schoolCode}` : ""}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function useNammaSnapshot() {
   const [profile, setProfile] = React.useState<NammaProfile>(() => getProfile());
