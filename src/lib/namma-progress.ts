@@ -452,7 +452,7 @@ export function saveClassmates(list: Classmate[]) {
 
 /* ───────────── auth (frontend-only demo) ───────────── */
 
-export type UserRole = "student" | "teacher" | "admin";
+export type UserRole = "student" | "teacher" | "principal" | "admin";
 
 export type NammaAuth = {
   isAuthed: boolean;
