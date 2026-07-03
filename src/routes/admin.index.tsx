@@ -35,14 +35,15 @@ const ACTIONS: {
   sub: string;
   icon: React.ComponentType<{ className?: string }>;
   tone: string;
-  to: "/admin/schools" | "/admin/teachers" | "/admin/students";
+  to: "/admin/schools" | "/admin/teachers" | "/admin/students" | "/admin/oversight";
   primary?: boolean;
 }[] = [
   { title: "Add School", sub: "Onboard a new school", icon: Building2, tone: "challenge", to: "/admin/schools", primary: true },
   { title: "Add Teachers", sub: "Create teacher accounts", icon: Users, tone: "explore", to: "/admin/teachers" },
   { title: "Add Students", sub: "Create student logins", icon: GraduationCap, tone: "story", to: "/admin/students" },
-  { title: "View Schools", sub: "Manage participating schools", icon: SchoolIcon, tone: "bonus", to: "/admin/schools" },
+  { title: "District Oversight", sub: "Roll-up across all schools", icon: ShieldCheck, tone: "reflect", to: "/admin/oversight" },
 ];
+
 
 function useAdminSnapshot() {
   const [tick, setTick] = React.useState(0);
