@@ -36,8 +36,10 @@ import {
   EVIDENCE_TYPES,
   listEvidence,
   onEvidenceState,
+  type EvidenceItem,
   type EvidenceType,
 } from "@/lib/namma-evidence";
+
 
 
 export const Route = createFileRoute("/admin/oversight")({
