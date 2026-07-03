@@ -69,7 +69,15 @@ const ROLE_META: Record<
     tone: "explore",
     accent: "from-explore via-decide to-bonus",
     icon: Users,
-    blurb: "Track every class with ease.",
+    blurb: "Plan, track and support every class.",
+  },
+  principal: {
+    title: "Principal",
+    emoji: "🏫",
+    tone: "bonus",
+    accent: "from-bonus via-challenge to-reflect",
+    icon: School,
+    blurb: "See implementation across your school.",
   },
   admin: {
     title: "Admin",
@@ -77,7 +85,7 @@ const ROLE_META: Record<
     tone: "challenge",
     accent: "from-challenge via-story to-reflect",
     icon: ShieldCheck,
-    blurb: "Manage your learning universe.",
+    blurb: "Manage schools across the platform.",
   },
 };
 
