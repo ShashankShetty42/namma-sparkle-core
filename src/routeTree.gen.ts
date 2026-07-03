@@ -30,6 +30,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TeacherIndexRouteImport } from './routes/teacher.index'
 import { Route as PrincipalIndexRouteImport } from './routes/principal.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as TeacherWorkbookRouteImport } from './routes/teacher.workbook'
 import { Route as TeacherResourcesRouteImport } from './routes/teacher.resources'
 import { Route as TeacherReportsRouteImport } from './routes/teacher.reports'
@@ -175,6 +176,11 @@ const PrincipalIndexRoute = PrincipalIndexRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyCodeRoute = VerifyCodeRouteImport.update({
+  id: '/verify/$code',
+  path: '/verify/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TeacherWorkbookRoute = TeacherWorkbookRouteImport.update({
@@ -442,6 +448,7 @@ export interface FileRoutesByFullPath {
   '/teacher/reports': typeof TeacherReportsRoute
   '/teacher/resources': typeof TeacherResourcesRoute
   '/teacher/workbook': typeof TeacherWorkbookRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/admin/': typeof AdminIndexRoute
   '/principal/': typeof PrincipalIndexRoute
   '/teacher/': typeof TeacherIndexRoute
@@ -504,6 +511,7 @@ export interface FileRoutesByTo {
   '/teacher/reports': typeof TeacherReportsRoute
   '/teacher/resources': typeof TeacherResourcesRoute
   '/teacher/workbook': typeof TeacherWorkbookRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/admin': typeof AdminIndexRoute
   '/principal': typeof PrincipalIndexRoute
   '/teacher': typeof TeacherIndexRoute
@@ -569,6 +577,7 @@ export interface FileRoutesById {
   '/teacher/reports': typeof TeacherReportsRoute
   '/teacher/resources': typeof TeacherResourcesRoute
   '/teacher/workbook': typeof TeacherWorkbookRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/admin/': typeof AdminIndexRoute
   '/principal/': typeof PrincipalIndexRoute
   '/teacher/': typeof TeacherIndexRoute
@@ -635,6 +644,7 @@ export interface FileRouteTypes {
     | '/teacher/reports'
     | '/teacher/resources'
     | '/teacher/workbook'
+    | '/verify/$code'
     | '/admin/'
     | '/principal/'
     | '/teacher/'
@@ -697,6 +707,7 @@ export interface FileRouteTypes {
     | '/teacher/reports'
     | '/teacher/resources'
     | '/teacher/workbook'
+    | '/verify/$code'
     | '/admin'
     | '/principal'
     | '/teacher'
@@ -761,6 +772,7 @@ export interface FileRouteTypes {
     | '/teacher/reports'
     | '/teacher/resources'
     | '/teacher/workbook'
+    | '/verify/$code'
     | '/admin/'
     | '/principal/'
     | '/teacher/'
@@ -805,6 +817,7 @@ export interface RootRouteChildren {
   StudentProjectsRoute: typeof StudentProjectsRoute
   StudentWeeklyTasksRoute: typeof StudentWeeklyTasksRoute
   StudentWorkbookRoute: typeof StudentWorkbookRoute
+  VerifyCodeRoute: typeof VerifyCodeRoute
   AdminIndexRoute: typeof AdminIndexRoute
   StudentMissionMissionIndexRoute: typeof StudentMissionMissionIndexRoute
 }
@@ -956,6 +969,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify/$code': {
+      id: '/verify/$code'
+      path: '/verify/$code'
+      fullPath: '/verify/$code'
+      preLoaderRoute: typeof VerifyCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/teacher/workbook': {
@@ -1372,6 +1392,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudentProjectsRoute: StudentProjectsRoute,
   StudentWeeklyTasksRoute: StudentWeeklyTasksRoute,
   StudentWorkbookRoute: StudentWorkbookRoute,
+  VerifyCodeRoute: VerifyCodeRoute,
   AdminIndexRoute: AdminIndexRoute,
   StudentMissionMissionIndexRoute: StudentMissionMissionIndexRoute,
 }
