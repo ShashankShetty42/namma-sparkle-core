@@ -62,6 +62,7 @@ import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminStudentsRouteImport } from './routes/admin.students'
 import { Route as AdminSchoolsRouteImport } from './routes/admin.schools'
 import { Route as AdminReportTemplatesRouteImport } from './routes/admin.report-templates'
+import { Route as AdminOversightRouteImport } from './routes/admin.oversight'
 import { Route as AdminLearningOutcomesRouteImport } from './routes/admin.learning-outcomes'
 import { Route as AdminGradeTemplatesRouteImport } from './routes/admin.grade-templates'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -334,6 +335,11 @@ const AdminReportTemplatesRoute = AdminReportTemplatesRouteImport.update({
   path: '/admin/report-templates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminOversightRoute = AdminOversightRouteImport.update({
+  id: '/admin/oversight',
+  path: '/admin/oversight',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLearningOutcomesRoute = AdminLearningOutcomesRouteImport.update({
   id: '/admin/learning-outcomes',
   path: '/admin/learning-outcomes',
@@ -389,6 +395,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/grade-templates': typeof AdminGradeTemplatesRoute
   '/admin/learning-outcomes': typeof AdminLearningOutcomesRoute
+  '/admin/oversight': typeof AdminOversightRoute
   '/admin/report-templates': typeof AdminReportTemplatesRoute
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
@@ -448,6 +455,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/grade-templates': typeof AdminGradeTemplatesRoute
   '/admin/learning-outcomes': typeof AdminLearningOutcomesRoute
+  '/admin/oversight': typeof AdminOversightRoute
   '/admin/report-templates': typeof AdminReportTemplatesRoute
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
@@ -510,6 +518,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/grade-templates': typeof AdminGradeTemplatesRoute
   '/admin/learning-outcomes': typeof AdminLearningOutcomesRoute
+  '/admin/oversight': typeof AdminOversightRoute
   '/admin/report-templates': typeof AdminReportTemplatesRoute
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
@@ -573,6 +582,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/grade-templates'
     | '/admin/learning-outcomes'
+    | '/admin/oversight'
     | '/admin/report-templates'
     | '/admin/schools'
     | '/admin/students'
@@ -632,6 +642,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/grade-templates'
     | '/admin/learning-outcomes'
+    | '/admin/oversight'
     | '/admin/report-templates'
     | '/admin/schools'
     | '/admin/students'
@@ -693,6 +704,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/grade-templates'
     | '/admin/learning-outcomes'
+    | '/admin/oversight'
     | '/admin/report-templates'
     | '/admin/schools'
     | '/admin/students'
@@ -754,6 +766,7 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminGradeTemplatesRoute: typeof AdminGradeTemplatesRoute
   AdminLearningOutcomesRoute: typeof AdminLearningOutcomesRoute
+  AdminOversightRoute: typeof AdminOversightRoute
   AdminReportTemplatesRoute: typeof AdminReportTemplatesRoute
   AdminSchoolsRoute: typeof AdminSchoolsRouteWithChildren
   AdminStudentsRoute: typeof AdminStudentsRoute
@@ -1142,6 +1155,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportTemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/oversight': {
+      id: '/admin/oversight'
+      path: '/admin/oversight'
+      fullPath: '/admin/oversight'
+      preLoaderRoute: typeof AdminOversightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/learning-outcomes': {
       id: '/admin/learning-outcomes'
       path: '/admin/learning-outcomes'
@@ -1297,6 +1317,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminGradeTemplatesRoute: AdminGradeTemplatesRoute,
   AdminLearningOutcomesRoute: AdminLearningOutcomesRoute,
+  AdminOversightRoute: AdminOversightRoute,
   AdminReportTemplatesRoute: AdminReportTemplatesRoute,
   AdminSchoolsRoute: AdminSchoolsRouteWithChildren,
   AdminStudentsRoute: AdminStudentsRoute,
