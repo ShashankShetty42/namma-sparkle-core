@@ -90,7 +90,7 @@ function OversightPage() {
     const schools = getSchools();
     const teachers = getTeachers();
     const students = getStudents();
-    const evidence = getEvidence();
+    const evidence = listEvidence();
 
     const rows: SchoolRow[] = schools.map((s) => {
       const list = students.filter((st) => st.school_id === s.school_id);
