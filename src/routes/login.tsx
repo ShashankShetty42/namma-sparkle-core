@@ -327,7 +327,7 @@ function LoginPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            {(activeRole === "student" || activeRole === "teacher") && (
+            {(activeRole === "student" || activeRole === "teacher" || activeRole === "principal") && (
               <Field
                 icon={<School className="h-4 w-4" />}
                 label={activeRole === "student" ? "School code" : "School access code"}
