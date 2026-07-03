@@ -1,225 +1,529 @@
 import * as React from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
-  Award,
-  BarChart3,
-  Download,
-  Flame,
+  ArrowUpRight,
+  BookOpenCheck,
+  CalendarClock,
+  ClipboardCheck,
+  ClipboardList,
+  FileSpreadsheet,
+  FolderKanban,
   GraduationCap,
-  Mail,
-  Printer,
+  Library,
+  NotebookPen,
   Sparkles,
-  Trophy,
+  Target,
   Users,
 } from "lucide-react";
 
 import { AppShell } from "@/components/namma/app-shell";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { nammaEase } from "@/components/namma/motion";
-import devExplaining from "@/assets/characters/dev-explaining.png";
-import { toast } from "sonner";
+import { LEGAL_TAGLINES } from "@/lib/namma-legal";
+import { GRADES, type GradeNumber } from "@/lib/namma-curriculum";
+import { getAuth, onNammaState } from "@/lib/namma-progress";
+import {
+  getSchool,
+  getStudents,
+  getTeachers,
+  onAdminState,
+  type Student,
+  type Teacher,
+} from "@/lib/namma-admin";
 
 export const Route = createFileRoute("/teacher/")({
-  head: () => ({ meta: [{ title: "Teacher dashboard · Namma AI" }] }),
+  head: () => ({
+    meta: [
+      { title: "Teacher Dashboard · Namma AI" },
+      {
+        name: "description",
+        content:
+          "Plan CT & AI weeks, track workbook completion, manage projects and capture classroom evidence for Grades 3–8.",
+      },
+      { property: "og:title", content: "Teacher Dashboard · Namma AI" },
+      {
+        property: "og:description",
+        content:
+          "Weekly plans, student completion, workbook check-ins and project evidence — all in one teacher workspace.",
+      },
+    ],
+  }),
   component: TeacherDashboard,
 });
 
-const CLASS_OVERVIEW = [
-  { label: "Class completion", value: "91%", tone: "success", icon: Trophy, sub: "Week 9 · 8A" },
-  { label: "Active streaks", value: "27/30", tone: "decide", icon: Flame, sub: "5+ weeks" },
-  { label: "Badges earned", value: "184", tone: "bonus", icon: Award, sub: "+22 this week" },
-  { label: "Avg engagement", value: "4.6/5", tone: "explore", icon: BarChart3, sub: "↑ 0.4 vs last wk" },
-];
-
-const STUDENTS = [
-  { name: "Aarav K.", grade: "8A", week: 92, streak: 5, badges: 12, last: "Wk 9", tier: "Advanced" },
-  { name: "Meera P.", grade: "8A", week: 98, streak: 7, badges: 15, last: "Wk 9", tier: "Expert" },
-  { name: "Kabir S.", grade: "8A", week: 84, streak: 4, badges: 9, last: "Wk 9", tier: "Advanced" },
-  { name: "Diya R.", grade: "8A", week: 76, streak: 3, badges: 8, last: "Wk 8", tier: "—" },
-  { name: "Ishaan V.", grade: "8A", week: 88, streak: 6, badges: 11, last: "Wk 9", tier: "Advanced" },
-];
-
-const INSIGHTS = [
-  "Aarav consistently completes weekly adventures before unlock deadlines.",
-  "Riya excels in ethical reasoning activities.",
-  "Class 8A has a 91% completion streak this quarter.",
-];
+/* ─────────── Component ─────────── */
 
 function TeacherDashboard() {
+  const [email, setEmail] = React.useState<string | null>(null);
+  const [schoolCode, setSchoolCode] = React.useState<string | null>(null);
+  const [tick, setTick] = React.useState(0);
+
+  React.useEffect(() => {
+    const refresh = () => {
+      const a = getAuth();
+      setEmail(a.email);
+      setSchoolCode(a.schoolCode);
+      setTick((t) => t + 1);
+    };
+    refresh();
+    const offA = onAdminState(refresh);
+    const offN = onNammaState(refresh);
+    return () => {
+      offA();
+      offN();
+    };
+  }, []);
+
+  /* Resolve teacher record + assigned school. */
+  const teacher: Teacher | null = React.useMemo(() => {
+    if (!email) return null;
+    return (
+      getTeachers().find(
+        (t) => t.teacher_email.toLowerCase() === email.toLowerCase(),
+      ) ?? null
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, tick]);
+
+  const effectiveSchoolCode = teacher?.school_id ?? schoolCode ?? null;
+  const school = React.useMemo(
+    () => (effectiveSchoolCode ? getSchool(effectiveSchoolCode) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveSchoolCode, tick],
+  );
+  const students: Student[] = React.useMemo(
+    () => (effectiveSchoolCode ? getStudents(effectiveSchoolCode) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveSchoolCode, tick],
+  );
+
+  /* Group students by grade for the class list. */
+  const byGrade = React.useMemo(() => {
+    const map = new Map<string, Student[]>();
+    for (const s of students) {
+      const arr = map.get(s.grade) ?? [];
+      arr.push(s);
+      map.set(s.grade, arr);
+    }
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [students]);
+
+  const totalClasses = byGrade.length;
+  const totalStudents = students.length;
+
   return (
     <AppShell>
       <div className="shell-inner !gap-8">
         {/* Hero */}
         <motion.section
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: nammaEase }}
-          className="relative overflow-hidden rounded-[36px] border border-white/70 bg-gradient-to-br from-explore-soft via-white to-reflect-soft p-6 shadow-[var(--shadow-float)] md:p-10"
+          transition={{ duration: 0.5, ease: [0.2, 0.7, 0.3, 1] }}
+          className="relative overflow-hidden rounded-[32px] border border-white/70 bg-gradient-to-br from-explore-soft via-white to-decide-soft p-8 shadow-[var(--shadow-float)] md:p-10"
         >
-          <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-explore/25 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-reflect/25 blur-3xl" />
-          <div className="relative grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
-            <div className="space-y-4">
-              <span className="inline-flex items-center gap-2 rounded-full bg-explore/10 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-explore">
-                <Users className="h-3 w-3" /> Teacher portal · Class 8A
+          <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/50 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-decide/10 blur-3xl" />
+          <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl space-y-3">
+              <span className="inline-flex items-center gap-2 rounded-full border border-explore/25 bg-white/70 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-explore">
+                <Sparkles className="h-3.5 w-3.5" /> Teacher · Weekly Implementation
               </span>
-              <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-foreground md:text-5xl">
-                Your class is{" "}
-                <span className="bg-gradient-to-r from-explore via-reflect to-decide bg-clip-text text-transparent">
-                  on a magical run.
-                </span>
+              <h1 className="font-display text-3xl font-extrabold leading-tight text-foreground md:text-5xl">
+                {teacher ? `Hi, ${teacher.teacher_name.split(" ")[0]}.` : "Your teacher workspace."}
               </h1>
-              <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-                91% of Class 8A completed Week 9 ahead of unlock. Track every student&apos;s
-                journey, streaks and badges — and share progress with parents in one click.
+              <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
+                Plan this week&apos;s CT &amp; AI sessions, track workbook and project completion,
+                and capture classroom evidence — everything you need in one workspace.
               </p>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="hero" size="lg" onClick={() => toast.success("Generating quarterly PDF…")}>
-                  <Download className="h-4 w-4" /> Generate quarterly report
-                </Button>
-                <Button variant="soft" size="lg" onClick={() => toast("Send to Parent flow opens here")}>
-                  <Mail className="h-4 w-4" /> Send to parents
-                </Button>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <MetaChip icon={<GraduationCap className="h-3.5 w-3.5" />}>
+                  {school ? school.school_name : "No school assigned"}
+                </MetaChip>
+                <MetaChip icon={<Users className="h-3.5 w-3.5" />}>
+                  {totalClasses} classes · {totalStudents} students
+                </MetaChip>
+                <MetaChip icon={<CalendarClock className="h-3.5 w-3.5" />}>
+                  Week of {new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                </MetaChip>
               </div>
             </div>
-            <div className="relative hidden h-64 items-end justify-center md:flex">
-              <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-white/60 to-white/20 backdrop-blur-sm" />
-              <motion.img
-                src={devExplaining}
-                alt="Dev"
-                initial={{ y: 16, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="relative h-52 w-52 object-contain animate-[namma-float_5s_ease-in-out_infinite] drop-shadow-[0_25px_30px_rgba(0,0,0,0.18)]"
-              />
-              <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.45 }}
-                className="absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-2xl border border-white bg-white/95 px-3 py-1.5 text-xs font-bold text-foreground shadow-[var(--shadow-soft)]"
-              >
-                <span className="text-explore">Dev:</span> 27 students on streak!
-              </motion.div>
+            <div className="flex flex-wrap gap-2 md:justify-end">
+              <PrimaryAction to="/teacher/planner" icon={<CalendarClock className="h-4 w-4" />}>
+                Open weekly planner
+              </PrimaryAction>
+              <SecondaryAction to="/teacher/completion" icon={<ClipboardList className="h-4 w-4" />}>
+                Student completion
+              </SecondaryAction>
             </div>
           </div>
         </motion.section>
 
-        {/* Overview tiles */}
-        <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {CLASS_OVERVIEW.map((s, i) => {
-            const Icon = s.icon;
-            return (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="relative overflow-hidden rounded-[24px] border border-white/70 bg-white/90 p-4 shadow-[var(--shadow-soft)]"
-              >
-                <span className={cn("flex h-10 w-10 items-center justify-center rounded-2xl", `bg-${s.tone}-soft text-${s.tone}`)}>
-                  <Icon className="h-5 w-5" />
-                </span>
-                <div className="mt-3 font-reward text-2xl leading-none text-foreground">{s.value}</div>
-                <div className="mt-1 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                  {s.label}
-                </div>
-                <div className="mt-1 text-xs text-muted-foreground">{s.sub}</div>
-              </motion.div>
-            );
-          })}
+        {/* KPI grid */}
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <KpiCard
+            tone="explore"
+            icon={<Users className="h-5 w-5" />}
+            label="Students in my classes"
+            value={totalStudents}
+            hint={`${totalClasses} grade groups`}
+          />
+          <KpiCard
+            tone="decide"
+            icon={<BookOpenCheck className="h-5 w-5" />}
+            label="Workbook completion"
+            value="0%"
+            hint="Update from Workbook Tracker"
+          />
+          <KpiCard
+            tone="challenge"
+            icon={<FolderKanban className="h-5 w-5" />}
+            label="Active projects"
+            value={0}
+            hint="Start a project journal"
+          />
+          <KpiCard
+            tone="success"
+            icon={<FileSpreadsheet className="h-5 w-5" />}
+            label="Evidence captured"
+            value={0}
+            hint="Photos, worksheets, quotes"
+          />
         </section>
 
-        {/* Student table */}
-        <motion.section
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="section-panel relative overflow-hidden"
-        >
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <div className="eyebrow">
-                <GraduationCap className="h-3.5 w-3.5" /> Student progress
+        {/* This week + quick actions */}
+        <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="rounded-[28px] border border-foreground/10 bg-white/85 p-6 shadow-[var(--shadow-soft)] lg:col-span-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-decide">
+                  This week
+                </p>
+                <h2 className="font-display text-xl font-extrabold text-foreground">
+                  Your weekly implementation checklist
+                </h2>
               </div>
-              <h2 className="mt-2 font-display text-2xl font-bold text-foreground md:text-3xl">
-                Class 8A · Week 9
+              <Link
+                to="/teacher/planner"
+                className="inline-flex items-center gap-1 rounded-full border border-foreground/10 bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-decide-soft"
+              >
+                Open planner <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <ul className="mt-5 space-y-2">
+              <ChecklistRow
+                icon={<CalendarClock className="h-4 w-4" />}
+                title="Publish this week's plan"
+                desc="Pick focus area, activity, workbook pages and expected outcome."
+                to="/teacher/planner"
+              />
+              <ChecklistRow
+                icon={<BookOpenCheck className="h-4 w-4" />}
+                title="Mark workbook completion"
+                desc="Tick pages completed by each student — feeds into principal view."
+                to="/teacher/workbook"
+              />
+              <ChecklistRow
+                icon={<NotebookPen className="h-4 w-4" />}
+                title="Log observations"
+                desc="Short journal notes on how students engaged this week."
+                to="/teacher/journal"
+              />
+              <ChecklistRow
+                icon={<FolderKanban className="h-4 w-4" />}
+                title="Update project journal"
+                desc="Upload photos, artefacts and student reflections."
+                to="/teacher/projects"
+              />
+              <ChecklistRow
+                icon={<ClipboardCheck className="h-4 w-4" />}
+                title="Run a check-in assessment"
+                desc="Quick formative check tied to the week's learning outcome."
+                to="/teacher/assessments"
+              />
+            </ul>
+          </div>
+
+          <div className="rounded-[28px] border border-foreground/10 bg-gradient-to-br from-bonus-soft via-white to-explore-soft p-6 shadow-[var(--shadow-soft)]">
+            <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-bonus">
+              Curriculum context
+            </p>
+            <h2 className="font-display text-xl font-extrabold text-foreground">
+              What to focus on
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Grades 3–5 focus on Computational Thinking. Grades 6–8 add AI literacy, ethics and
+              projects.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {GRADES.map((g) => (
+                <span
+                  key={g.grade}
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em]",
+                    g.track === "CT"
+                      ? "border-explore/25 bg-explore-soft text-explore"
+                      : "border-bonus/25 bg-bonus-soft text-bonus",
+                  )}
+                >
+                  G{g.grade} · {g.track}
+                </span>
+              ))}
+            </div>
+            <Link
+              to="/teacher/resources"
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
+            >
+              <Library className="h-4 w-4" /> Open resources
+            </Link>
+            <p className="mt-4 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              {LEGAL_TAGLINES.outcomes}
+            </p>
+          </div>
+        </section>
+
+        {/* My classes */}
+        <section className="rounded-[28px] border border-foreground/10 bg-white/85 p-6 shadow-[var(--shadow-soft)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-explore">
+                My classes
+              </p>
+              <h2 className="font-display text-xl font-extrabold text-foreground">
+                Grades I teach at {school?.school_name ?? "this school"}
               </h2>
             </div>
-            <Button variant="soft" size="sm" onClick={() => toast.success("CSV export started")}>
-              <Printer className="h-4 w-4" /> Export
-            </Button>
-          </div>
-
-          <div className="mt-5 overflow-x-auto rounded-3xl border border-foreground/5 bg-white/80">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                  <th className="p-3 text-left">Student</th>
-                  <th className="p-3 text-left">Grade</th>
-                  <th className="p-3 text-left">Weekly</th>
-                  <th className="p-3 text-left">Streak</th>
-                  <th className="p-3 text-left">Badges</th>
-                  <th className="p-3 text-left">Last active</th>
-                  <th className="p-3 text-left">Tier</th>
-                </tr>
-              </thead>
-              <tbody>
-                {STUDENTS.map((s) => (
-                  <tr key={s.name} className="border-t border-foreground/5">
-                    <td className="p-3 font-display font-bold text-foreground">{s.name}</td>
-                    <td className="p-3 text-muted-foreground">{s.grade}</td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-24 overflow-hidden rounded-full bg-secondary/70">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-explore to-bonus"
-                            style={{ width: `${s.week}%` }}
-                          />
-                        </div>
-                        <span className="font-bold text-foreground">{s.week}%</span>
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-decide-soft px-2 py-0.5 text-xs font-bold text-decide">
-                        <Flame className="h-3 w-3" /> {s.streak}w
-                      </span>
-                    </td>
-                    <td className="p-3 font-bold text-foreground">{s.badges}</td>
-                    <td className="p-3 text-muted-foreground">{s.last}</td>
-                    <td className="p-3">
-                      <span className={cn("rounded-full px-2 py-0.5 text-[0.7rem] font-bold", s.tier === "Expert" ? "bg-bonus-soft text-bonus" : s.tier === "Advanced" ? "bg-challenge-soft text-challenge" : "bg-muted text-muted-foreground")}>
-                        {s.tier}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </motion.section>
-
-        {/* Insights */}
-        <section className="grid gap-4 md:grid-cols-3">
-          {INSIGHTS.map((line, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.06 }}
-              className="rounded-[24px] border border-white/70 bg-gradient-to-br from-white via-white to-explore-soft/50 p-5 shadow-[var(--shadow-soft)]"
+            <Link
+              to="/teacher/classes"
+              className="inline-flex items-center gap-1 rounded-full border border-foreground/10 bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-explore-soft"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-bonus-soft text-bonus">
-                <Sparkles className="h-4 w-4" />
-              </span>
-              <p className="mt-3 font-display text-sm font-bold leading-snug text-foreground">{line}</p>
-            </motion.div>
-          ))}
+              Manage classes <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          {byGrade.length === 0 ? (
+            <EmptyRow
+              text="No classes assigned yet — ask your Namma AI admin to add students at your school."
+              cta="Open student directory"
+              to="/teacher/classes"
+            />
+          ) : (
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {byGrade.map(([grade, list]) => {
+                const n = parseInt(grade.replace(/\D/g, ""), 10) as GradeNumber;
+                const track =
+                  GRADES.find((g) => g.grade === n)?.track ??
+                  (n >= 6 ? "CT+AI" : "CT");
+                return (
+                  <div
+                    key={grade}
+                    className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-[var(--shadow-soft)]"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="font-display text-lg font-extrabold text-foreground">
+                        {grade}
+                      </div>
+                      <span
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.18em]",
+                          track === "CT"
+                            ? "bg-explore-soft text-explore"
+                            : "bg-bonus-soft text-bonus",
+                        )}
+                      >
+                        {track}
+                      </span>
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {list.length} students
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {list.slice(0, 5).map((s) => (
+                        <span
+                          key={s.student_id}
+                          className="rounded-full bg-foreground/5 px-2 py-0.5 text-[0.65rem] font-semibold text-foreground"
+                        >
+                          {s.student_name.split(" ")[0]}
+                        </span>
+                      ))}
+                      {list.length > 5 && (
+                        <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-[0.65rem] font-semibold text-muted-foreground">
+                          +{list.length - 5}
+                        </span>
+                      )}
+                    </div>
+                    <Link
+                      to="/teacher/completion"
+                      className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-foreground hover:underline"
+                    >
+                      Track completion <ArrowUpRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* Reports */}
+        <section className="rounded-[28px] border border-foreground/10 bg-gradient-to-br from-xp-soft via-white to-bonus-soft p-6 shadow-[var(--shadow-soft)]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-xp">
+                Reports
+              </p>
+              <h2 className="font-display text-xl font-extrabold text-foreground">
+                Share progress with your principal
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Weekly and term reports pull directly from your planner, workbook and journal
+                entries.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                to="/teacher/reports"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
+              >
+                <Target className="h-4 w-4" /> Open reports
+              </Link>
+            </div>
+          </div>
         </section>
       </div>
     </AppShell>
+  );
+}
+
+/* ─────────── Small building blocks ─────────── */
+
+function MetaChip({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 bg-white/80 px-2.5 py-1 text-[0.7rem] font-semibold text-foreground">
+      <span className="text-muted-foreground">{icon}</span>
+      {children}
+    </span>
+  );
+}
+
+function PrimaryAction({
+  to,
+  icon,
+  children,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      to={to}
+      className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
+    >
+      {icon}
+      {children}
+    </Link>
+  );
+}
+function SecondaryAction({
+  to,
+  icon,
+  children,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      to={to}
+      className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-white/90 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-white"
+    >
+      {icon}
+      {children}
+    </Link>
+  );
+}
+
+const kpiTone: Record<string, string> = {
+  explore: "from-explore-soft to-white text-explore",
+  decide: "from-decide-soft to-white text-decide",
+  challenge: "from-challenge-soft to-white text-challenge",
+  success: "from-success-soft to-white text-success",
+};
+
+function KpiCard({
+  tone,
+  icon,
+  label,
+  value,
+  hint,
+}: {
+  tone: keyof typeof kpiTone;
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  hint?: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+      className={cn(
+        "rounded-[24px] border border-white/70 bg-gradient-to-br p-5 shadow-[var(--shadow-soft)]",
+        kpiTone[tone],
+      )}
+    >
+      <div className="flex items-center justify-between text-foreground/70">
+        <span className="text-[0.65rem] font-bold uppercase tracking-[0.2em]">{label}</span>
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-white/80">{icon}</span>
+      </div>
+      <div className="mt-3 font-display text-3xl font-extrabold text-foreground">{value}</div>
+      {hint && <div className="mt-1 text-xs text-muted-foreground">{hint}</div>}
+    </motion.div>
+  );
+}
+
+function ChecklistRow({
+  icon,
+  title,
+  desc,
+  to,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  to: string;
+}) {
+  return (
+    <li>
+      <Link
+        to={to}
+        className="group flex items-start gap-3 rounded-2xl border border-foreground/10 bg-white/80 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]"
+      >
+        <span className="mt-0.5 grid h-8 w-8 place-items-center rounded-xl bg-decide-soft text-decide">
+          {icon}
+        </span>
+        <div className="flex-1">
+          <div className="text-sm font-bold text-foreground">{title}</div>
+          <div className="text-xs text-muted-foreground">{desc}</div>
+        </div>
+        <ArrowUpRight className="mt-1 h-4 w-4 text-muted-foreground group-hover:text-foreground" />
+      </Link>
+    </li>
+  );
+}
+
+function EmptyRow({ text, cta, to }: { text: string; cta: string; to: string }) {
+  return (
+    <div className="mt-5 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-foreground/15 bg-white/70 px-4 py-5 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+      <span>{text}</span>
+      <Link
+        to={to}
+        className="inline-flex items-center gap-1 rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-white hover:opacity-95"
+      >
+        {cta} <ArrowUpRight className="h-3.5 w-3.5" />
+      </Link>
+    </div>
   );
 }
