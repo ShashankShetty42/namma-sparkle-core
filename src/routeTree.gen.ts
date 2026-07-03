@@ -17,6 +17,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PrincipalRouteImport } from './routes/principal'
 import { Route as MissionsRouteImport } from './routes/missions'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -71,6 +72,11 @@ const ResourcesRoute = ResourcesRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrincipalRoute = PrincipalRouteImport.update({
+  id: '/principal',
+  path: '/principal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MissionsRoute = MissionsRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/missions': typeof MissionsRoute
+  '/principal': typeof PrincipalRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/missions': typeof MissionsRoute
+  '/principal': typeof PrincipalRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/missions': typeof MissionsRoute
+  '/principal': typeof PrincipalRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/missions'
+    | '/principal'
     | '/profile'
     | '/resources'
     | '/rewards'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/missions'
+    | '/principal'
     | '/profile'
     | '/resources'
     | '/rewards'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/missions'
+    | '/principal'
     | '/profile'
     | '/resources'
     | '/rewards'
@@ -313,6 +325,7 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MissionsRoute: typeof MissionsRoute
+  PrincipalRoute: typeof PrincipalRoute
   ProfileRoute: typeof ProfileRoute
   ResourcesRoute: typeof ResourcesRoute
   RewardsRoute: typeof RewardsRoute
@@ -383,6 +396,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/principal': {
+      id: '/principal'
+      path: '/principal'
+      fullPath: '/principal'
+      preLoaderRoute: typeof PrincipalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/missions': {
@@ -527,6 +547,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MissionsRoute: MissionsRoute,
+  PrincipalRoute: PrincipalRoute,
   ProfileRoute: ProfileRoute,
   ResourcesRoute: ResourcesRoute,
   RewardsRoute: RewardsRoute,
