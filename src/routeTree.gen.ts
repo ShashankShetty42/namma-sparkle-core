@@ -17,6 +17,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PrincipalRouteImport } from './routes/principal'
 import { Route as MissionsRouteImport } from './routes/missions'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -26,10 +27,45 @@ import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as BadgesRouteImport } from './routes/badges'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TeacherIndexRouteImport } from './routes/teacher.index'
+import { Route as PrincipalIndexRouteImport } from './routes/principal.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as TeacherWorkbookRouteImport } from './routes/teacher.workbook'
+import { Route as TeacherResourcesRouteImport } from './routes/teacher.resources'
+import { Route as TeacherReportsRouteImport } from './routes/teacher.reports'
+import { Route as TeacherProjectsRouteImport } from './routes/teacher.projects'
+import { Route as TeacherPlannerRouteImport } from './routes/teacher.planner'
+import { Route as TeacherJournalRouteImport } from './routes/teacher.journal'
+import { Route as TeacherCompletionRouteImport } from './routes/teacher.completion'
+import { Route as TeacherClassesRouteImport } from './routes/teacher.classes'
+import { Route as TeacherAssessmentsRouteImport } from './routes/teacher.assessments'
+import { Route as StudentWorkbookRouteImport } from './routes/student.workbook'
+import { Route as StudentWeeklyTasksRouteImport } from './routes/student.weekly-tasks'
+import { Route as StudentProjectsRouteImport } from './routes/student.projects'
+import { Route as StudentPortfolioRouteImport } from './routes/student.portfolio'
+import { Route as StudentPortalActivitiesRouteImport } from './routes/student.portal-activities'
+import { Route as StudentCertificatesRouteImport } from './routes/student.certificates'
+import { Route as PrincipalTeachersRouteImport } from './routes/principal.teachers'
+import { Route as PrincipalStudentsRouteImport } from './routes/principal.students'
+import { Route as PrincipalSettingsRouteImport } from './routes/principal.settings'
+import { Route as PrincipalReportsRouteImport } from './routes/principal.reports'
+import { Route as PrincipalProjectsRouteImport } from './routes/principal.projects'
+import { Route as PrincipalProgressRouteImport } from './routes/principal.progress'
+import { Route as PrincipalImplementationRouteImport } from './routes/principal.implementation'
+import { Route as PrincipalGradesRouteImport } from './routes/principal.grades'
+import { Route as PrincipalEvidenceRouteImport } from './routes/principal.evidence'
+import { Route as PrincipalCertificatesRouteImport } from './routes/principal.certificates'
+import { Route as PrincipalCalendarRouteImport } from './routes/principal.calendar'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
+import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminStudentsRouteImport } from './routes/admin.students'
 import { Route as AdminSchoolsRouteImport } from './routes/admin.schools'
+import { Route as AdminReportTemplatesRouteImport } from './routes/admin.report-templates'
+import { Route as AdminLearningOutcomesRouteImport } from './routes/admin.learning-outcomes'
+import { Route as AdminGradeTemplatesRouteImport } from './routes/admin.grade-templates'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminActivityLibraryRouteImport } from './routes/admin.activity-library'
 import { Route as ActivitiesSlugRouteImport } from './routes/activities.$slug'
 import { Route as AdminSchoolsSchoolIdRouteImport } from './routes/admin.schools.$schoolId'
 
@@ -71,6 +107,11 @@ const ResourcesRoute = ResourcesRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrincipalRoute = PrincipalRouteImport.update({
+  id: '/principal',
+  path: '/principal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MissionsRoute = MissionsRouteImport.update({
@@ -118,14 +159,164 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherIndexRoute = TeacherIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const PrincipalIndexRoute = PrincipalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PrincipalRoute,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherWorkbookRoute = TeacherWorkbookRouteImport.update({
+  id: '/workbook',
+  path: '/workbook',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherResourcesRoute = TeacherResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherReportsRoute = TeacherReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherProjectsRoute = TeacherProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherPlannerRoute = TeacherPlannerRouteImport.update({
+  id: '/planner',
+  path: '/planner',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherJournalRoute = TeacherJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherCompletionRoute = TeacherCompletionRouteImport.update({
+  id: '/completion',
+  path: '/completion',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherClassesRoute = TeacherClassesRouteImport.update({
+  id: '/classes',
+  path: '/classes',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherAssessmentsRoute = TeacherAssessmentsRouteImport.update({
+  id: '/assessments',
+  path: '/assessments',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const StudentWorkbookRoute = StudentWorkbookRouteImport.update({
+  id: '/student/workbook',
+  path: '/student/workbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentWeeklyTasksRoute = StudentWeeklyTasksRouteImport.update({
+  id: '/student/weekly-tasks',
+  path: '/student/weekly-tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentProjectsRoute = StudentProjectsRouteImport.update({
+  id: '/student/projects',
+  path: '/student/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentPortfolioRoute = StudentPortfolioRouteImport.update({
+  id: '/student/portfolio',
+  path: '/student/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentPortalActivitiesRoute = StudentPortalActivitiesRouteImport.update({
+  id: '/student/portal-activities',
+  path: '/student/portal-activities',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentCertificatesRoute = StudentCertificatesRouteImport.update({
+  id: '/student/certificates',
+  path: '/student/certificates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrincipalTeachersRoute = PrincipalTeachersRouteImport.update({
+  id: '/teachers',
+  path: '/teachers',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalStudentsRoute = PrincipalStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalSettingsRoute = PrincipalSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalReportsRoute = PrincipalReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalProjectsRoute = PrincipalProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalProgressRoute = PrincipalProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalImplementationRoute = PrincipalImplementationRouteImport.update({
+  id: '/implementation',
+  path: '/implementation',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalGradesRoute = PrincipalGradesRouteImport.update({
+  id: '/grades',
+  path: '/grades',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalEvidenceRoute = PrincipalEvidenceRouteImport.update({
+  id: '/evidence',
+  path: '/evidence',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalCertificatesRoute = PrincipalCertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalCalendarRoute = PrincipalCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminTeachersRoute = AdminTeachersRouteImport.update({
   id: '/admin/teachers',
   path: '/admin/teachers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSupportRoute = AdminSupportRouteImport.update({
+  id: '/admin/support',
+  path: '/admin/support',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminStudentsRoute = AdminStudentsRouteImport.update({
@@ -136,6 +327,31 @@ const AdminStudentsRoute = AdminStudentsRouteImport.update({
 const AdminSchoolsRoute = AdminSchoolsRouteImport.update({
   id: '/admin/schools',
   path: '/admin/schools',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminReportTemplatesRoute = AdminReportTemplatesRouteImport.update({
+  id: '/admin/report-templates',
+  path: '/admin/report-templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLearningOutcomesRoute = AdminLearningOutcomesRouteImport.update({
+  id: '/admin/learning-outcomes',
+  path: '/admin/learning-outcomes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminGradeTemplatesRoute = AdminGradeTemplatesRouteImport.update({
+  id: '/admin/grade-templates',
+  path: '/admin/grade-templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminActivityLibraryRoute = AdminActivityLibraryRouteImport.update({
+  id: '/admin/activity-library',
+  path: '/admin/activity-library',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ActivitiesSlugRoute = ActivitiesSlugRouteImport.update({
@@ -159,19 +375,55 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/missions': typeof MissionsRoute
+  '/principal': typeof PrincipalRouteWithChildren
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
-  '/teacher': typeof TeacherRoute
+  '/teacher': typeof TeacherRouteWithChildren
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
+  '/admin/activity-library': typeof AdminActivityLibraryRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/grade-templates': typeof AdminGradeTemplatesRoute
+  '/admin/learning-outcomes': typeof AdminLearningOutcomesRoute
+  '/admin/report-templates': typeof AdminReportTemplatesRoute
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/principal/calendar': typeof PrincipalCalendarRoute
+  '/principal/certificates': typeof PrincipalCertificatesRoute
+  '/principal/evidence': typeof PrincipalEvidenceRoute
+  '/principal/grades': typeof PrincipalGradesRoute
+  '/principal/implementation': typeof PrincipalImplementationRoute
+  '/principal/progress': typeof PrincipalProgressRoute
+  '/principal/projects': typeof PrincipalProjectsRoute
+  '/principal/reports': typeof PrincipalReportsRoute
+  '/principal/settings': typeof PrincipalSettingsRoute
+  '/principal/students': typeof PrincipalStudentsRoute
+  '/principal/teachers': typeof PrincipalTeachersRoute
+  '/student/certificates': typeof StudentCertificatesRoute
+  '/student/portal-activities': typeof StudentPortalActivitiesRoute
+  '/student/portfolio': typeof StudentPortfolioRoute
+  '/student/projects': typeof StudentProjectsRoute
+  '/student/weekly-tasks': typeof StudentWeeklyTasksRoute
+  '/student/workbook': typeof StudentWorkbookRoute
+  '/teacher/assessments': typeof TeacherAssessmentsRoute
+  '/teacher/classes': typeof TeacherClassesRoute
+  '/teacher/completion': typeof TeacherCompletionRoute
+  '/teacher/journal': typeof TeacherJournalRoute
+  '/teacher/planner': typeof TeacherPlannerRoute
+  '/teacher/projects': typeof TeacherProjectsRoute
+  '/teacher/reports': typeof TeacherReportsRoute
+  '/teacher/resources': typeof TeacherResourcesRoute
+  '/teacher/workbook': typeof TeacherWorkbookRoute
   '/admin/': typeof AdminIndexRoute
+  '/principal/': typeof PrincipalIndexRoute
+  '/teacher/': typeof TeacherIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesByTo {
@@ -190,13 +442,47 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
-  '/teacher': typeof TeacherRoute
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
+  '/admin/activity-library': typeof AdminActivityLibraryRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/grade-templates': typeof AdminGradeTemplatesRoute
+  '/admin/learning-outcomes': typeof AdminLearningOutcomesRoute
+  '/admin/report-templates': typeof AdminReportTemplatesRoute
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/principal/calendar': typeof PrincipalCalendarRoute
+  '/principal/certificates': typeof PrincipalCertificatesRoute
+  '/principal/evidence': typeof PrincipalEvidenceRoute
+  '/principal/grades': typeof PrincipalGradesRoute
+  '/principal/implementation': typeof PrincipalImplementationRoute
+  '/principal/progress': typeof PrincipalProgressRoute
+  '/principal/projects': typeof PrincipalProjectsRoute
+  '/principal/reports': typeof PrincipalReportsRoute
+  '/principal/settings': typeof PrincipalSettingsRoute
+  '/principal/students': typeof PrincipalStudentsRoute
+  '/principal/teachers': typeof PrincipalTeachersRoute
+  '/student/certificates': typeof StudentCertificatesRoute
+  '/student/portal-activities': typeof StudentPortalActivitiesRoute
+  '/student/portfolio': typeof StudentPortfolioRoute
+  '/student/projects': typeof StudentProjectsRoute
+  '/student/weekly-tasks': typeof StudentWeeklyTasksRoute
+  '/student/workbook': typeof StudentWorkbookRoute
+  '/teacher/assessments': typeof TeacherAssessmentsRoute
+  '/teacher/classes': typeof TeacherClassesRoute
+  '/teacher/completion': typeof TeacherCompletionRoute
+  '/teacher/journal': typeof TeacherJournalRoute
+  '/teacher/planner': typeof TeacherPlannerRoute
+  '/teacher/projects': typeof TeacherProjectsRoute
+  '/teacher/reports': typeof TeacherReportsRoute
+  '/teacher/resources': typeof TeacherResourcesRoute
+  '/teacher/workbook': typeof TeacherWorkbookRoute
   '/admin': typeof AdminIndexRoute
+  '/principal': typeof PrincipalIndexRoute
+  '/teacher': typeof TeacherIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRoutesById {
@@ -210,19 +496,55 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/missions': typeof MissionsRoute
+  '/principal': typeof PrincipalRouteWithChildren
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/rewards': typeof RewardsRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
-  '/teacher': typeof TeacherRoute
+  '/teacher': typeof TeacherRouteWithChildren
   '/welcome': typeof WelcomeRoute
   '/activities/$slug': typeof ActivitiesSlugRoute
+  '/admin/activity-library': typeof AdminActivityLibraryRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/grade-templates': typeof AdminGradeTemplatesRoute
+  '/admin/learning-outcomes': typeof AdminLearningOutcomesRoute
+  '/admin/report-templates': typeof AdminReportTemplatesRoute
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/principal/calendar': typeof PrincipalCalendarRoute
+  '/principal/certificates': typeof PrincipalCertificatesRoute
+  '/principal/evidence': typeof PrincipalEvidenceRoute
+  '/principal/grades': typeof PrincipalGradesRoute
+  '/principal/implementation': typeof PrincipalImplementationRoute
+  '/principal/progress': typeof PrincipalProgressRoute
+  '/principal/projects': typeof PrincipalProjectsRoute
+  '/principal/reports': typeof PrincipalReportsRoute
+  '/principal/settings': typeof PrincipalSettingsRoute
+  '/principal/students': typeof PrincipalStudentsRoute
+  '/principal/teachers': typeof PrincipalTeachersRoute
+  '/student/certificates': typeof StudentCertificatesRoute
+  '/student/portal-activities': typeof StudentPortalActivitiesRoute
+  '/student/portfolio': typeof StudentPortfolioRoute
+  '/student/projects': typeof StudentProjectsRoute
+  '/student/weekly-tasks': typeof StudentWeeklyTasksRoute
+  '/student/workbook': typeof StudentWorkbookRoute
+  '/teacher/assessments': typeof TeacherAssessmentsRoute
+  '/teacher/classes': typeof TeacherClassesRoute
+  '/teacher/completion': typeof TeacherCompletionRoute
+  '/teacher/journal': typeof TeacherJournalRoute
+  '/teacher/planner': typeof TeacherPlannerRoute
+  '/teacher/projects': typeof TeacherProjectsRoute
+  '/teacher/reports': typeof TeacherReportsRoute
+  '/teacher/resources': typeof TeacherResourcesRoute
+  '/teacher/workbook': typeof TeacherWorkbookRoute
   '/admin/': typeof AdminIndexRoute
+  '/principal/': typeof PrincipalIndexRoute
+  '/teacher/': typeof TeacherIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
 }
 export interface FileRouteTypes {
@@ -237,6 +559,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/missions'
+    | '/principal'
     | '/profile'
     | '/resources'
     | '/rewards'
@@ -246,10 +569,45 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/welcome'
     | '/activities/$slug'
+    | '/admin/activity-library'
+    | '/admin/analytics'
+    | '/admin/grade-templates'
+    | '/admin/learning-outcomes'
+    | '/admin/report-templates'
     | '/admin/schools'
     | '/admin/students'
+    | '/admin/support'
     | '/admin/teachers'
+    | '/admin/users'
+    | '/principal/calendar'
+    | '/principal/certificates'
+    | '/principal/evidence'
+    | '/principal/grades'
+    | '/principal/implementation'
+    | '/principal/progress'
+    | '/principal/projects'
+    | '/principal/reports'
+    | '/principal/settings'
+    | '/principal/students'
+    | '/principal/teachers'
+    | '/student/certificates'
+    | '/student/portal-activities'
+    | '/student/portfolio'
+    | '/student/projects'
+    | '/student/weekly-tasks'
+    | '/student/workbook'
+    | '/teacher/assessments'
+    | '/teacher/classes'
+    | '/teacher/completion'
+    | '/teacher/journal'
+    | '/teacher/planner'
+    | '/teacher/projects'
+    | '/teacher/reports'
+    | '/teacher/resources'
+    | '/teacher/workbook'
     | '/admin/'
+    | '/principal/'
+    | '/teacher/'
     | '/admin/schools/$schoolId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -268,13 +626,47 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/support'
-    | '/teacher'
     | '/welcome'
     | '/activities/$slug'
+    | '/admin/activity-library'
+    | '/admin/analytics'
+    | '/admin/grade-templates'
+    | '/admin/learning-outcomes'
+    | '/admin/report-templates'
     | '/admin/schools'
     | '/admin/students'
+    | '/admin/support'
     | '/admin/teachers'
+    | '/admin/users'
+    | '/principal/calendar'
+    | '/principal/certificates'
+    | '/principal/evidence'
+    | '/principal/grades'
+    | '/principal/implementation'
+    | '/principal/progress'
+    | '/principal/projects'
+    | '/principal/reports'
+    | '/principal/settings'
+    | '/principal/students'
+    | '/principal/teachers'
+    | '/student/certificates'
+    | '/student/portal-activities'
+    | '/student/portfolio'
+    | '/student/projects'
+    | '/student/weekly-tasks'
+    | '/student/workbook'
+    | '/teacher/assessments'
+    | '/teacher/classes'
+    | '/teacher/completion'
+    | '/teacher/journal'
+    | '/teacher/planner'
+    | '/teacher/projects'
+    | '/teacher/reports'
+    | '/teacher/resources'
+    | '/teacher/workbook'
     | '/admin'
+    | '/principal'
+    | '/teacher'
     | '/admin/schools/$schoolId'
   id:
     | '__root__'
@@ -287,6 +679,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/missions'
+    | '/principal'
     | '/profile'
     | '/resources'
     | '/rewards'
@@ -296,10 +689,45 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/welcome'
     | '/activities/$slug'
+    | '/admin/activity-library'
+    | '/admin/analytics'
+    | '/admin/grade-templates'
+    | '/admin/learning-outcomes'
+    | '/admin/report-templates'
     | '/admin/schools'
     | '/admin/students'
+    | '/admin/support'
     | '/admin/teachers'
+    | '/admin/users'
+    | '/principal/calendar'
+    | '/principal/certificates'
+    | '/principal/evidence'
+    | '/principal/grades'
+    | '/principal/implementation'
+    | '/principal/progress'
+    | '/principal/projects'
+    | '/principal/reports'
+    | '/principal/settings'
+    | '/principal/students'
+    | '/principal/teachers'
+    | '/student/certificates'
+    | '/student/portal-activities'
+    | '/student/portfolio'
+    | '/student/projects'
+    | '/student/weekly-tasks'
+    | '/student/workbook'
+    | '/teacher/assessments'
+    | '/teacher/classes'
+    | '/teacher/completion'
+    | '/teacher/journal'
+    | '/teacher/planner'
+    | '/teacher/projects'
+    | '/teacher/reports'
+    | '/teacher/resources'
+    | '/teacher/workbook'
     | '/admin/'
+    | '/principal/'
+    | '/teacher/'
     | '/admin/schools/$schoolId'
   fileRoutesById: FileRoutesById
 }
@@ -313,17 +741,31 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MissionsRoute: typeof MissionsRoute
+  PrincipalRoute: typeof PrincipalRouteWithChildren
   ProfileRoute: typeof ProfileRoute
   ResourcesRoute: typeof ResourcesRoute
   RewardsRoute: typeof RewardsRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SupportRoute: typeof SupportRoute
-  TeacherRoute: typeof TeacherRoute
+  TeacherRoute: typeof TeacherRouteWithChildren
   WelcomeRoute: typeof WelcomeRoute
+  AdminActivityLibraryRoute: typeof AdminActivityLibraryRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminGradeTemplatesRoute: typeof AdminGradeTemplatesRoute
+  AdminLearningOutcomesRoute: typeof AdminLearningOutcomesRoute
+  AdminReportTemplatesRoute: typeof AdminReportTemplatesRoute
   AdminSchoolsRoute: typeof AdminSchoolsRouteWithChildren
   AdminStudentsRoute: typeof AdminStudentsRoute
+  AdminSupportRoute: typeof AdminSupportRoute
   AdminTeachersRoute: typeof AdminTeachersRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  StudentCertificatesRoute: typeof StudentCertificatesRoute
+  StudentPortalActivitiesRoute: typeof StudentPortalActivitiesRoute
+  StudentPortfolioRoute: typeof StudentPortfolioRoute
+  StudentProjectsRoute: typeof StudentProjectsRoute
+  StudentWeeklyTasksRoute: typeof StudentWeeklyTasksRoute
+  StudentWorkbookRoute: typeof StudentWorkbookRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -383,6 +825,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/principal': {
+      id: '/principal'
+      path: '/principal'
+      fullPath: '/principal'
+      preLoaderRoute: typeof PrincipalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/missions': {
@@ -448,6 +897,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher/': {
+      id: '/teacher/'
+      path: '/'
+      fullPath: '/teacher/'
+      preLoaderRoute: typeof TeacherIndexRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/principal/': {
+      id: '/principal/'
+      path: '/'
+      fullPath: '/principal/'
+      preLoaderRoute: typeof PrincipalIndexRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
     '/admin/': {
       id: '/admin/'
       path: '/admin'
@@ -455,11 +918,207 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher/workbook': {
+      id: '/teacher/workbook'
+      path: '/workbook'
+      fullPath: '/teacher/workbook'
+      preLoaderRoute: typeof TeacherWorkbookRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/resources': {
+      id: '/teacher/resources'
+      path: '/resources'
+      fullPath: '/teacher/resources'
+      preLoaderRoute: typeof TeacherResourcesRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/reports': {
+      id: '/teacher/reports'
+      path: '/reports'
+      fullPath: '/teacher/reports'
+      preLoaderRoute: typeof TeacherReportsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/projects': {
+      id: '/teacher/projects'
+      path: '/projects'
+      fullPath: '/teacher/projects'
+      preLoaderRoute: typeof TeacherProjectsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/planner': {
+      id: '/teacher/planner'
+      path: '/planner'
+      fullPath: '/teacher/planner'
+      preLoaderRoute: typeof TeacherPlannerRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/journal': {
+      id: '/teacher/journal'
+      path: '/journal'
+      fullPath: '/teacher/journal'
+      preLoaderRoute: typeof TeacherJournalRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/completion': {
+      id: '/teacher/completion'
+      path: '/completion'
+      fullPath: '/teacher/completion'
+      preLoaderRoute: typeof TeacherCompletionRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/classes': {
+      id: '/teacher/classes'
+      path: '/classes'
+      fullPath: '/teacher/classes'
+      preLoaderRoute: typeof TeacherClassesRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/assessments': {
+      id: '/teacher/assessments'
+      path: '/assessments'
+      fullPath: '/teacher/assessments'
+      preLoaderRoute: typeof TeacherAssessmentsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/student/workbook': {
+      id: '/student/workbook'
+      path: '/student/workbook'
+      fullPath: '/student/workbook'
+      preLoaderRoute: typeof StudentWorkbookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/weekly-tasks': {
+      id: '/student/weekly-tasks'
+      path: '/student/weekly-tasks'
+      fullPath: '/student/weekly-tasks'
+      preLoaderRoute: typeof StudentWeeklyTasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/projects': {
+      id: '/student/projects'
+      path: '/student/projects'
+      fullPath: '/student/projects'
+      preLoaderRoute: typeof StudentProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/portfolio': {
+      id: '/student/portfolio'
+      path: '/student/portfolio'
+      fullPath: '/student/portfolio'
+      preLoaderRoute: typeof StudentPortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/portal-activities': {
+      id: '/student/portal-activities'
+      path: '/student/portal-activities'
+      fullPath: '/student/portal-activities'
+      preLoaderRoute: typeof StudentPortalActivitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/certificates': {
+      id: '/student/certificates'
+      path: '/student/certificates'
+      fullPath: '/student/certificates'
+      preLoaderRoute: typeof StudentCertificatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/principal/teachers': {
+      id: '/principal/teachers'
+      path: '/teachers'
+      fullPath: '/principal/teachers'
+      preLoaderRoute: typeof PrincipalTeachersRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/students': {
+      id: '/principal/students'
+      path: '/students'
+      fullPath: '/principal/students'
+      preLoaderRoute: typeof PrincipalStudentsRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/settings': {
+      id: '/principal/settings'
+      path: '/settings'
+      fullPath: '/principal/settings'
+      preLoaderRoute: typeof PrincipalSettingsRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/reports': {
+      id: '/principal/reports'
+      path: '/reports'
+      fullPath: '/principal/reports'
+      preLoaderRoute: typeof PrincipalReportsRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/projects': {
+      id: '/principal/projects'
+      path: '/projects'
+      fullPath: '/principal/projects'
+      preLoaderRoute: typeof PrincipalProjectsRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/progress': {
+      id: '/principal/progress'
+      path: '/progress'
+      fullPath: '/principal/progress'
+      preLoaderRoute: typeof PrincipalProgressRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/implementation': {
+      id: '/principal/implementation'
+      path: '/implementation'
+      fullPath: '/principal/implementation'
+      preLoaderRoute: typeof PrincipalImplementationRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/grades': {
+      id: '/principal/grades'
+      path: '/grades'
+      fullPath: '/principal/grades'
+      preLoaderRoute: typeof PrincipalGradesRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/evidence': {
+      id: '/principal/evidence'
+      path: '/evidence'
+      fullPath: '/principal/evidence'
+      preLoaderRoute: typeof PrincipalEvidenceRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/certificates': {
+      id: '/principal/certificates'
+      path: '/certificates'
+      fullPath: '/principal/certificates'
+      preLoaderRoute: typeof PrincipalCertificatesRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/calendar': {
+      id: '/principal/calendar'
+      path: '/calendar'
+      fullPath: '/principal/calendar'
+      preLoaderRoute: typeof PrincipalCalendarRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/teachers': {
       id: '/admin/teachers'
       path: '/admin/teachers'
       fullPath: '/admin/teachers'
       preLoaderRoute: typeof AdminTeachersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/support': {
+      id: '/admin/support'
+      path: '/admin/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminSupportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/students': {
@@ -474,6 +1133,41 @@ declare module '@tanstack/react-router' {
       path: '/admin/schools'
       fullPath: '/admin/schools'
       preLoaderRoute: typeof AdminSchoolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/report-templates': {
+      id: '/admin/report-templates'
+      path: '/admin/report-templates'
+      fullPath: '/admin/report-templates'
+      preLoaderRoute: typeof AdminReportTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/learning-outcomes': {
+      id: '/admin/learning-outcomes'
+      path: '/admin/learning-outcomes'
+      fullPath: '/admin/learning-outcomes'
+      preLoaderRoute: typeof AdminLearningOutcomesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/grade-templates': {
+      id: '/admin/grade-templates'
+      path: '/admin/grade-templates'
+      fullPath: '/admin/grade-templates'
+      preLoaderRoute: typeof AdminGradeTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/activity-library': {
+      id: '/admin/activity-library'
+      path: '/admin/activity-library'
+      fullPath: '/admin/activity-library'
+      preLoaderRoute: typeof AdminActivityLibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/activities/$slug': {
@@ -505,6 +1199,69 @@ const ActivitiesRouteWithChildren = ActivitiesRoute._addFileChildren(
   ActivitiesRouteChildren,
 )
 
+interface PrincipalRouteChildren {
+  PrincipalCalendarRoute: typeof PrincipalCalendarRoute
+  PrincipalCertificatesRoute: typeof PrincipalCertificatesRoute
+  PrincipalEvidenceRoute: typeof PrincipalEvidenceRoute
+  PrincipalGradesRoute: typeof PrincipalGradesRoute
+  PrincipalImplementationRoute: typeof PrincipalImplementationRoute
+  PrincipalProgressRoute: typeof PrincipalProgressRoute
+  PrincipalProjectsRoute: typeof PrincipalProjectsRoute
+  PrincipalReportsRoute: typeof PrincipalReportsRoute
+  PrincipalSettingsRoute: typeof PrincipalSettingsRoute
+  PrincipalStudentsRoute: typeof PrincipalStudentsRoute
+  PrincipalTeachersRoute: typeof PrincipalTeachersRoute
+  PrincipalIndexRoute: typeof PrincipalIndexRoute
+}
+
+const PrincipalRouteChildren: PrincipalRouteChildren = {
+  PrincipalCalendarRoute: PrincipalCalendarRoute,
+  PrincipalCertificatesRoute: PrincipalCertificatesRoute,
+  PrincipalEvidenceRoute: PrincipalEvidenceRoute,
+  PrincipalGradesRoute: PrincipalGradesRoute,
+  PrincipalImplementationRoute: PrincipalImplementationRoute,
+  PrincipalProgressRoute: PrincipalProgressRoute,
+  PrincipalProjectsRoute: PrincipalProjectsRoute,
+  PrincipalReportsRoute: PrincipalReportsRoute,
+  PrincipalSettingsRoute: PrincipalSettingsRoute,
+  PrincipalStudentsRoute: PrincipalStudentsRoute,
+  PrincipalTeachersRoute: PrincipalTeachersRoute,
+  PrincipalIndexRoute: PrincipalIndexRoute,
+}
+
+const PrincipalRouteWithChildren = PrincipalRoute._addFileChildren(
+  PrincipalRouteChildren,
+)
+
+interface TeacherRouteChildren {
+  TeacherAssessmentsRoute: typeof TeacherAssessmentsRoute
+  TeacherClassesRoute: typeof TeacherClassesRoute
+  TeacherCompletionRoute: typeof TeacherCompletionRoute
+  TeacherJournalRoute: typeof TeacherJournalRoute
+  TeacherPlannerRoute: typeof TeacherPlannerRoute
+  TeacherProjectsRoute: typeof TeacherProjectsRoute
+  TeacherReportsRoute: typeof TeacherReportsRoute
+  TeacherResourcesRoute: typeof TeacherResourcesRoute
+  TeacherWorkbookRoute: typeof TeacherWorkbookRoute
+  TeacherIndexRoute: typeof TeacherIndexRoute
+}
+
+const TeacherRouteChildren: TeacherRouteChildren = {
+  TeacherAssessmentsRoute: TeacherAssessmentsRoute,
+  TeacherClassesRoute: TeacherClassesRoute,
+  TeacherCompletionRoute: TeacherCompletionRoute,
+  TeacherJournalRoute: TeacherJournalRoute,
+  TeacherPlannerRoute: TeacherPlannerRoute,
+  TeacherProjectsRoute: TeacherProjectsRoute,
+  TeacherReportsRoute: TeacherReportsRoute,
+  TeacherResourcesRoute: TeacherResourcesRoute,
+  TeacherWorkbookRoute: TeacherWorkbookRoute,
+  TeacherIndexRoute: TeacherIndexRoute,
+}
+
+const TeacherRouteWithChildren =
+  TeacherRoute._addFileChildren(TeacherRouteChildren)
+
 interface AdminSchoolsRouteChildren {
   AdminSchoolsSchoolIdRoute: typeof AdminSchoolsSchoolIdRoute
 }
@@ -527,17 +1284,31 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MissionsRoute: MissionsRoute,
+  PrincipalRoute: PrincipalRouteWithChildren,
   ProfileRoute: ProfileRoute,
   ResourcesRoute: ResourcesRoute,
   RewardsRoute: RewardsRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SupportRoute: SupportRoute,
-  TeacherRoute: TeacherRoute,
+  TeacherRoute: TeacherRouteWithChildren,
   WelcomeRoute: WelcomeRoute,
+  AdminActivityLibraryRoute: AdminActivityLibraryRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminGradeTemplatesRoute: AdminGradeTemplatesRoute,
+  AdminLearningOutcomesRoute: AdminLearningOutcomesRoute,
+  AdminReportTemplatesRoute: AdminReportTemplatesRoute,
   AdminSchoolsRoute: AdminSchoolsRouteWithChildren,
   AdminStudentsRoute: AdminStudentsRoute,
+  AdminSupportRoute: AdminSupportRoute,
   AdminTeachersRoute: AdminTeachersRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  StudentCertificatesRoute: StudentCertificatesRoute,
+  StudentPortalActivitiesRoute: StudentPortalActivitiesRoute,
+  StudentPortfolioRoute: StudentPortfolioRoute,
+  StudentProjectsRoute: StudentProjectsRoute,
+  StudentWeeklyTasksRoute: StudentWeeklyTasksRoute,
+  StudentWorkbookRoute: StudentWorkbookRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport

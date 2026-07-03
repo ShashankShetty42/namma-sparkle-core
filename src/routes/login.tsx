@@ -33,7 +33,7 @@ import devHappy from "@/assets/characters/dev-happy.png";
 import anayaHappy from "@/assets/characters/anaya-happy.png";
 
 const searchSchema = z.object({
-  role: z.enum(["student", "teacher", "admin"]).optional(),
+  role: z.enum(["student", "teacher", "principal", "admin"]).optional(),
 });
 
 export const Route = createFileRoute("/login")({
@@ -69,7 +69,15 @@ const ROLE_META: Record<
     tone: "explore",
     accent: "from-explore via-decide to-bonus",
     icon: Users,
-    blurb: "Track every class with ease.",
+    blurb: "Plan, track and support every class.",
+  },
+  principal: {
+    title: "Principal",
+    emoji: "🏫",
+    tone: "bonus",
+    accent: "from-bonus via-challenge to-reflect",
+    icon: School,
+    blurb: "See implementation across your school.",
   },
   admin: {
     title: "Admin",
@@ -77,7 +85,7 @@ const ROLE_META: Record<
     tone: "challenge",
     accent: "from-challenge via-story to-reflect",
     icon: ShieldCheck,
-    blurb: "Manage your learning universe.",
+    blurb: "Manage schools across the platform.",
   },
 };
 
@@ -159,6 +167,17 @@ function LoginPage() {
       setLoading(false);
       toast.success(`Welcome back, ${match.teacher_name}!`);
       navigate({ to: "/teacher", replace: true });
+      return;
+    }
+
+    if (activeRole === "principal") {
+      // Phase 1 demo: any principal with a school code signs in.
+      setLoading(true);
+      await new Promise((r) => setTimeout(r, 500));
+      signIn({ role: "principal", email: identifier, schoolCode: code || undefined });
+      setLoading(false);
+      toast.success("Welcome back, Principal!");
+      navigate({ to: "/principal", replace: true });
       return;
     }
 
@@ -308,7 +327,7 @@ function LoginPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            {(activeRole === "student" || activeRole === "teacher") && (
+            {(activeRole === "student" || activeRole === "teacher" || activeRole === "principal") && (
               <Field
                 icon={<School className="h-4 w-4" />}
                 label={activeRole === "student" ? "School code" : "School access code"}
