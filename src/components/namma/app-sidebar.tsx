@@ -60,6 +60,16 @@ export function AppSidebar() {
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
   const isCollapsed = !isMobile && collapsed;
 
+  const [role, setRole] = React.useState<UserRole | null>(() => getAuth().role);
+  React.useEffect(() => {
+    const sync = () => setRole(getAuth().role);
+    sync();
+    return onNammaState(sync);
+  }, []);
+  const NAV: NavItem[] = React.useMemo(() => navForRole(role), [role]);
+  const isStudent = role === "student" || role === null;
+
+
   return (
     <aside
       className={cn(
