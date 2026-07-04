@@ -1,529 +1,361 @@
 import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import {
-  ArrowUpRight,
+  AlertTriangle,
+  ArrowRight,
   BookOpenCheck,
-  CalendarClock,
-  ClipboardCheck,
+  CheckCircle2,
   ClipboardList,
-  FileSpreadsheet,
+  FileBarChart,
   FolderKanban,
-  GraduationCap,
-  Library,
   NotebookPen,
+  Search,
   Sparkles,
-  Target,
   Users,
+  Zap,
 } from "lucide-react";
 
 import { AppShell } from "@/components/namma/app-shell";
 import { cn } from "@/lib/utils";
-import { LEGAL_TAGLINES } from "@/lib/namma-legal";
-import { GRADES, type GradeNumber } from "@/lib/namma-curriculum";
-import { getAuth, onNammaState } from "@/lib/namma-progress";
-import {
-  getSchool,
-  getStudents,
-  getTeachers,
-  onAdminState,
-  type Student,
-  type Teacher,
-} from "@/lib/namma-admin";
+import { PLANNER, getDemoCompletionRows, type CompletionRow } from "@/lib/namma-demo";
 
 export const Route = createFileRoute("/teacher/")({
   head: () => ({
     meta: [
-      { title: "Teacher Dashboard · Namma AI" },
+      { title: "Teacher Weekly Workspace · Namma AI" },
       {
         name: "description",
         content:
-          "Plan CT & AI weeks, track workbook completion, manage projects and capture classroom evidence for Grades 3–8.",
-      },
-      { property: "og:title", content: "Teacher Dashboard · Namma AI" },
-      {
-        property: "og:description",
-        content:
-          "Weekly plans, student completion, workbook check-ins and project evidence — all in one teacher workspace.",
+          "Weekly implementation checklist, quick-update mode and student completion tracker for the CBSE CT & AI programme.",
       },
     ],
   }),
-  component: TeacherDashboard,
+  component: TeacherWorkspace,
 });
 
-/* ─────────── Component ─────────── */
+const TEACHER = {
+  name: "Ms. Ritu Malhotra",
+  className: "Grade 6A",
+  students: 32,
+  week: 8,
+  subject: "CT & AI",
+  status: "Needs Attention",
+};
 
-function TeacherDashboard() {
-  const [email, setEmail] = React.useState<string | null>(null);
-  const [schoolCode, setSchoolCode] = React.useState<string | null>(null);
-  const [tick, setTick] = React.useState(0);
+const WEEKLY_TASKS = [
+  { label: "Confirm workbook completion", due: "Today", done: false },
+  { label: "Add class observation", due: "Today", done: false },
+  { label: "Review pending submissions", due: "Tomorrow", done: false },
+  { label: "Update competency notes", due: "This week", done: true },
+  { label: "Mark students needing support", due: "This week", done: false },
+  { label: "Generate weekly class report", due: "Friday", done: false },
+];
 
-  React.useEffect(() => {
-    const refresh = () => {
-      const a = getAuth();
-      setEmail(a.email);
-      setSchoolCode(a.schoolCode);
-      setTick((t) => t + 1);
-    };
-    refresh();
-    const offA = onAdminState(refresh);
-    const offN = onNammaState(refresh);
-    return () => {
-      offA();
-      offN();
-    };
-  }, []);
+function TeacherWorkspace() {
+  const rows = React.useMemo(() => getDemoCompletionRows(), []);
+  const [query, setQuery] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<"all" | CompletionRow["status"]>("all");
+  const [quickOpen, setQuickOpen] = React.useState(false);
 
-  /* Resolve teacher record + assigned school. */
-  const teacher: Teacher | null = React.useMemo(() => {
-    if (!email) return null;
-    return (
-      getTeachers().find(
-        (t) => t.teacher_email.toLowerCase() === email.toLowerCase(),
-      ) ?? null
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email, tick]);
+  const filtered = rows.filter((r) => {
+    if (statusFilter !== "all" && r.status !== statusFilter) return false;
+    if (query && !r.student.toLowerCase().includes(query.toLowerCase())) return false;
+    return true;
+  });
 
-  const effectiveSchoolCode = teacher?.school_id ?? schoolCode ?? null;
-  const school = React.useMemo(
-    () => (effectiveSchoolCode ? getSchool(effectiveSchoolCode) : null),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveSchoolCode, tick],
-  );
-  const students: Student[] = React.useMemo(
-    () => (effectiveSchoolCode ? getStudents(effectiveSchoolCode) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveSchoolCode, tick],
-  );
-
-  /* Group students by grade for the class list. */
-  const byGrade = React.useMemo(() => {
-    const map = new Map<string, Student[]>();
-    for (const s of students) {
-      const arr = map.get(s.grade) ?? [];
-      arr.push(s);
-      map.set(s.grade, arr);
-    }
-    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-  }, [students]);
-
-  const totalClasses = byGrade.length;
-  const totalStudents = students.length;
+  const totals = {
+    workbook: rows.filter((r) => r.workbook === "Completed").length,
+    portal: rows.filter((r) => r.portal === "Completed").length,
+    reflection: rows.filter((r) => r.reflection === "Submitted").length,
+    project: rows.filter((r) => r.project === "Submitted").length,
+    pendingApproval: rows.filter((r) => r.approval === "Needs Review" || r.approval === "Pending").length,
+    needsSupport: rows.filter((r) => r.status === "Needs Attention").length,
+  };
 
   return (
     <AppShell>
-      <div className="shell-inner !gap-8">
-        {/* Hero */}
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.2, 0.7, 0.3, 1] }}
-          className="relative overflow-hidden rounded-[32px] border border-white/70 bg-gradient-to-br from-explore-soft via-white to-decide-soft p-8 shadow-[var(--shadow-float)] md:p-10"
-        >
-          <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/50 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-decide/10 blur-3xl" />
-          <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-2xl space-y-3">
-              <span className="inline-flex items-center gap-2 rounded-full border border-explore/25 bg-white/70 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-explore">
-                <Sparkles className="h-3.5 w-3.5" /> Teacher · Weekly Implementation
-              </span>
-              <h1 className="font-display text-3xl font-extrabold leading-tight text-foreground md:text-5xl">
-                {teacher ? `Hi, ${teacher.teacher_name.split(" ")[0]}.` : "Your teacher workspace."}
+      <div className="shell-inner !gap-6">
+        {/* Header */}
+        <section className="rounded-3xl border border-border/60 bg-white p-6 shadow-sm md:p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                <Sparkles className="h-3 w-3" /> Teacher · Weekly workspace
+              </div>
+              <h1 className="mt-3 font-display text-3xl font-extrabold text-foreground">
+                {TEACHER.name}
               </h1>
-              <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-                Plan this week&apos;s CT &amp; AI sessions, track workbook and project completion,
-                and capture classroom evidence — everything you need in one workspace.
-              </p>
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <MetaChip icon={<GraduationCap className="h-3.5 w-3.5" />}>
-                  {school ? school.school_name : "No school assigned"}
-                </MetaChip>
-                <MetaChip icon={<Users className="h-3.5 w-3.5" />}>
-                  {totalClasses} classes · {totalStudents} students
-                </MetaChip>
-                <MetaChip icon={<CalendarClock className="h-3.5 w-3.5" />}>
-                  Week of {new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                </MetaChip>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 md:justify-end">
-              <PrimaryAction to="/teacher/planner" icon={<CalendarClock className="h-4 w-4" />}>
-                Open weekly planner
-              </PrimaryAction>
-              <SecondaryAction to="/teacher/completion" icon={<ClipboardList className="h-4 w-4" />}>
-                Student completion
-              </SecondaryAction>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* KPI grid */}
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard
-            tone="explore"
-            icon={<Users className="h-5 w-5" />}
-            label="Students in my classes"
-            value={totalStudents}
-            hint={`${totalClasses} grade groups`}
-          />
-          <KpiCard
-            tone="decide"
-            icon={<BookOpenCheck className="h-5 w-5" />}
-            label="Workbook completion"
-            value="0%"
-            hint="Update from Workbook Tracker"
-          />
-          <KpiCard
-            tone="challenge"
-            icon={<FolderKanban className="h-5 w-5" />}
-            label="Active projects"
-            value={0}
-            hint="Start a project journal"
-          />
-          <KpiCard
-            tone="success"
-            icon={<FileSpreadsheet className="h-5 w-5" />}
-            label="Evidence captured"
-            value={0}
-            hint="Photos, worksheets, quotes"
-          />
-        </section>
-
-        {/* This week + quick actions */}
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="rounded-[28px] border border-foreground/10 bg-white/85 p-6 shadow-[var(--shadow-soft)] lg:col-span-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-decide">
-                  This week
-                </p>
-                <h2 className="font-display text-xl font-extrabold text-foreground">
-                  Your weekly implementation checklist
-                </h2>
-              </div>
-              <Link
-                to="/teacher/planner"
-                className="inline-flex items-center gap-1 rounded-full border border-foreground/10 bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-decide-soft"
-              >
-                Open planner <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-            <ul className="mt-5 space-y-2">
-              <ChecklistRow
-                icon={<CalendarClock className="h-4 w-4" />}
-                title="Publish this week's plan"
-                desc="Pick focus area, activity, workbook pages and expected outcome."
-                to="/teacher/planner"
-              />
-              <ChecklistRow
-                icon={<BookOpenCheck className="h-4 w-4" />}
-                title="Mark workbook completion"
-                desc="Tick pages completed by each student — feeds into principal view."
-                to="/teacher/workbook"
-              />
-              <ChecklistRow
-                icon={<NotebookPen className="h-4 w-4" />}
-                title="Log observations"
-                desc="Short journal notes on how students engaged this week."
-                to="/teacher/journal"
-              />
-              <ChecklistRow
-                icon={<FolderKanban className="h-4 w-4" />}
-                title="Update project journal"
-                desc="Upload photos, artefacts and student reflections."
-                to="/teacher/projects"
-              />
-              <ChecklistRow
-                icon={<ClipboardCheck className="h-4 w-4" />}
-                title="Run a check-in assessment"
-                desc="Quick formative check tied to the week's learning outcome."
-                to="/teacher/assessments"
-              />
-            </ul>
-          </div>
-
-          <div className="rounded-[28px] border border-foreground/10 bg-gradient-to-br from-bonus-soft via-white to-explore-soft p-6 shadow-[var(--shadow-soft)]">
-            <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-bonus">
-              Curriculum context
-            </p>
-            <h2 className="font-display text-xl font-extrabold text-foreground">
-              What to focus on
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Grades 3–5 focus on Computational Thinking. Grades 6–8 add AI literacy, ethics and
-              projects.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {GRADES.map((g) => (
-                <span
-                  key={g.grade}
-                  className={cn(
-                    "rounded-full border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em]",
-                    g.track === "CT"
-                      ? "border-explore/25 bg-explore-soft text-explore"
-                      : "border-bonus/25 bg-bonus-soft text-bonus",
-                  )}
-                >
-                  G{g.grade} · {g.track}
-                </span>
-              ))}
-            </div>
-            <Link
-              to="/teacher/resources"
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
-            >
-              <Library className="h-4 w-4" /> Open resources
-            </Link>
-            <p className="mt-4 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {LEGAL_TAGLINES.outcomes}
-            </p>
-          </div>
-        </section>
-
-        {/* My classes */}
-        <section className="rounded-[28px] border border-foreground/10 bg-white/85 p-6 shadow-[var(--shadow-soft)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-explore">
-                My classes
-              </p>
-              <h2 className="font-display text-xl font-extrabold text-foreground">
-                Grades I teach at {school?.school_name ?? "this school"}
-              </h2>
-            </div>
-            <Link
-              to="/teacher/classes"
-              className="inline-flex items-center gap-1 rounded-full border border-foreground/10 bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-explore-soft"
-            >
-              Manage classes <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-
-          {byGrade.length === 0 ? (
-            <EmptyRow
-              text="No classes assigned yet — ask your Namma AI admin to add students at your school."
-              cta="Open student directory"
-              to="/teacher/classes"
-            />
-          ) : (
-            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {byGrade.map(([grade, list]) => {
-                const n = parseInt(grade.replace(/\D/g, ""), 10) as GradeNumber;
-                const track =
-                  GRADES.find((g) => g.grade === n)?.track ??
-                  (n >= 6 ? "CT+AI" : "CT");
-                return (
-                  <div
-                    key={grade}
-                    className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-[var(--shadow-soft)]"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="font-display text-lg font-extrabold text-foreground">
-                        {grade}
-                      </div>
-                      <span
-                        className={cn(
-                          "rounded-full px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.18em]",
-                          track === "CT"
-                            ? "bg-explore-soft text-explore"
-                            : "bg-bonus-soft text-bonus",
-                        )}
-                      >
-                        {track}
-                      </span>
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      {list.length} students
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {list.slice(0, 5).map((s) => (
-                        <span
-                          key={s.student_id}
-                          className="rounded-full bg-foreground/5 px-2 py-0.5 text-[0.65rem] font-semibold text-foreground"
-                        >
-                          {s.student_name.split(" ")[0]}
-                        </span>
-                      ))}
-                      {list.length > 5 && (
-                        <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-[0.65rem] font-semibold text-muted-foreground">
-                          +{list.length - 5}
-                        </span>
-                      )}
-                    </div>
-                    <Link
-                      to="/teacher/completion"
-                      className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-foreground hover:underline"
-                    >
-                      Track completion <ArrowUpRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        {/* Reports */}
-        <section className="rounded-[28px] border border-foreground/10 bg-gradient-to-br from-xp-soft via-white to-bonus-soft p-6 shadow-[var(--shadow-soft)]">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-xp">
-                Reports
-              </p>
-              <h2 className="font-display text-xl font-extrabold text-foreground">
-                Share progress with your principal
-              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Weekly and term reports pull directly from your planner, workbook and journal
-                entries.
+                {TEACHER.className} · {TEACHER.students} students · Week {TEACHER.week} · {TEACHER.subject}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setQuickOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-95"
+              >
+                <Zap className="h-4 w-4" /> Quick update mode
+              </button>
               <Link
                 to="/teacher/reports"
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
+                className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-muted/40"
               >
-                <Target className="h-4 w-4" /> Open reports
+                <FileBarChart className="h-4 w-4" /> Weekly report
               </Link>
             </div>
           </div>
         </section>
+
+        {/* KPI row */}
+        <section className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
+          <Kpi label="Workbook" value={`${totals.workbook} / ${rows.length}`} icon={BookOpenCheck} tone="blue" />
+          <Kpi label="Portal / Activity" value={`${totals.portal} / ${rows.length}`} icon={ClipboardList} tone="blue" />
+          <Kpi label="Reflections" value={`${totals.reflection} / ${rows.length}`} icon={NotebookPen} tone="blue" />
+          <Kpi label="Projects" value={`${totals.project} / ${rows.length}`} icon={FolderKanban} tone="blue" />
+          <Kpi label="Approvals pending" value={totals.pendingApproval} icon={AlertTriangle} tone="amber" />
+          <Kpi label="Needs support" value={totals.needsSupport} icon={Users} tone="red" />
+          <Kpi label="Observations · month" value={31} icon={NotebookPen} tone="green" />
+        </section>
+
+        {/* Weekly checklist */}
+        <section className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Week {PLANNER.week} · {PLANNER.focus}
+              </div>
+              <h2 className="font-display text-lg font-extrabold text-foreground">
+                This week's implementation checklist
+              </h2>
+            </div>
+          </div>
+          <ul className="mt-4 grid grid-cols-1 gap-2 md:grid-cols-2">
+            {WEEKLY_TASKS.map((t) => (
+              <li
+                key={t.label}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl border p-3",
+                  t.done ? "border-emerald-100 bg-emerald-50/30" : "border-border/60 bg-white",
+                )}
+              >
+                <span
+                  className={cn(
+                    "grid h-8 w-8 place-items-center rounded-full",
+                    t.done ? "bg-emerald-100 text-emerald-700" : "bg-muted/40 text-muted-foreground",
+                  )}
+                >
+                  {t.done ? <CheckCircle2 className="h-4 w-4" /> : <ClipboardList className="h-4 w-4" />}
+                </span>
+                <div className="flex-1">
+                  <div className="text-sm font-semibold text-foreground">{t.label}</div>
+                  <div className="text-[0.7rem] text-muted-foreground">Due · {t.due}</div>
+                </div>
+                <button className="rounded-full border border-border/60 bg-white px-3 py-1 text-[0.7rem] font-semibold text-foreground hover:bg-muted/40">
+                  {t.done ? "View" : "Do it"}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Student completion table */}
+        <section className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Grade 6A · {rows.length} students
+              </div>
+              <h2 className="font-display text-lg font-extrabold text-foreground">
+                Student completion tracker
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search student"
+                  className="w-52 rounded-full border border-border/60 bg-white pl-8 pr-3 py-1.5 text-xs focus:border-foreground focus:outline-none"
+                />
+              </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+                className="rounded-full border border-border/60 bg-white px-3 py-1.5 text-xs font-semibold text-foreground focus:outline-none"
+              >
+                <option value="all">All statuses</option>
+                <option value="Completed">Completed</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Needs Attention">Needs Attention</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[900px] text-left text-xs">
+              <thead>
+                <tr className="border-b border-border/60 text-[0.65rem] uppercase tracking-wider text-muted-foreground">
+                  <th className="py-2 pl-2">Student</th>
+                  <th className="py-2">Workbook</th>
+                  <th className="py-2">Portal</th>
+                  <th className="py-2">Quiz</th>
+                  <th className="py-2">Reflection</th>
+                  <th className="py-2">Project</th>
+                  <th className="py-2">Approval</th>
+                  <th className="py-2">Status</th>
+                  <th className="py-2">Last</th>
+                  <th className="py-2 pr-2 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((r) => (
+                  <tr key={r.student} className="border-b border-border/30 hover:bg-muted/20">
+                    <td className="py-2 pl-2 font-semibold text-foreground">{r.student}</td>
+                    <td className="py-2"><CellPill v={r.workbook} /></td>
+                    <td className="py-2"><CellPill v={r.portal} /></td>
+                    <td className="py-2 tabular-nums text-foreground">{r.quiz}</td>
+                    <td className="py-2"><CellPill v={r.reflection} /></td>
+                    <td className="py-2"><CellPill v={r.project} /></td>
+                    <td className="py-2"><CellPill v={r.approval} /></td>
+                    <td className="py-2"><StatusPill s={r.status} /></td>
+                    <td className="py-2 text-muted-foreground">{r.lastActivity}</td>
+                    <td className="py-2 pr-2 text-right">
+                      <button className="rounded-full border border-border/60 bg-white px-2.5 py-1 text-[0.65rem] font-semibold hover:bg-muted/40">
+                        Open
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={10} className="py-8 text-center text-muted-foreground">
+                      No students match your filters.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
+
+      {quickOpen && <QuickUpdateModal onClose={() => setQuickOpen(false)} count={rows.length} />}
     </AppShell>
   );
 }
 
-/* ─────────── Small building blocks ─────────── */
+/* ─────────── Quick update modal ─────────── */
 
-function MetaChip({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+function QuickUpdateModal({ onClose, count }: { onClose: () => void; count: number }) {
+  const actions = [
+    { label: `Mark entire class workbook completed (${count} students)`, icon: BookOpenCheck },
+    { label: "Mark selected students completed", icon: CheckCircle2 },
+    { label: "Add observation for selected students", icon: NotebookPen },
+    { label: "Upload class evidence photo", icon: ClipboardList },
+    { label: "Assign project status", icon: FolderKanban },
+    { label: "Approve selected submissions", icon: CheckCircle2 },
+    { label: "Generate class report", icon: FileBarChart },
+  ];
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 bg-white/80 px-2.5 py-1 text-[0.7rem] font-semibold text-foreground">
-      <span className="text-muted-foreground">{icon}</span>
-      {children}
-    </span>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={onClose}>
+      <div
+        className="w-full max-w-lg rounded-3xl border border-border/60 bg-white p-6 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+              Quick update mode
+            </div>
+            <h2 className="mt-1 font-display text-xl font-extrabold text-foreground">
+              Do a week of work in 60 seconds
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-full border border-border/60 bg-white px-3 py-1 text-xs font-semibold hover:bg-muted/40"
+          >
+            Close
+          </button>
+        </div>
+        <ul className="mt-4 space-y-2">
+          {actions.map((a) => (
+            <li key={a.label}>
+              <button className="flex w-full items-center gap-3 rounded-xl border border-border/60 bg-white p-3 text-left transition hover:border-foreground/30 hover:bg-muted/20">
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-muted/40">
+                  <a.icon className="h-4 w-4 text-foreground" />
+                </span>
+                <span className="flex-1 text-sm font-semibold text-foreground">{a.label}</span>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
-function PrimaryAction({
-  to,
-  icon,
-  children,
-}: {
-  to: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      to={to}
-      className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
-    >
-      {icon}
-      {children}
-    </Link>
-  );
-}
-function SecondaryAction({
-  to,
-  icon,
-  children,
-}: {
-  to: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      to={to}
-      className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-white/90 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-white"
-    >
-      {icon}
-      {children}
-    </Link>
-  );
-}
+/* ─────────── Small components ─────────── */
 
-const kpiTone: Record<string, string> = {
-  explore: "from-explore-soft to-white text-explore",
-  decide: "from-decide-soft to-white text-decide",
-  challenge: "from-challenge-soft to-white text-challenge",
-  success: "from-success-soft to-white text-success",
-};
-
-function KpiCard({
-  tone,
-  icon,
+function Kpi({
   label,
   value,
-  hint,
+  icon: Icon,
+  tone,
 }: {
-  tone: keyof typeof kpiTone;
-  icon: React.ReactNode;
   label: string;
   value: React.ReactNode;
-  hint?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  tone: "blue" | "green" | "amber" | "red";
 }) {
+  const bg =
+    tone === "green" ? "bg-emerald-50 text-emerald-700"
+    : tone === "amber" ? "bg-amber-50 text-amber-700"
+    : tone === "red" ? "bg-red-50 text-red-700"
+    : "bg-blue-50 text-blue-700";
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      className={cn(
-        "rounded-[24px] border border-white/70 bg-gradient-to-br p-5 shadow-[var(--shadow-soft)]",
-        kpiTone[tone],
-      )}
-    >
-      <div className="flex items-center justify-between text-foreground/70">
-        <span className="text-[0.65rem] font-bold uppercase tracking-[0.2em]">{label}</span>
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-white/80">{icon}</span>
-      </div>
-      <div className="mt-3 font-display text-3xl font-extrabold text-foreground">{value}</div>
-      {hint && <div className="mt-1 text-xs text-muted-foreground">{hint}</div>}
-    </motion.div>
-  );
-}
-
-function ChecklistRow({
-  icon,
-  title,
-  desc,
-  to,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-  to: string;
-}) {
-  return (
-    <li>
-      <Link
-        to={to}
-        className="group flex items-start gap-3 rounded-2xl border border-foreground/10 bg-white/80 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]"
-      >
-        <span className="mt-0.5 grid h-8 w-8 place-items-center rounded-xl bg-decide-soft text-decide">
-          {icon}
+    <div className="rounded-2xl border border-border/60 bg-white p-4 shadow-sm">
+      <div className="flex items-center justify-between">
+        <span className={cn("grid h-8 w-8 place-items-center rounded-full", bg)}>
+          <Icon className="h-4 w-4" />
         </span>
-        <div className="flex-1">
-          <div className="text-sm font-bold text-foreground">{title}</div>
-          <div className="text-xs text-muted-foreground">{desc}</div>
-        </div>
-        <ArrowUpRight className="mt-1 h-4 w-4 text-muted-foreground group-hover:text-foreground" />
-      </Link>
-    </li>
+      </div>
+      <div className="mt-3 font-display text-xl font-extrabold tabular-nums text-foreground">
+        {value}
+      </div>
+      <div className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+    </div>
   );
 }
 
-function EmptyRow({ text, cta, to }: { text: string; cta: string; to: string }) {
+function CellPill({ v }: { v: string }) {
+  const tone =
+    v === "Completed" || v === "Submitted" || v === "Approved"
+      ? "bg-emerald-50 text-emerald-700"
+      : v === "Partial" || v === "Needs Review" || v === "Pending"
+        ? "bg-amber-50 text-amber-700"
+        : v === "Not Started"
+          ? "bg-muted/60 text-muted-foreground"
+          : "bg-blue-50 text-blue-700";
   return (
-    <div className="mt-5 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-foreground/15 bg-white/70 px-4 py-5 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-      <span>{text}</span>
-      <Link
-        to={to}
-        className="inline-flex items-center gap-1 rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-white hover:opacity-95"
-      >
-        {cta} <ArrowUpRight className="h-3.5 w-3.5" />
-      </Link>
-    </div>
+    <span className={cn("rounded-full px-2 py-0.5 text-[0.65rem] font-semibold", tone)}>{v}</span>
+  );
+}
+
+function StatusPill({ s }: { s: CompletionRow["status"] }) {
+  const tone =
+    s === "Completed"
+      ? "bg-emerald-50 text-emerald-700"
+      : s === "In Progress"
+        ? "bg-blue-50 text-blue-700"
+        : "bg-amber-50 text-amber-700";
+  return (
+    <span className={cn("rounded-full px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider", tone)}>
+      {s}
+    </span>
   );
 }
