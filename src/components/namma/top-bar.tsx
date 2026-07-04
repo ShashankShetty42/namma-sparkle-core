@@ -1,10 +1,11 @@
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Bell, Flame, LogOut, Menu, Search, Sparkles, Star } from "lucide-react";
+import { Bell, FlaskConical, Flame, LogOut, Menu, Sparkles, Star } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useAppShell } from "@/components/namma/app-shell-context";
 import { getProfile, onNammaState, signOut } from "@/lib/namma-progress";
+import { isDemoSchoolActive } from "@/lib/namma-demo";
 
 export function TopBar() {
   const { isMobile, setMobileOpen } = useAppShell();
@@ -47,7 +48,19 @@ export function TopBar() {
 
       </div>
 
-      <div className="hidden flex-1 md:block" />
+      <div className="hidden flex-1 md:flex md:items-center md:justify-center">
+        {isDemoSchoolActive() && (
+          <span
+            title="You're viewing seeded sample data for Namma Vidya Public School."
+            className="inline-flex items-center gap-1.5 rounded-full border border-bonus/25 bg-bonus-soft/60 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-bonus"
+          >
+            <FlaskConical className="h-3 w-3" /> Demo School View
+          </span>
+        )}
+      </div>
+
+
+
 
 
       <div className="flex items-center gap-2 md:gap-3">
