@@ -54,17 +54,17 @@ import {
 export const Route = createFileRoute("/principal/")({
   head: () => ({
     meta: [
-      { title: "School Command Centre · Namma AI" },
+      { title: "New-Age Skills Command Centre · Namma AI" },
       {
         name: "description",
         content:
-          "Track CT & AI implementation across Grades 3–8 with implementation health, evidence readiness, grade drill-downs and smart alerts.",
+          "School-wide implementation visibility for future-ready learning programs. Currently tracking CBSE CT & AI for Grades 3–8.",
       },
-      { property: "og:title", content: "CT & AI Implementation Command Centre" },
+      { property: "og:title", content: "New-Age Skills Command Centre · Namma AI" },
       {
         property: "og:description",
         content:
-          "Premium dashboard for CBSE schools implementing Computational Thinking and Artificial Intelligence for Grades 3–8.",
+          "Track new-age skill implementation across grades. Start with CBSE CT & AI. Expand later into coding, robotics, STEM, life skills and more.",
       },
     ],
   }),
@@ -97,6 +97,7 @@ function PrincipalCommandCentre() {
     <AppShell>
       <div className="shell-inner !gap-6">
         <HeroBar />
+        <ActiveProgramCard />
         <KpiGrid />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <HealthBreakdown />
@@ -112,6 +113,7 @@ function PrincipalCommandCentre() {
           <SmartInsights />
           <RecommendedActions />
         </div>
+        <FutureProgramsStrip />
       </div>
     </AppShell>
   );
@@ -125,17 +127,25 @@ function HeroBar() {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
-            <Sparkles className="h-3 w-3" /> Principal · School Command Centre
+            <Sparkles className="h-3 w-3" /> Principal · New-Age Skills Command Centre
           </div>
           <h1 className="mt-3 font-display text-3xl font-extrabold text-foreground md:text-4xl">
-            {DEMO_SCHOOL_NAME}
+            New-Age Skills Command Centre
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground md:text-base">
-            Academic Year {DEMO_ACADEMIC_YEAR} · Week {DEMO_CURRENT_WEEK} of {DEMO_TOTAL_WEEKS} ·
-            Grades 3–8 · CBSE Affiliated
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground md:text-base">
+            School-wide implementation visibility for future-ready learning programs at{" "}
+            <strong>{DEMO_SCHOOL_NAME}</strong>. Currently active:{" "}
+            <strong>CBSE CT & AI</strong> · Grades 3–8 · Academic Year {DEMO_ACADEMIC_YEAR} ·
+            Week {DEMO_CURRENT_WEEK} of {DEMO_TOTAL_WEEKS}.
           </p>
         </div>
         <div className="flex gap-2">
+          <Link
+            to="/principal/programs"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-muted/40"
+          >
+            <Sparkles className="h-4 w-4" /> Active programs
+          </Link>
           <Link
             to="/principal/reports"
             className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-muted/40"
@@ -149,6 +159,101 @@ function HeroBar() {
             <Download className="h-4 w-4" /> July evidence pack
           </Link>
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────── Active program card ─────────── */
+
+function ActiveProgramCard() {
+  return (
+    <section className="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50/60 via-white to-white p-5 shadow-sm md:p-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-start gap-4">
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-decide/10 text-decide">
+            <Sparkles className="h-6 w-6" />
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-emerald-700">
+                Active Program
+              </span>
+              <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
+                Grades 3–8 · AY 2026–27
+              </span>
+            </div>
+            <h2 className="mt-1 font-display text-xl font-extrabold text-foreground">
+              CBSE CT & AI Implementation
+            </h2>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              Implementation 76% · Evidence 74% · Grade 7 needs attention · Grade 3 strongest
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Link
+            to="/principal/programs"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-muted/40"
+          >
+            All programs
+          </Link>
+          <Link
+            to="/principal/implementation"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-95"
+          >
+            View CT & AI dashboard <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────── Future programs strip ─────────── */
+
+function FutureProgramsStrip() {
+  return (
+    <section className="rounded-3xl border border-border/60 bg-white p-5 shadow-sm md:p-6">
+      <div className="flex items-end justify-between">
+        <div>
+          <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+            Future Program Expansion
+          </div>
+          <h2 className="font-display text-lg font-extrabold text-foreground">
+            Coming soon to your school
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Your school can use the same implementation framework for other new-age skill
+            programs in the future.
+          </p>
+        </div>
+        <Link
+          to="/principal/future-programs"
+          className="text-xs font-semibold text-foreground hover:underline"
+        >
+          See all →
+        </Link>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
+        {[
+          "Coding Foundations",
+          "Robotics & STEM",
+          "Digital Citizenship",
+          "Design Thinking",
+          "Entrepreneurship",
+          "Life Skills",
+        ].map((name) => (
+          <div
+            key={name}
+            className="rounded-2xl border border-border/60 bg-muted/20 p-3 text-center"
+          >
+            <div className="font-display text-sm font-extrabold text-foreground">{name}</div>
+            <div className="mt-1 text-[0.6rem] font-bold uppercase tracking-wider text-muted-foreground">
+              Coming Soon
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
