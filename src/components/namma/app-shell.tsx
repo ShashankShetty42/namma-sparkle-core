@@ -57,28 +57,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
     return () => off();
   }, [navigate, pathname]);
 
-  // Per-session welcome moment (after onboarding is done).
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-    const fire = () => {
-      const profile = getProfile();
-      if (!profile.onboarded) return;
-      const last = window.sessionStorage.getItem(WELCOME_KEY);
-      if (last) return;
-      window.sessionStorage.setItem(WELCOME_KEY, String(Date.now()));
-      const buddy = profile.favorite === "neo" ? "Neo" : profile.favorite === "dev" ? "Dev" : "Anaya";
-      const wave = profile.favorite === "neo" ? "👋" : profile.favorite === "dev" ? "🤖" : "💫";
-      window.setTimeout(() => {
-        toast(`${buddy} says hi ${wave}`, {
-          description: `Welcome back, ${profile.name}. Ready for today's adventure?`,
-          duration: 4500,
-        });
-      }, 900);
-    };
-    fire();
-    const off = onNammaState(fire);
-    return () => off();
-  }, []);
+  // Phase 1: character welcome toast hidden — Command Centre only.
 
   if (authed === null || authed === false) {
     return (
