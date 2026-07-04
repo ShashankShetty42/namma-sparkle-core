@@ -271,16 +271,16 @@ const KPIS: {
   trend?: string;
 }[] = [
   {
-    label: "Implementation Health",
+    label: "Program Health",
     value: `${SCHOOL_STATS.overallImplementation} / 100`,
-    hint: "Good · +6 vs last month",
+    hint: "CT & AI · +6 vs last month",
     status: "green",
     icon: Activity,
     to: "/principal/implementation",
     trend: "+6%",
   },
   {
-    label: "Evidence Readiness",
+    label: "Program Evidence",
     value: "74%",
     hint: `${SCHOOL_STATS.evidenceItems.toLocaleString()} items collected`,
     status: "green",
@@ -296,7 +296,7 @@ const KPIS: {
     to: "/principal/students",
   },
   {
-    label: "Teacher Updates",
+    label: "Program Teachers",
     value: `${SCHOOL_STATS.teachersActiveThisWeek} / ${SCHOOL_STATS.teachersTotal}`,
     hint: "Active this week",
     status: "amber",
@@ -304,7 +304,7 @@ const KPIS: {
     to: "/principal/teachers",
   },
   {
-    label: "Project Review Backlog",
+    label: "Project Backlog",
     value: 42,
     hint: "Across Grades 6–8",
     status: "amber",
