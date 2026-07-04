@@ -67,46 +67,38 @@ export const ROLE_HOME: Record<UserRole, string> = {
 /* ─────────── Principal / School Admin ─────────── */
 
 export const PRINCIPAL_NAV: RoleNavItem[] = [
-  { label: "Dashboard", to: "/principal", icon: LayoutDashboard, tone: "story" },
+  { label: "Command Centre", to: "/principal", icon: LayoutDashboard, tone: "story" },
   { label: "Grades", to: "/principal/grades", icon: GraduationCap, tone: "explore" },
   { label: "Teachers", to: "/principal/teachers", icon: Users, tone: "decide" },
   { label: "Students", to: "/principal/students", icon: Users, tone: "reflect" },
   { label: "Implementation Tracker", to: "/principal/implementation", icon: Target, tone: "challenge" },
-  { label: "CT & AI Progress", to: "/principal/progress", icon: BarChart3, tone: "bonus" },
-  { label: "Projects", to: "/principal/projects", icon: FolderKanban, tone: "explore" },
+  { label: "Competency Analytics", to: "/principal/progress", icon: BarChart3, tone: "bonus" },
+  { label: "Project Review", to: "/principal/projects", icon: FolderKanban, tone: "explore" },
   { label: "Evidence Portfolio", to: "/principal/evidence", icon: FileSpreadsheet, tone: "success" },
-  { label: "Reports", to: "/principal/reports", icon: FileBarChart, tone: "xp" },
-  { label: "Certificates", to: "/principal/certificates", icon: Award, tone: "bonus" },
-  { label: "Calendar", to: "/principal/calendar", icon: Calendar, tone: "story" },
-  { label: "Settings", to: "/principal/settings", icon: Settings, tone: "decide" },
+  { label: "Reports Centre", to: "/principal/reports", icon: FileBarChart, tone: "xp" },
+  { label: "Certificate Centre", to: "/principal/certificates", icon: Award, tone: "bonus" },
+  { label: "Implementation Calendar", to: "/principal/calendar", icon: Calendar, tone: "story" },
 ];
 
 /* ─────────── Teacher ─────────── */
 
 export const TEACHER_NAV: RoleNavItem[] = [
-  { label: "Dashboard", to: "/teacher", icon: LayoutDashboard, tone: "story" },
+  { label: "Weekly Workspace", to: "/teacher", icon: LayoutDashboard, tone: "story" },
   { label: "My Classes", to: "/teacher/classes", icon: Users, tone: "explore" },
   { label: "Weekly Planner", to: "/teacher/planner", icon: Calendar, tone: "decide" },
   { label: "Student Completion", to: "/teacher/completion", icon: ListChecks, tone: "reflect" },
-  { label: "Verify Code", to: "/teacher/verify", icon: ShieldCheck, tone: "success" },
-
   { label: "Workbook Tracker", to: "/teacher/workbook", icon: BookText, tone: "challenge" },
-  { label: "Projects", to: "/teacher/projects", icon: FolderKanban, tone: "bonus" },
-  { label: "Assessments", to: "/teacher/assessments", icon: ClipboardCheck, tone: "success" },
+  { label: "Project Review", to: "/teacher/projects", icon: FolderKanban, tone: "bonus" },
   { label: "Observation Journal", to: "/teacher/journal", icon: NotebookPen, tone: "explore" },
-  { label: "Reports", to: "/teacher/reports", icon: FileBarChart, tone: "xp" },
-  { label: "Resources", to: "/teacher/resources", icon: Library, tone: "story" },
 ];
 
 /* ─────────── Student ─────────── */
 
 export const STUDENT_NAV: RoleNavItem[] = [
   { label: "My Progress", to: "/", icon: LayoutDashboard, tone: "story" },
-  { label: "Weekly Status", to: "/student/weekly-tasks", icon: ClipboardList, tone: "decide" },
   { label: "Workbook Check-ins", to: "/student/workbook", icon: BookOpen, tone: "reflect" },
-  { label: "Projects", to: "/student/projects", icon: FolderKanban, tone: "bonus" },
-  { label: "Teacher Feedback", to: "/student/portfolio", icon: FileSpreadsheet, tone: "success" },
-  { label: "Portfolio", to: "/student/portfolio", icon: FileSpreadsheet, tone: "explore" },
+  { label: "My Projects", to: "/student/projects", icon: FolderKanban, tone: "bonus" },
+  { label: "My Portfolio", to: "/student/portfolio", icon: FileSpreadsheet, tone: "success" },
   { label: "Certificates", to: "/student/certificates", icon: Trophy, tone: "xp" },
 ];
 
@@ -117,9 +109,6 @@ export const ADMIN_NAV: RoleNavItem[] = [
   { label: "Schools", to: "/admin/schools", icon: Building2, tone: "challenge" },
   { label: "Teachers", to: "/admin/teachers", icon: Users, tone: "explore" },
   { label: "Students", to: "/admin/students", icon: GraduationCap, tone: "reflect" },
-  { label: "Grade Templates", to: "/admin/grade-templates", icon: Layers, tone: "bonus" },
-  { label: "Learning Outcomes", to: "/admin/learning-outcomes", icon: Target, tone: "decide" },
-  { label: "Activity Library", to: "/admin/activity-library", icon: Sparkles, tone: "explore" },
   { label: "Report Templates", to: "/admin/report-templates", icon: FileText, tone: "xp" },
   { label: "User Management", to: "/admin/users", icon: ShieldCheck, tone: "challenge" },
   { label: "Analytics", to: "/admin/analytics", icon: BarChart3, tone: "success" },
