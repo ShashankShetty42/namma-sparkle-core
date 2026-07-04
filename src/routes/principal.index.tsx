@@ -616,7 +616,7 @@ function HealthBreakdown() {
 
 function WeeklyTrendCard() {
   return (
-    <Card title="Weekly Completion Trend" eyebrow={`Weeks 1–${DEMO_CURRENT_WEEK}`}>
+    <Card title="Monthly Tracking Trend" eyebrow={`Active window · ${ACADEMIC_SETUP.currentMonthYear}`}>
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={WEEKLY_TREND}>
           <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" vertical={false} />
@@ -738,7 +738,7 @@ function GradeCard({ g }: { g: GradeSummary }) {
 
       <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
         <Metric label="Students" value={g.students} />
-        <Metric label="Week" value={`${g.currentWeek} / 35`} />
+        <Metric label="Current Period" value={ACADEMIC_SETUP.currentPeriodLabel} />
         <MetricBar label="Implementation" value={g.studentCompletion} />
         <MetricBar label="Workbook" value={g.workbookTracking} />
         {g.track === "CT+AI" && (
