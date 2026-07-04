@@ -39,7 +39,7 @@ import { cn } from "@/lib/utils";
 import {
   COMPETENCY_COVERAGE,
   DEMO_ACADEMIC_YEAR,
-  DEMO_CURRENT_WEEK,
+  
   DEMO_SCHOOL_NAME,
   EVIDENCE_MIX,
   GRADE_SUMMARIES,
