@@ -50,6 +50,7 @@ import { Route as StudentGradeJourneyRouteImport } from './routes/student.grade-
 import { Route as StudentCertificatesRouteImport } from './routes/student.certificates'
 import { Route as PrincipalTeachersRouteImport } from './routes/principal.teachers'
 import { Route as PrincipalStudentsRouteImport } from './routes/principal.students'
+import { Route as PrincipalSetupWizardRouteImport } from './routes/principal.setup-wizard'
 import { Route as PrincipalSettingsRouteImport } from './routes/principal.settings'
 import { Route as PrincipalReportsRouteImport } from './routes/principal.reports'
 import { Route as PrincipalProjectsRouteImport } from './routes/principal.projects'
@@ -57,10 +58,12 @@ import { Route as PrincipalProgressRouteImport } from './routes/principal.progre
 import { Route as PrincipalProgramsRouteImport } from './routes/principal.programs'
 import { Route as PrincipalImplementationRouteImport } from './routes/principal.implementation'
 import { Route as PrincipalGradesRouteImport } from './routes/principal.grades'
+import { Route as PrincipalGapAnalysisRouteImport } from './routes/principal.gap-analysis'
 import { Route as PrincipalFutureProgramsRouteImport } from './routes/principal.future-programs'
 import { Route as PrincipalEvidenceRouteImport } from './routes/principal.evidence'
 import { Route as PrincipalCertificatesRouteImport } from './routes/principal.certificates'
 import { Route as PrincipalCalendarRouteImport } from './routes/principal.calendar'
+import { Route as PrincipalBackfillRouteImport } from './routes/principal.backfill'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
 import { Route as AdminSupportRouteImport } from './routes/admin.support'
@@ -283,6 +286,11 @@ const PrincipalStudentsRoute = PrincipalStudentsRouteImport.update({
   path: '/students',
   getParentRoute: () => PrincipalRoute,
 } as any)
+const PrincipalSetupWizardRoute = PrincipalSetupWizardRouteImport.update({
+  id: '/setup-wizard',
+  path: '/setup-wizard',
+  getParentRoute: () => PrincipalRoute,
+} as any)
 const PrincipalSettingsRoute = PrincipalSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -318,6 +326,11 @@ const PrincipalGradesRoute = PrincipalGradesRouteImport.update({
   path: '/grades',
   getParentRoute: () => PrincipalRoute,
 } as any)
+const PrincipalGapAnalysisRoute = PrincipalGapAnalysisRouteImport.update({
+  id: '/gap-analysis',
+  path: '/gap-analysis',
+  getParentRoute: () => PrincipalRoute,
+} as any)
 const PrincipalFutureProgramsRoute = PrincipalFutureProgramsRouteImport.update({
   id: '/future-programs',
   path: '/future-programs',
@@ -336,6 +349,11 @@ const PrincipalCertificatesRoute = PrincipalCertificatesRouteImport.update({
 const PrincipalCalendarRoute = PrincipalCalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalBackfillRoute = PrincipalBackfillRouteImport.update({
+  id: '/backfill',
+  path: '/backfill',
   getParentRoute: () => PrincipalRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -452,10 +470,12 @@ export interface FileRoutesByFullPath {
   '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/admin/users': typeof AdminUsersRoute
+  '/principal/backfill': typeof PrincipalBackfillRoute
   '/principal/calendar': typeof PrincipalCalendarRoute
   '/principal/certificates': typeof PrincipalCertificatesRoute
   '/principal/evidence': typeof PrincipalEvidenceRoute
   '/principal/future-programs': typeof PrincipalFutureProgramsRoute
+  '/principal/gap-analysis': typeof PrincipalGapAnalysisRoute
   '/principal/grades': typeof PrincipalGradesRouteWithChildren
   '/principal/implementation': typeof PrincipalImplementationRoute
   '/principal/programs': typeof PrincipalProgramsRoute
@@ -463,6 +483,7 @@ export interface FileRoutesByFullPath {
   '/principal/projects': typeof PrincipalProjectsRoute
   '/principal/reports': typeof PrincipalReportsRoute
   '/principal/settings': typeof PrincipalSettingsRoute
+  '/principal/setup-wizard': typeof PrincipalSetupWizardRoute
   '/principal/students': typeof PrincipalStudentsRoute
   '/principal/teachers': typeof PrincipalTeachersRoute
   '/student/certificates': typeof StudentCertificatesRoute
@@ -520,10 +541,12 @@ export interface FileRoutesByTo {
   '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/admin/users': typeof AdminUsersRoute
+  '/principal/backfill': typeof PrincipalBackfillRoute
   '/principal/calendar': typeof PrincipalCalendarRoute
   '/principal/certificates': typeof PrincipalCertificatesRoute
   '/principal/evidence': typeof PrincipalEvidenceRoute
   '/principal/future-programs': typeof PrincipalFutureProgramsRoute
+  '/principal/gap-analysis': typeof PrincipalGapAnalysisRoute
   '/principal/grades': typeof PrincipalGradesRouteWithChildren
   '/principal/implementation': typeof PrincipalImplementationRoute
   '/principal/programs': typeof PrincipalProgramsRoute
@@ -531,6 +554,7 @@ export interface FileRoutesByTo {
   '/principal/projects': typeof PrincipalProjectsRoute
   '/principal/reports': typeof PrincipalReportsRoute
   '/principal/settings': typeof PrincipalSettingsRoute
+  '/principal/setup-wizard': typeof PrincipalSetupWizardRoute
   '/principal/students': typeof PrincipalStudentsRoute
   '/principal/teachers': typeof PrincipalTeachersRoute
   '/student/certificates': typeof StudentCertificatesRoute
@@ -591,10 +615,12 @@ export interface FileRoutesById {
   '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/admin/users': typeof AdminUsersRoute
+  '/principal/backfill': typeof PrincipalBackfillRoute
   '/principal/calendar': typeof PrincipalCalendarRoute
   '/principal/certificates': typeof PrincipalCertificatesRoute
   '/principal/evidence': typeof PrincipalEvidenceRoute
   '/principal/future-programs': typeof PrincipalFutureProgramsRoute
+  '/principal/gap-analysis': typeof PrincipalGapAnalysisRoute
   '/principal/grades': typeof PrincipalGradesRouteWithChildren
   '/principal/implementation': typeof PrincipalImplementationRoute
   '/principal/programs': typeof PrincipalProgramsRoute
@@ -602,6 +628,7 @@ export interface FileRoutesById {
   '/principal/projects': typeof PrincipalProjectsRoute
   '/principal/reports': typeof PrincipalReportsRoute
   '/principal/settings': typeof PrincipalSettingsRoute
+  '/principal/setup-wizard': typeof PrincipalSetupWizardRoute
   '/principal/students': typeof PrincipalStudentsRoute
   '/principal/teachers': typeof PrincipalTeachersRoute
   '/student/certificates': typeof StudentCertificatesRoute
@@ -663,10 +690,12 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/teachers'
     | '/admin/users'
+    | '/principal/backfill'
     | '/principal/calendar'
     | '/principal/certificates'
     | '/principal/evidence'
     | '/principal/future-programs'
+    | '/principal/gap-analysis'
     | '/principal/grades'
     | '/principal/implementation'
     | '/principal/programs'
@@ -674,6 +703,7 @@ export interface FileRouteTypes {
     | '/principal/projects'
     | '/principal/reports'
     | '/principal/settings'
+    | '/principal/setup-wizard'
     | '/principal/students'
     | '/principal/teachers'
     | '/student/certificates'
@@ -731,10 +761,12 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/teachers'
     | '/admin/users'
+    | '/principal/backfill'
     | '/principal/calendar'
     | '/principal/certificates'
     | '/principal/evidence'
     | '/principal/future-programs'
+    | '/principal/gap-analysis'
     | '/principal/grades'
     | '/principal/implementation'
     | '/principal/programs'
@@ -742,6 +774,7 @@ export interface FileRouteTypes {
     | '/principal/projects'
     | '/principal/reports'
     | '/principal/settings'
+    | '/principal/setup-wizard'
     | '/principal/students'
     | '/principal/teachers'
     | '/student/certificates'
@@ -801,10 +834,12 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/teachers'
     | '/admin/users'
+    | '/principal/backfill'
     | '/principal/calendar'
     | '/principal/certificates'
     | '/principal/evidence'
     | '/principal/future-programs'
+    | '/principal/gap-analysis'
     | '/principal/grades'
     | '/principal/implementation'
     | '/principal/programs'
@@ -812,6 +847,7 @@ export interface FileRouteTypes {
     | '/principal/projects'
     | '/principal/reports'
     | '/principal/settings'
+    | '/principal/setup-wizard'
     | '/principal/students'
     | '/principal/teachers'
     | '/student/certificates'
@@ -1172,6 +1208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrincipalStudentsRouteImport
       parentRoute: typeof PrincipalRoute
     }
+    '/principal/setup-wizard': {
+      id: '/principal/setup-wizard'
+      path: '/setup-wizard'
+      fullPath: '/principal/setup-wizard'
+      preLoaderRoute: typeof PrincipalSetupWizardRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
     '/principal/settings': {
       id: '/principal/settings'
       path: '/settings'
@@ -1221,6 +1264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrincipalGradesRouteImport
       parentRoute: typeof PrincipalRoute
     }
+    '/principal/gap-analysis': {
+      id: '/principal/gap-analysis'
+      path: '/gap-analysis'
+      fullPath: '/principal/gap-analysis'
+      preLoaderRoute: typeof PrincipalGapAnalysisRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
     '/principal/future-programs': {
       id: '/principal/future-programs'
       path: '/future-programs'
@@ -1247,6 +1297,13 @@ declare module '@tanstack/react-router' {
       path: '/calendar'
       fullPath: '/principal/calendar'
       preLoaderRoute: typeof PrincipalCalendarRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/backfill': {
+      id: '/principal/backfill'
+      path: '/backfill'
+      fullPath: '/principal/backfill'
+      preLoaderRoute: typeof PrincipalBackfillRouteImport
       parentRoute: typeof PrincipalRoute
     }
     '/admin/users': {
@@ -1389,10 +1446,12 @@ const PrincipalGradesRouteWithChildren = PrincipalGradesRoute._addFileChildren(
 )
 
 interface PrincipalRouteChildren {
+  PrincipalBackfillRoute: typeof PrincipalBackfillRoute
   PrincipalCalendarRoute: typeof PrincipalCalendarRoute
   PrincipalCertificatesRoute: typeof PrincipalCertificatesRoute
   PrincipalEvidenceRoute: typeof PrincipalEvidenceRoute
   PrincipalFutureProgramsRoute: typeof PrincipalFutureProgramsRoute
+  PrincipalGapAnalysisRoute: typeof PrincipalGapAnalysisRoute
   PrincipalGradesRoute: typeof PrincipalGradesRouteWithChildren
   PrincipalImplementationRoute: typeof PrincipalImplementationRoute
   PrincipalProgramsRoute: typeof PrincipalProgramsRoute
@@ -1400,16 +1459,19 @@ interface PrincipalRouteChildren {
   PrincipalProjectsRoute: typeof PrincipalProjectsRoute
   PrincipalReportsRoute: typeof PrincipalReportsRoute
   PrincipalSettingsRoute: typeof PrincipalSettingsRoute
+  PrincipalSetupWizardRoute: typeof PrincipalSetupWizardRoute
   PrincipalStudentsRoute: typeof PrincipalStudentsRoute
   PrincipalTeachersRoute: typeof PrincipalTeachersRoute
   PrincipalIndexRoute: typeof PrincipalIndexRoute
 }
 
 const PrincipalRouteChildren: PrincipalRouteChildren = {
+  PrincipalBackfillRoute: PrincipalBackfillRoute,
   PrincipalCalendarRoute: PrincipalCalendarRoute,
   PrincipalCertificatesRoute: PrincipalCertificatesRoute,
   PrincipalEvidenceRoute: PrincipalEvidenceRoute,
   PrincipalFutureProgramsRoute: PrincipalFutureProgramsRoute,
+  PrincipalGapAnalysisRoute: PrincipalGapAnalysisRoute,
   PrincipalGradesRoute: PrincipalGradesRouteWithChildren,
   PrincipalImplementationRoute: PrincipalImplementationRoute,
   PrincipalProgramsRoute: PrincipalProgramsRoute,
@@ -1417,6 +1479,7 @@ const PrincipalRouteChildren: PrincipalRouteChildren = {
   PrincipalProjectsRoute: PrincipalProjectsRoute,
   PrincipalReportsRoute: PrincipalReportsRoute,
   PrincipalSettingsRoute: PrincipalSettingsRoute,
+  PrincipalSetupWizardRoute: PrincipalSetupWizardRoute,
   PrincipalStudentsRoute: PrincipalStudentsRoute,
   PrincipalTeachersRoute: PrincipalTeachersRoute,
   PrincipalIndexRoute: PrincipalIndexRoute,
