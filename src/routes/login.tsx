@@ -24,7 +24,7 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/login")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
-    meta: [{ title: "Sign in · Namma AI · CT & AI Implementation Command Centre" }],
+    meta: [{ title: "Sign in · Namma AI · New-Age Skills Implementation Platform" }],
   }),
   component: LoginPage,
 });
@@ -39,7 +39,7 @@ type RoleMeta = {
 const ROLE_META: Record<UserRole, RoleMeta> = {
   principal: {
     title: "Principal",
-    tagline: "See implementation health across every grade.",
+    tagline: "See implementation health across every new-age skills program.",
     icon: School,
     tone: "decide",
   },
@@ -51,22 +51,22 @@ const ROLE_META: Record<UserRole, RoleMeta> = {
   },
   student: {
     title: "Student",
-    tagline: "Mark workbook check-ins and submit your CT & AI work.",
+    tagline: "See your progress in your school's new-age skills program.",
     icon: GraduationCap,
     tone: "success",
   },
   admin: {
     title: "Namma AI Admin",
-    tagline: "Manage schools onboarded to the Command Centre.",
+    tagline: "Manage schools and implementation programs.",
     icon: ShieldCheck,
     tone: "challenge",
   },
 };
 
 const HIGHLIGHTS = [
-  { icon: Target,          label: "Implementation tracker across Grades 3–8" },
+  { icon: Target,          label: "Implementation tracker across new-age skill programs" },
   { icon: BarChart3,       label: "Competency analytics & weekly trends" },
-  { icon: FileSpreadsheet, label: "1,400+ evidence items · board-ready reports" },
+  { icon: FileSpreadsheet, label: "Program evidence · board-ready reports" },
   { icon: Award,           label: "Automated certificates with principal signature" },
 ];
 
@@ -154,14 +154,15 @@ function LoginPage() {
         >
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-decide/25 bg-decide/10 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.22em] text-decide">
-              <ShieldCheck className="h-3 w-3" /> CBSE · CT & AI · Grades 3–8
+              <ShieldCheck className="h-3 w-3" /> New-Age Skills · Starting with CBSE CT & AI
             </span>
             <h1 className="mt-4 font-display text-3xl font-extrabold leading-[1.05] text-foreground md:text-[2.4rem]">
-              The <span className="bg-gradient-to-r from-decide via-story to-bonus bg-clip-text text-transparent">Implementation Command Centre</span> for your school.
+              The <span className="bg-gradient-to-r from-decide via-story to-bonus bg-clip-text text-transparent">New-Age Skills Implementation Platform</span> for schools.
             </h1>
             <p className="mt-3 max-w-lg text-sm text-muted-foreground md:text-base">
-              Track workbook, projects, teacher activity, evidence and certificates for the CBSE
-              Computational Thinking &amp; AI curriculum — one live view, board-ready any day of the year.
+              Implementation, evidence, analytics and reporting for future-ready learning
+              programs — starting with CBSE CT & AI for Grades 3–8. Coding, robotics, STEM,
+              life skills and more coming soon.
             </p>
           </div>
 
