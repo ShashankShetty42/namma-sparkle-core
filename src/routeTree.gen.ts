@@ -72,6 +72,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminActivityLibraryRouteImport } from './routes/admin.activity-library'
 import { Route as ActivitiesSlugRouteImport } from './routes/activities.$slug'
 import { Route as StudentMissionMissionIndexRouteImport } from './routes/student.mission.$missionIndex'
+import { Route as PrincipalGradesGradeRouteImport } from './routes/principal.grades.$grade'
 import { Route as AdminSchoolsSchoolIdRouteImport } from './routes/admin.schools.$schoolId'
 
 const WelcomeRoute = WelcomeRouteImport.update({
@@ -390,6 +391,11 @@ const StudentMissionMissionIndexRoute =
     path: '/student/mission/$missionIndex',
     getParentRoute: () => rootRouteImport,
   } as any)
+const PrincipalGradesGradeRoute = PrincipalGradesGradeRouteImport.update({
+  id: '/$grade',
+  path: '/$grade',
+  getParentRoute: () => PrincipalGradesRoute,
+} as any)
 const AdminSchoolsSchoolIdRoute = AdminSchoolsSchoolIdRouteImport.update({
   id: '/$schoolId',
   path: '/$schoolId',
@@ -430,7 +436,7 @@ export interface FileRoutesByFullPath {
   '/principal/calendar': typeof PrincipalCalendarRoute
   '/principal/certificates': typeof PrincipalCertificatesRoute
   '/principal/evidence': typeof PrincipalEvidenceRoute
-  '/principal/grades': typeof PrincipalGradesRoute
+  '/principal/grades': typeof PrincipalGradesRouteWithChildren
   '/principal/implementation': typeof PrincipalImplementationRoute
   '/principal/progress': typeof PrincipalProgressRoute
   '/principal/projects': typeof PrincipalProjectsRoute
@@ -460,6 +466,7 @@ export interface FileRoutesByFullPath {
   '/principal/': typeof PrincipalIndexRoute
   '/teacher/': typeof TeacherIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
+  '/principal/grades/$grade': typeof PrincipalGradesGradeRoute
   '/student/mission/$missionIndex': typeof StudentMissionMissionIndexRoute
 }
 export interface FileRoutesByTo {
@@ -494,7 +501,7 @@ export interface FileRoutesByTo {
   '/principal/calendar': typeof PrincipalCalendarRoute
   '/principal/certificates': typeof PrincipalCertificatesRoute
   '/principal/evidence': typeof PrincipalEvidenceRoute
-  '/principal/grades': typeof PrincipalGradesRoute
+  '/principal/grades': typeof PrincipalGradesRouteWithChildren
   '/principal/implementation': typeof PrincipalImplementationRoute
   '/principal/progress': typeof PrincipalProgressRoute
   '/principal/projects': typeof PrincipalProjectsRoute
@@ -524,6 +531,7 @@ export interface FileRoutesByTo {
   '/principal': typeof PrincipalIndexRoute
   '/teacher': typeof TeacherIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
+  '/principal/grades/$grade': typeof PrincipalGradesGradeRoute
   '/student/mission/$missionIndex': typeof StudentMissionMissionIndexRoute
 }
 export interface FileRoutesById {
@@ -561,7 +569,7 @@ export interface FileRoutesById {
   '/principal/calendar': typeof PrincipalCalendarRoute
   '/principal/certificates': typeof PrincipalCertificatesRoute
   '/principal/evidence': typeof PrincipalEvidenceRoute
-  '/principal/grades': typeof PrincipalGradesRoute
+  '/principal/grades': typeof PrincipalGradesRouteWithChildren
   '/principal/implementation': typeof PrincipalImplementationRoute
   '/principal/progress': typeof PrincipalProgressRoute
   '/principal/projects': typeof PrincipalProjectsRoute
@@ -591,6 +599,7 @@ export interface FileRoutesById {
   '/principal/': typeof PrincipalIndexRoute
   '/teacher/': typeof TeacherIndexRoute
   '/admin/schools/$schoolId': typeof AdminSchoolsSchoolIdRoute
+  '/principal/grades/$grade': typeof PrincipalGradesGradeRoute
   '/student/mission/$missionIndex': typeof StudentMissionMissionIndexRoute
 }
 export interface FileRouteTypes {
@@ -659,6 +668,7 @@ export interface FileRouteTypes {
     | '/principal/'
     | '/teacher/'
     | '/admin/schools/$schoolId'
+    | '/principal/grades/$grade'
     | '/student/mission/$missionIndex'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -723,6 +733,7 @@ export interface FileRouteTypes {
     | '/principal'
     | '/teacher'
     | '/admin/schools/$schoolId'
+    | '/principal/grades/$grade'
     | '/student/mission/$missionIndex'
   id:
     | '__root__'
@@ -789,6 +800,7 @@ export interface FileRouteTypes {
     | '/principal/'
     | '/teacher/'
     | '/admin/schools/$schoolId'
+    | '/principal/grades/$grade'
     | '/student/mission/$missionIndex'
   fileRoutesById: FileRoutesById
 }
@@ -1277,6 +1289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentMissionMissionIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/principal/grades/$grade': {
+      id: '/principal/grades/$grade'
+      path: '/$grade'
+      fullPath: '/principal/grades/$grade'
+      preLoaderRoute: typeof PrincipalGradesGradeRouteImport
+      parentRoute: typeof PrincipalGradesRoute
+    }
     '/admin/schools/$schoolId': {
       id: '/admin/schools/$schoolId'
       path: '/$schoolId'
@@ -1299,11 +1318,23 @@ const ActivitiesRouteWithChildren = ActivitiesRoute._addFileChildren(
   ActivitiesRouteChildren,
 )
 
+interface PrincipalGradesRouteChildren {
+  PrincipalGradesGradeRoute: typeof PrincipalGradesGradeRoute
+}
+
+const PrincipalGradesRouteChildren: PrincipalGradesRouteChildren = {
+  PrincipalGradesGradeRoute: PrincipalGradesGradeRoute,
+}
+
+const PrincipalGradesRouteWithChildren = PrincipalGradesRoute._addFileChildren(
+  PrincipalGradesRouteChildren,
+)
+
 interface PrincipalRouteChildren {
   PrincipalCalendarRoute: typeof PrincipalCalendarRoute
   PrincipalCertificatesRoute: typeof PrincipalCertificatesRoute
   PrincipalEvidenceRoute: typeof PrincipalEvidenceRoute
-  PrincipalGradesRoute: typeof PrincipalGradesRoute
+  PrincipalGradesRoute: typeof PrincipalGradesRouteWithChildren
   PrincipalImplementationRoute: typeof PrincipalImplementationRoute
   PrincipalProgressRoute: typeof PrincipalProgressRoute
   PrincipalProjectsRoute: typeof PrincipalProjectsRoute
@@ -1318,7 +1349,7 @@ const PrincipalRouteChildren: PrincipalRouteChildren = {
   PrincipalCalendarRoute: PrincipalCalendarRoute,
   PrincipalCertificatesRoute: PrincipalCertificatesRoute,
   PrincipalEvidenceRoute: PrincipalEvidenceRoute,
-  PrincipalGradesRoute: PrincipalGradesRoute,
+  PrincipalGradesRoute: PrincipalGradesRouteWithChildren,
   PrincipalImplementationRoute: PrincipalImplementationRoute,
   PrincipalProgressRoute: PrincipalProgressRoute,
   PrincipalProjectsRoute: PrincipalProjectsRoute,
@@ -1420,13 +1451,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

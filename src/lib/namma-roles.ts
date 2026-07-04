@@ -101,14 +101,12 @@ export const TEACHER_NAV: RoleNavItem[] = [
 /* ─────────── Student ─────────── */
 
 export const STUDENT_NAV: RoleNavItem[] = [
-  { label: "Dashboard", to: "/", icon: LayoutDashboard, tone: "story" },
-  { label: "My Grade Journey", to: "/student/grade-journey", icon: Map, tone: "explore" },
-  { label: "Weekly Tasks", to: "/student/weekly-tasks", icon: ClipboardList, tone: "decide" },
+  { label: "My Progress", to: "/", icon: LayoutDashboard, tone: "story" },
+  { label: "Weekly Status", to: "/student/weekly-tasks", icon: ClipboardList, tone: "decide" },
   { label: "Workbook Check-ins", to: "/student/workbook", icon: BookOpen, tone: "reflect" },
-  { label: "Portal Activities", to: "/student/portal-activities", icon: Compass, tone: "challenge" },
   { label: "Projects", to: "/student/projects", icon: FolderKanban, tone: "bonus" },
-  { label: "Badges", to: "/badges", icon: Award, tone: "bonus" },
-  { label: "Portfolio", to: "/student/portfolio", icon: FileSpreadsheet, tone: "success" },
+  { label: "Teacher Feedback", to: "/student/portfolio", icon: FileSpreadsheet, tone: "success" },
+  { label: "Portfolio", to: "/student/portfolio", icon: FileSpreadsheet, tone: "explore" },
   { label: "Certificates", to: "/student/certificates", icon: Trophy, tone: "xp" },
 ];
 

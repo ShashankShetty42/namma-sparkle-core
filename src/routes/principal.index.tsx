@@ -1,573 +1,707 @@
 import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import {
-  ArrowUpRight,
+  Activity,
+  AlertTriangle,
+  ArrowRight,
   Award,
   BookOpenCheck,
-  Building2,
-  CalendarClock,
-  ClipboardCheck,
+  CheckCircle2,
+  ClipboardList,
+  Download,
+  FileBarChart,
   FileSpreadsheet,
   FolderKanban,
   GraduationCap,
-  LineChart,
-  ShieldCheck,
+  Info,
   Sparkles,
   Target,
+  TrendingUp,
   Users,
 } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { AppShell } from "@/components/namma/app-shell";
 import { cn } from "@/lib/utils";
-import { LEGAL_TAGLINES } from "@/lib/namma-legal";
-import { GRADES } from "@/lib/namma-curriculum";
 import {
-  getAuth,
-  onNammaState,
-} from "@/lib/namma-progress";
-import {
-  getSchool,
-  getSchoolStats,
-  getStudents,
-  getTeachers,
-  onAdminState,
-  type School,
-} from "@/lib/namma-admin";
+  COMPETENCY_COVERAGE,
+  DEMO_ACADEMIC_YEAR,
+  DEMO_CURRENT_WEEK,
+  DEMO_SCHOOL_NAME,
+  DEMO_TOTAL_WEEKS,
+  EVIDENCE_MIX,
+  GRADE_SUMMARIES,
+  SCHOOL_STATS,
+  SMART_ALERTS,
+  WEEKLY_TREND,
+  type AlertTone,
+  type GradeSummary,
+} from "@/lib/namma-demo";
 
 export const Route = createFileRoute("/principal/")({
   head: () => ({
     meta: [
-      { title: "School Implementation Dashboard · Namma AI" },
+      { title: "School Command Centre · Namma AI" },
       {
         name: "description",
         content:
-          "See CT & AI implementation across your school — grades, teachers, students, workbook completion, projects and evidence readiness.",
+          "Track CT & AI implementation across Grades 3–8 with implementation health, evidence readiness, grade drill-downs and smart alerts.",
       },
-      { property: "og:title", content: "School Implementation Dashboard · Namma AI" },
+      { property: "og:title", content: "CT & AI Implementation Command Centre" },
       {
         property: "og:description",
         content:
-          "A single view of CBSE CT & AI implementation across Grades 3–8, built for school leadership.",
+          "Premium dashboard for CBSE schools implementing Computational Thinking and Artificial Intelligence for Grades 3–8.",
       },
     ],
   }),
-  component: PrincipalDashboard,
+  component: PrincipalCommandCentre,
 });
 
-/* ─────────── Component ─────────── */
+const HEALTH_BREAKDOWN = [
+  { label: "Teacher updates", score: 20, max: 25 },
+  { label: "Student completion", score: 18, max: 25 },
+  { label: "Workbook check-ins", score: 16, max: 20 },
+  { label: "Project evidence", score: 12, max: 15 },
+  { label: "Assessment records", score: 8, max: 10 },
+  { label: "Observation journals", score: 7, max: 10 },
+  { label: "Report readiness", score: 5, max: 5 },
+];
 
-function PrincipalDashboard() {
-  const [schoolCode, setSchoolCode] = React.useState<string | null>(null);
-  const [tick, setTick] = React.useState(0);
+const RECOMMENDED_ACTIONS = [
+  { label: "Follow up with Grade 7B teacher", to: "/principal/teachers", icon: Users },
+  { label: "Review pending Grade 6 AI projects", to: "/teacher/projects", icon: FolderKanban },
+  { label: "Generate July Evidence Pack", to: "/principal/evidence", icon: FileSpreadsheet },
+  { label: "Schedule project week for Grades 6–8", to: "/principal/calendar", icon: Target },
+  { label: "Review certificate eligibility list", to: "/principal/certificates", icon: Award },
+  { label: "Check classes silent for 7+ days", to: "/principal/teachers", icon: AlertTriangle },
+];
 
-  React.useEffect(() => {
-    const refresh = () => {
-      setSchoolCode(getAuth().schoolCode);
-      setTick((t) => t + 1);
-    };
-    refresh();
-    const offA = onAdminState(refresh);
-    const offN = onNammaState(refresh);
-    return () => {
-      offA();
-      offN();
-    };
-  }, []);
+const DONUT_COLORS = ["#2563eb", "#7c3aed", "#f59e0b", "#10b981", "#ef4444", "#6366f1"];
 
-  const school: School | null = React.useMemo(
-    () => (schoolCode ? getSchool(schoolCode) : null),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [schoolCode, tick],
-  );
-
-  const stats = React.useMemo(
-    () =>
-      schoolCode
-        ? getSchoolStats(schoolCode)
-        : { totalStudents: 0, totalTeachers: 0, activitiesCompleted: 0, averageCompletion: 0, distribution: {} },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [schoolCode, tick],
-  );
-
-  const teachers = React.useMemo(
-    () => (schoolCode ? getTeachers(schoolCode) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [schoolCode, tick],
-  );
-
-  const students = React.useMemo(
-    () => (schoolCode ? getStudents(schoolCode) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [schoolCode, tick],
-  );
-
-  /* Track split: CT (G3–5) vs CT+AI (G6–8) */
-  const trackSplit = React.useMemo(() => {
-    let ct = 0;
-    let ctai = 0;
-    for (const s of students) {
-      const n = parseInt(s.grade.replace(/\D/g, ""), 10);
-      if (n >= 3 && n <= 5) ct++;
-      else if (n >= 6 && n <= 8) ctai++;
-    }
-    return { ct, ctai, total: ct + ctai || 1 };
-  }, [students]);
-
+function PrincipalCommandCentre() {
   return (
     <AppShell>
-      <div className="shell-inner !gap-8">
-        {/* Hero */}
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.2, 0.7, 0.3, 1] }}
-          className="relative overflow-hidden rounded-[32px] border border-white/70 bg-gradient-to-br from-bonus-soft via-white to-challenge-soft p-8 shadow-[var(--shadow-float)] md:p-10"
-        >
-          <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/40 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-bonus/10 blur-3xl" />
-          <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-2xl space-y-3">
-              <span className="inline-flex items-center gap-2 rounded-full border border-bonus/25 bg-white/70 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-bonus">
-                <Sparkles className="h-3.5 w-3.5" /> Principal · School Implementation
-              </span>
-              <h1 className="font-display text-3xl font-extrabold leading-tight text-foreground md:text-5xl">
-                {school ? school.school_name : "Your school"}
-              </h1>
-              <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-                A single view of CT &amp; AI implementation — grades, teachers, students, workbook
-                completion, projects and evidence readiness for Grades 3–8.
-              </p>
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <MetaChip icon={<Building2 className="h-3.5 w-3.5" />}>
-                  {school?.school_id ?? "No school code"}
-                </MetaChip>
-                {school?.city && (
-                  <MetaChip icon={<CalendarClock className="h-3.5 w-3.5" />}>
-                    {school.city}{school.state ? `, ${school.state}` : ""}
-                  </MetaChip>
-                )}
-                <MetaChip icon={<ShieldCheck className="h-3.5 w-3.5" />}>
-                  {LEGAL_TAGLINES.short}
-                </MetaChip>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 md:justify-end">
-              <PrimaryAction to="/principal/implementation" icon={<Target className="h-4 w-4" />}>
-                Implementation tracker
-              </PrimaryAction>
-              <SecondaryAction to="/principal/reports" icon={<LineChart className="h-4 w-4" />}>
-                View reports
-              </SecondaryAction>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* KPI grid */}
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard
-            tone="explore"
-            icon={<GraduationCap className="h-5 w-5" />}
-            label="Students onboarded"
-            value={stats.totalStudents}
-            hint={`${trackSplit.ct} on CT · ${trackSplit.ctai} on CT+AI`}
-          />
-          <KpiCard
-            tone="decide"
-            icon={<Users className="h-5 w-5" />}
-            label="Teachers active"
-            value={stats.totalTeachers}
-            hint={teachers.length ? "Class ownership assigned" : "Add teachers to begin"}
-          />
-          <KpiCard
-            tone="challenge"
-            icon={<BookOpenCheck className="h-5 w-5" />}
-            label="Workbook completion"
-            value={`${stats.averageCompletion}%`}
-            hint="Averaged across all grades"
-          />
-          <KpiCard
-            tone="success"
-            icon={<FileSpreadsheet className="h-5 w-5" />}
-            label="Evidence ready"
-            value={stats.activitiesCompleted}
-            hint="Artefacts collected this term"
-          />
-        </section>
-
-        {/* Two-column: grade distribution + track split */}
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="rounded-[28px] border border-foreground/10 bg-white/80 p-6 shadow-[var(--shadow-soft)] lg:col-span-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-explore">
-                  Grade coverage · 3–8
-                </p>
-                <h2 className="font-display text-xl font-extrabold text-foreground">
-                  Students per grade
-                </h2>
-              </div>
-              <Link
-                to="/principal/grades"
-                className="inline-flex items-center gap-1 rounded-full border border-foreground/10 bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-explore-soft"
-              >
-                Manage grades <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-            <div className="mt-5 space-y-3">
-              {GRADES.map((g) => {
-                const count = stats.distribution[g.label] ?? 0;
-                const max = Math.max(1, ...GRADES.map((x) => stats.distribution[x.label] ?? 0));
-                const pct = Math.round((count / max) * 100);
-                return (
-                  <div key={g.grade} className="grid grid-cols-[80px_1fr_48px] items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-foreground">G{g.grade}</span>
-                      <TrackPill track={g.track} />
-                    </div>
-                    <div className="relative h-3 rounded-full bg-foreground/5">
-                      <div
-                        className={cn(
-                          "absolute inset-y-0 left-0 rounded-full",
-                          g.track === "CT" ? "bg-explore" : "bg-bonus",
-                        )}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                    <div className="text-right text-sm font-semibold tabular-nums text-foreground">
-                      {count}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="rounded-[28px] border border-foreground/10 bg-gradient-to-br from-explore-soft via-white to-bonus-soft p-6 shadow-[var(--shadow-soft)]">
-            <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-decide">
-              Curriculum track split
-            </p>
-            <h2 className="font-display text-xl font-extrabold text-foreground">CT vs CT + AI</h2>
-            <div className="mt-5 space-y-4">
-              <TrackBar
-                label="Computational Thinking (G3–5)"
-                value={trackSplit.ct}
-                total={trackSplit.total}
-                colorClass="bg-explore"
-              />
-              <TrackBar
-                label="CT + AI (G6–8)"
-                value={trackSplit.ctai}
-                total={trackSplit.total}
-                colorClass="bg-bonus"
-              />
-            </div>
-            <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
-              Track split follows the CBSE CT &amp; AI implementation model for middle school.
-            </p>
-          </div>
-        </section>
-
-        {/* Implementation readiness + quick actions */}
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <ReadinessCard
-            title="Weekly planners"
-            desc="Teachers publishing weekly CT/AI plans."
-            complete={teachers.length > 0}
-            to="/teacher/planner"
-            tone="decide"
-            icon={<CalendarClock className="h-5 w-5" />}
-          />
-          <ReadinessCard
-            title="Project journals"
-            desc="Student projects with evidence artefacts."
-            complete={stats.activitiesCompleted > 0}
-            to="/principal/projects"
-            tone="explore"
-            icon={<FolderKanban className="h-5 w-5" />}
-          />
-          <ReadinessCard
-            title="Assessment records"
-            desc="Formative check-ins captured this term."
-            complete={false}
-            to="/teacher/assessments"
-            tone="challenge"
-            icon={<ClipboardCheck className="h-5 w-5" />}
-          />
-        </section>
-
-        {/* Teacher activity + certificates */}
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="rounded-[28px] border border-foreground/10 bg-white/80 p-6 shadow-[var(--shadow-soft)] lg:col-span-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-decide">
-                  Teacher activity
-                </p>
-                <h2 className="font-display text-xl font-extrabold text-foreground">
-                  Recently added educators
-                </h2>
-              </div>
-              <Link
-                to="/principal/teachers"
-                className="inline-flex items-center gap-1 rounded-full border border-foreground/10 bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-decide-soft"
-              >
-                Manage teachers <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-            {teachers.length === 0 ? (
-              <EmptyRow
-                text="No teachers yet — add educators to allocate grades and start weekly plans."
-                cta="Add teachers"
-                to="/admin/teachers"
-              />
-            ) : (
-              <ul className="mt-5 space-y-2">
-                {teachers.slice(0, 5).map((t) => (
-                  <li
-                    key={t.teacher_id}
-                    className="flex items-center justify-between rounded-2xl border border-foreground/10 bg-white/70 px-4 py-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="grid h-9 w-9 place-items-center rounded-full bg-decide-soft text-decide">
-                        <Users className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold text-foreground">{t.teacher_name}</div>
-                        <div className="text-xs text-muted-foreground">{t.teacher_email}</div>
-                      </div>
-                    </div>
-                    <span className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                      {new Date(t.created_at).toLocaleDateString()}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="rounded-[28px] border border-foreground/10 bg-gradient-to-br from-bonus-soft via-white to-xp-soft p-6 shadow-[var(--shadow-soft)]">
-            <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-bonus">
-              Certificates
-            </p>
-            <h2 className="font-display text-xl font-extrabold text-foreground">
-              Implementation certificate
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Generate a school-level certificate once your termly implementation targets are met.
-            </p>
-            <Link
-              to="/principal/certificates"
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
-            >
-              <Award className="h-4 w-4" /> Open certificates
-            </Link>
-            <p className="mt-4 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {LEGAL_TAGLINES.outcomes}
-            </p>
-          </div>
-        </section>
+      <div className="shell-inner !gap-6">
+        <HeroBar />
+        <KpiGrid />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <HealthBreakdown />
+          <WeeklyTrendCard />
+          <EvidenceDonut />
+        </div>
+        <GradeGrid />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <GradeBarChart />
+          <CompetencyBars />
+        </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <SmartInsights />
+          <RecommendedActions />
+        </div>
       </div>
     </AppShell>
   );
 }
 
-/* ─────────── Small building blocks ─────────── */
+/* ─────────── Hero ─────────── */
 
-function MetaChip({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+function HeroBar() {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 bg-white/80 px-2.5 py-1 text-[0.7rem] font-semibold text-foreground">
-      <span className="text-muted-foreground">{icon}</span>
-      {children}
-    </span>
-  );
-}
-
-function PrimaryAction({
-  to,
-  icon,
-  children,
-}: {
-  to: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      to={to}
-      className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
-    >
-      {icon}
-      {children}
-    </Link>
-  );
-}
-function SecondaryAction({
-  to,
-  icon,
-  children,
-}: {
-  to: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      to={to}
-      className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-white/90 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-white"
-    >
-      {icon}
-      {children}
-    </Link>
-  );
-}
-
-const kpiTone: Record<string, string> = {
-  explore: "from-explore-soft to-white text-explore",
-  decide: "from-decide-soft to-white text-decide",
-  challenge: "from-challenge-soft to-white text-challenge",
-  success: "from-success-soft to-white text-success",
-  bonus: "from-bonus-soft to-white text-bonus",
-};
-
-function KpiCard({
-  tone,
-  icon,
-  label,
-  value,
-  hint,
-}: {
-  tone: keyof typeof kpiTone;
-  icon: React.ReactNode;
-  label: string;
-  value: React.ReactNode;
-  hint?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      className={cn(
-        "rounded-[24px] border border-white/70 bg-gradient-to-br p-5 shadow-[var(--shadow-soft)]",
-        kpiTone[tone],
-      )}
-    >
-      <div className="flex items-center justify-between text-foreground/70">
-        <span className="text-[0.65rem] font-bold uppercase tracking-[0.2em]">{label}</span>
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-white/80">{icon}</span>
+    <section className="rounded-3xl border border-border/60 bg-white p-6 shadow-sm md:p-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+            <Sparkles className="h-3 w-3" /> Principal · School Command Centre
+          </div>
+          <h1 className="mt-3 font-display text-3xl font-extrabold text-foreground md:text-4xl">
+            {DEMO_SCHOOL_NAME}
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground md:text-base">
+            Academic Year {DEMO_ACADEMIC_YEAR} · Week {DEMO_CURRENT_WEEK} of {DEMO_TOTAL_WEEKS} ·
+            Grades 3–8 · CBSE Affiliated
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Link
+            to="/principal/reports"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-muted/40"
+          >
+            <FileBarChart className="h-4 w-4" /> View reports
+          </Link>
+          <Link
+            to="/principal/evidence"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-95"
+          >
+            <Download className="h-4 w-4" /> July evidence pack
+          </Link>
+        </div>
       </div>
-      <div className="mt-3 font-display text-3xl font-extrabold text-foreground">{value}</div>
-      {hint && <div className="mt-1 text-xs text-muted-foreground">{hint}</div>}
-    </motion.div>
+    </section>
   );
 }
 
-function TrackPill({ track }: { track: "CT" | "CT+AI" }) {
+/* ─────────── KPI grid ─────────── */
+
+const KPIS: {
+  label: string;
+  value: string | number;
+  hint: string;
+  status: "green" | "amber" | "red" | "blue";
+  icon: React.ComponentType<{ className?: string }>;
+  to: string;
+  trend?: string;
+}[] = [
+  {
+    label: "Implementation Health",
+    value: `${SCHOOL_STATS.overallImplementation} / 100`,
+    hint: "Good · +6 vs last month",
+    status: "green",
+    icon: Activity,
+    to: "/principal/implementation",
+    trend: "+6%",
+  },
+  {
+    label: "Evidence Readiness",
+    value: "74%",
+    hint: `${SCHOOL_STATS.evidenceItems.toLocaleString()} items collected`,
+    status: "green",
+    icon: FileSpreadsheet,
+    to: "/principal/evidence",
+  },
+  {
+    label: "Students On Track",
+    value: SCHOOL_STATS.studentsOnTrack,
+    hint: `${SCHOOL_STATS.studentsNeedingAttention} need attention · ${SCHOOL_STATS.studentsDelayed} delayed`,
+    status: "amber",
+    icon: GraduationCap,
+    to: "/principal/students",
+  },
+  {
+    label: "Teacher Updates",
+    value: `${SCHOOL_STATS.teachersActiveThisWeek} / ${SCHOOL_STATS.teachersTotal}`,
+    hint: "Active this week",
+    status: "amber",
+    icon: Users,
+    to: "/principal/teachers",
+  },
+  {
+    label: "Project Review Backlog",
+    value: 42,
+    hint: "Across Grades 6–8",
+    status: "amber",
+    icon: FolderKanban,
+    to: "/teacher/projects",
+  },
+  {
+    label: "Certificate Eligibility",
+    value: SCHOOL_STATS.certificatesEligible,
+    hint: "Ready for principal approval",
+    status: "green",
+    icon: Award,
+    to: "/principal/certificates",
+  },
+];
+
+function KpiGrid() {
+  return (
+    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      {KPIS.map((k) => (
+        <Link
+          key={k.label}
+          to={k.to}
+          className="group rounded-2xl border border-border/60 bg-white p-5 shadow-sm transition hover:border-foreground/30 hover:shadow-md"
+        >
+          <div className="flex items-center justify-between">
+            <span className={cn("grid h-9 w-9 place-items-center rounded-full", statusBg(k.status))}>
+              <k.icon className={cn("h-4 w-4", statusFg(k.status))} />
+            </span>
+            <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
+          </div>
+          <div className="mt-4 font-display text-2xl font-extrabold tabular-nums text-foreground">
+            {k.value}
+          </div>
+          <div className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+            {k.label}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">{k.hint}</p>
+          {k.trend && (
+            <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[0.65rem] font-bold text-emerald-700">
+              <TrendingUp className="h-3 w-3" /> {k.trend}
+            </span>
+          )}
+        </Link>
+      ))}
+    </section>
+  );
+}
+
+/* ─────────── Health breakdown ─────────── */
+
+function HealthBreakdown() {
+  return (
+    <Card title="Health Score Breakdown" eyebrow="How the 76 / 100 is calculated">
+      <div className="space-y-3">
+        {HEALTH_BREAKDOWN.map((h) => {
+          const pct = (h.score / h.max) * 100;
+          return (
+            <div key={h.label}>
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-foreground">{h.label}</span>
+                <span className="font-bold tabular-nums text-muted-foreground">
+                  {h.score} / {h.max}
+                </span>
+              </div>
+              <div className="mt-1.5 h-2 rounded-full bg-muted/60">
+                <div
+                  className={cn(
+                    "h-full rounded-full",
+                    pct >= 90 ? "bg-emerald-500" : pct >= 70 ? "bg-blue-500" : "bg-amber-500",
+                  )}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
+/* ─────────── Weekly trend chart ─────────── */
+
+function WeeklyTrendCard() {
+  return (
+    <Card title="Weekly Completion Trend" eyebrow={`Weeks 1–${DEMO_CURRENT_WEEK}`}>
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={WEEKLY_TREND}>
+          <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" vertical={false} />
+          <XAxis
+            dataKey="week"
+            tickFormatter={(v) => `W${v}`}
+            tick={{ fontSize: 11, fill: "#6b7280" }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={{ fontSize: 11, fill: "#6b7280" }}
+            axisLine={false}
+            tickLine={false}
+            domain={[0, 100]}
+            tickFormatter={(v) => `${v}%`}
+          />
+          <Tooltip
+            formatter={(v: number) => [`${v}%`, "Completion"]}
+            labelFormatter={(l) => `Week ${l}`}
+            contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12 }}
+          />
+          <Line
+            type="monotone"
+            dataKey="pct"
+            stroke="#2563eb"
+            strokeWidth={2.5}
+            dot={{ r: 4, fill: "#2563eb" }}
+            activeDot={{ r: 6 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </Card>
+  );
+}
+
+/* ─────────── Evidence donut ─────────── */
+
+function EvidenceDonut() {
+  return (
+    <Card title="Evidence Collected" eyebrow={`${SCHOOL_STATS.evidenceItems.toLocaleString()} artefacts`}>
+      <div className="flex items-center gap-4">
+        <ResponsiveContainer width="60%" height={180}>
+          <PieChart>
+            <Pie
+              data={EVIDENCE_MIX}
+              dataKey="pct"
+              nameKey="label"
+              innerRadius={45}
+              outerRadius={75}
+              stroke="none"
+            >
+              {EVIDENCE_MIX.map((_, i) => (
+                <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(v: number) => [`${v}%`, ""]}
+              contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12 }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+        <ul className="flex-1 space-y-1.5 text-xs">
+          {EVIDENCE_MIX.map((e, i) => (
+            <li key={e.label} className="flex items-center gap-2">
+              <span
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }}
+              />
+              <span className="flex-1 text-foreground">{e.label}</span>
+              <span className="font-bold tabular-nums text-muted-foreground">{e.pct}%</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Card>
+  );
+}
+
+/* ─────────── Grade grid ─────────── */
+
+function GradeGrid() {
+  return (
+    <section>
+      <SectionHead
+        title="Grade Overview · 3–8"
+        subtitle="Click any grade to open the drill-down dashboard."
+        action={{ label: "All grades", to: "/principal/grades" }}
+      />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {GRADE_SUMMARIES.map((g) => (
+          <GradeCard key={g.grade} g={g} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function GradeCard({ g }: { g: GradeSummary }) {
+  const status = g.risk === "On Track" ? "green" : g.risk === "Needs Attention" ? "amber" : "red";
+  return (
+    <Link
+      to="/principal/grades/$grade"
+      params={{ grade: String(g.grade) }}
+      className="group block rounded-2xl border border-border/60 bg-white p-5 shadow-sm transition hover:border-foreground/30 hover:shadow-md"
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="font-display text-lg font-extrabold text-foreground">{g.label}</h3>
+            <span className="rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-muted-foreground">
+              {g.track}
+            </span>
+          </div>
+          <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{g.focus}</p>
+        </div>
+        <StatusPill status={status}>{g.risk}</StatusPill>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+        <Metric label="Students" value={g.students} />
+        <Metric label="Week" value={`${g.currentWeek} / 35`} />
+        <MetricBar label="Implementation" value={g.studentCompletion} />
+        <MetricBar label="Workbook" value={g.workbookTracking} />
+        {g.track === "CT+AI" && (
+          <>
+            <MetricBar label="AI activity" value={g.aiActivity ?? 0} />
+            <MetricBar label="Projects" value={g.projectCompletion ?? 0} />
+          </>
+        )}
+      </div>
+
+      <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-3 text-xs">
+        <span className="text-muted-foreground">Observations: {g.observations}</span>
+        <span className="inline-flex items-center gap-1 font-semibold text-foreground opacity-0 transition group-hover:opacity-100">
+          Drill down <ArrowRight className="h-3 w-3" />
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+/* ─────────── Grade bar chart ─────────── */
+
+function GradeBarChart() {
+  const data = GRADE_SUMMARIES.map((g) => ({ grade: g.label.replace("Grade ", "G"), pct: g.studentCompletion }));
+  return (
+    <Card title="Grade-wise Implementation" eyebrow="Student completion %">
+      <ResponsiveContainer width="100%" height={240}>
+        <BarChart data={data}>
+          <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="grade" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
+          <YAxis
+            tick={{ fontSize: 11, fill: "#6b7280" }}
+            axisLine={false}
+            tickLine={false}
+            domain={[0, 100]}
+            tickFormatter={(v) => `${v}%`}
+          />
+          <Tooltip
+            formatter={(v: number) => [`${v}%`, "Completion"]}
+            contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12 }}
+          />
+          <Bar dataKey="pct" radius={[6, 6, 0, 0]}>
+            {data.map((d, i) => (
+              <Cell
+                key={i}
+                fill={d.pct >= 75 ? "#10b981" : d.pct >= 65 ? "#f59e0b" : "#ef4444"}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </Card>
+  );
+}
+
+function CompetencyBars() {
+  return (
+    <Card title="Competency Coverage" eyebrow="School-wide" className="lg:col-span-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {COMPETENCY_COVERAGE.map((c) => (
+          <div key={c.competency}>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-foreground">{c.competency}</span>
+              <span className="font-bold tabular-nums text-muted-foreground">{c.pct}%</span>
+            </div>
+            <div className="mt-1 h-2 rounded-full bg-muted/60">
+              <div
+                className={cn(
+                  "h-full rounded-full",
+                  c.pct >= 75 ? "bg-emerald-500" : c.pct >= 65 ? "bg-blue-500" : "bg-amber-500",
+                )}
+                style={{ width: `${c.pct}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+/* ─────────── Smart insights + actions ─────────── */
+
+function SmartInsights() {
+  return (
+    <Card
+      title="Smart Insights"
+      eyebrow={`${SMART_ALERTS.length} findings this week`}
+      className="lg:col-span-2"
+    >
+      <ul className="space-y-2">
+        {SMART_ALERTS.map((a) => (
+          <li
+            key={a.id}
+            className={cn(
+              "flex items-start gap-3 rounded-xl border p-3",
+              alertBg(a.tone),
+            )}
+          >
+            <span className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full", alertIconBg(a.tone))}>
+              {alertIcon(a.tone)}
+            </span>
+            <div className="flex-1">
+              <div className="text-sm font-bold text-foreground">{a.title}</div>
+              <p className="text-xs text-muted-foreground">{a.body}</p>
+            </div>
+            <button className="shrink-0 rounded-full border border-border/60 bg-white px-3 py-1 text-[0.7rem] font-semibold text-foreground hover:bg-muted/40">
+              Act
+            </button>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+function RecommendedActions() {
+  return (
+    <Card title="Recommended Next Actions" eyebrow="Prioritised for this week">
+      <ul className="space-y-2">
+        {RECOMMENDED_ACTIONS.map((a) => (
+          <li key={a.label}>
+            <Link
+              to={a.to}
+              className="flex items-center gap-3 rounded-xl border border-border/60 bg-white p-3 text-sm transition hover:border-foreground/30 hover:bg-muted/20"
+            >
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-muted/50">
+                <a.icon className="h-4 w-4 text-foreground" />
+              </span>
+              <span className="flex-1 font-semibold text-foreground">{a.label}</span>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+/* ─────────── Reusable primitives ─────────── */
+
+function Card({
+  title,
+  eyebrow,
+  children,
+  className,
+}: {
+  title: string;
+  eyebrow?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("rounded-2xl border border-border/60 bg-white p-5 shadow-sm", className)}>
+      {eyebrow && (
+        <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+          {eyebrow}
+        </div>
+      )}
+      <h3 className="mt-0.5 font-display text-base font-extrabold text-foreground">{title}</h3>
+      <div className="mt-4">{children}</div>
+    </div>
+  );
+}
+
+function SectionHead({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: { label: string; to: string };
+}) {
+  return (
+    <div className="mb-4 flex items-end justify-between">
+      <div>
+        <h2 className="font-display text-lg font-extrabold text-foreground">{title}</h2>
+        {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+      </div>
+      {action && (
+        <Link
+          to={action.to}
+          className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/40"
+        >
+          {action.label} <ArrowRight className="h-3 w-3" />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="rounded-lg bg-muted/30 px-3 py-2">
+      <div className="text-[0.6rem] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+      <div className="font-display text-sm font-bold tabular-nums text-foreground">{value}</div>
+    </div>
+  );
+}
+
+function MetricBar({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg bg-muted/30 px-3 py-2">
+      <div className="flex items-center justify-between">
+        <span className="text-[0.6rem] font-semibold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </span>
+        <span className="text-xs font-bold tabular-nums text-foreground">{value}%</span>
+      </div>
+      <div className="mt-1 h-1.5 rounded-full bg-white">
+        <div
+          className={cn(
+            "h-full rounded-full",
+            value >= 75 ? "bg-emerald-500" : value >= 65 ? "bg-blue-500" : value >= 50 ? "bg-amber-500" : "bg-red-500",
+          )}
+          style={{ width: `${value}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function StatusPill({
+  status,
+  children,
+}: {
+  status: "green" | "amber" | "red" | "blue";
+  children: React.ReactNode;
+}) {
   return (
     <span
       className={cn(
-        "rounded-full px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.18em]",
-        track === "CT"
-          ? "bg-explore-soft text-explore"
-          : "bg-bonus-soft text-bonus",
+        "rounded-full px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider",
+        status === "green" && "bg-emerald-50 text-emerald-700",
+        status === "amber" && "bg-amber-50 text-amber-700",
+        status === "red" && "bg-red-50 text-red-700",
+        status === "blue" && "bg-blue-50 text-blue-700",
       )}
     >
-      {track}
+      {children}
     </span>
   );
 }
 
-function TrackBar({
-  label,
-  value,
-  total,
-  colorClass,
-}: {
-  label: string;
-  value: number;
-  total: number;
-  colorClass: string;
-}) {
-  const pct = Math.round((value / total) * 100);
-  return (
-    <div>
-      <div className="flex items-center justify-between text-xs font-semibold text-foreground">
-        <span>{label}</span>
-        <span className="tabular-nums text-muted-foreground">
-          {value} · {pct}%
-        </span>
-      </div>
-      <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-foreground/5">
-        <div className={cn("h-full rounded-full", colorClass)} style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
+/* ─────────── Status helpers ─────────── */
+
+function statusBg(s: "green" | "amber" | "red" | "blue") {
+  return s === "green"
+    ? "bg-emerald-50"
+    : s === "amber"
+      ? "bg-amber-50"
+      : s === "red"
+        ? "bg-red-50"
+        : "bg-blue-50";
+}
+function statusFg(s: "green" | "amber" | "red" | "blue") {
+  return s === "green"
+    ? "text-emerald-600"
+    : s === "amber"
+      ? "text-amber-600"
+      : s === "red"
+        ? "text-red-600"
+        : "text-blue-600";
 }
 
-const readinessTone: Record<string, string> = {
-  decide: "border-decide/20 bg-decide-soft text-decide",
-  explore: "border-explore/20 bg-explore-soft text-explore",
-  challenge: "border-challenge/20 bg-challenge-soft text-challenge",
-};
-
-function ReadinessCard({
-  title,
-  desc,
-  complete,
-  to,
-  tone,
-  icon,
-}: {
-  title: string;
-  desc: string;
-  complete: boolean;
-  to: string;
-  tone: keyof typeof readinessTone;
-  icon: React.ReactNode;
-}) {
-  return (
-    <Link
-      to={to}
-      className="group rounded-[24px] border border-foreground/10 bg-white/85 p-5 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-float)]"
-    >
-      <div className="flex items-start justify-between">
-        <span
-          className={cn(
-            "inline-flex h-10 w-10 items-center justify-center rounded-2xl border",
-            readinessTone[tone],
-          )}
-        >
-          {icon}
-        </span>
-        <span
-          className={cn(
-            "rounded-full px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.18em]",
-            complete ? "bg-success-soft text-success" : "bg-foreground/5 text-muted-foreground",
-          )}
-        >
-          {complete ? "In progress" : "Not started"}
-        </span>
-      </div>
-      <h3 className="mt-4 font-display text-lg font-extrabold text-foreground">{title}</h3>
-      <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
-      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-foreground group-hover:underline">
-        Open <ArrowUpRight className="h-3.5 w-3.5" />
-      </span>
-    </Link>
-  );
+function alertBg(tone: AlertTone) {
+  return tone === "positive"
+    ? "border-emerald-100 bg-emerald-50/40"
+    : tone === "attention"
+      ? "border-amber-100 bg-amber-50/40"
+      : tone === "delayed"
+        ? "border-red-100 bg-red-50/40"
+        : "border-blue-100 bg-blue-50/40";
+}
+function alertIconBg(tone: AlertTone) {
+  return tone === "positive"
+    ? "bg-emerald-100 text-emerald-700"
+    : tone === "attention"
+      ? "bg-amber-100 text-amber-700"
+      : tone === "delayed"
+        ? "bg-red-100 text-red-700"
+        : "bg-blue-100 text-blue-700";
+}
+function alertIcon(tone: AlertTone) {
+  const cls = "h-4 w-4";
+  if (tone === "positive") return <CheckCircle2 className={cls} />;
+  if (tone === "delayed") return <AlertTriangle className={cls} />;
+  if (tone === "attention") return <ClipboardList className={cls} />;
+  return <Info className={cls} />;
 }
 
-function EmptyRow({ text, cta, to }: { text: string; cta: string; to: string }) {
-  return (
-    <div className="mt-5 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-foreground/15 bg-white/70 px-4 py-5 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-      <span>{text}</span>
-      <Link
-        to={to}
-        className="inline-flex items-center gap-1 rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-white hover:opacity-95"
-      >
-        {cta} <ArrowUpRight className="h-3.5 w-3.5" />
-      </Link>
-    </div>
-  );
-}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _kept = BookOpenCheck;

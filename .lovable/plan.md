@@ -1,70 +1,69 @@
-# Namma AI → CBSE CT & AI Implementation Platform
+# Namma AI → CT & AI Implementation Command Centre (Phase 1)
 
-Restructure the existing portal into a premium, school-ready implementation suite for Grades 3–8. This plan sets up the **architecture, routing, roles, sidebars, data model, and empty screen shells** only. No screen is fully built here — those come in the specified order in follow-up turns.
+Reposition the existing portal into a premium, implementation-focused command centre for CBSE schools running CT & AI for Grades 3–8. Preserve the routing shell, role system, and demo-seed infrastructure that already exist. Replace curriculum/learning surfaces with implementation, evidence, and reporting surfaces.
 
-## Scope of this turn (structure only)
+## Scope guardrails
 
-1. **Roles & routing skeleton** — four role experiences with role-based post-login redirect:
-   - `principal` → `/principal`
-   - `teacher` → `/teacher`
-   - `student` → `/student`
-   - `admin` (Namma AI) → `/admin`
-2. **Sidebars** — one premium sidebar layout per role, using the existing brand tokens but toned down (no heavy mascots on principal/teacher/admin). Neo appears only on student surfaces, empty states, and celebrations.
-3. **Route shells** — every sidebar item gets a route file with a titled placeholder ("Coming in the next build step"). This makes navigation real without pre-building content.
-4. **Data layer stubs** — extend `src/lib/namma-admin.ts` with grade/week/mission/evidence/project/certificate shapes (localStorage) so later screens can plug in without refactor. Seed one demo school ("Green Valley Public School"), teachers, and students on first load.
-5. **Legal guardrails** — global constants for approved phrasing ("Supports implementation of CBSE CT & AI curriculum"). No CBSE logo, no copied content.
+- **Do NOT rebuild from scratch.** Keep `AppShell`, role sidebars, auth, demo seed, and routing.
+- **Phase 1 only.** No lessons, games, module unlocks, curriculum content. Student area is status-only.
+- **Legal.** Only approved phrasing (already in `namma-legal.ts`). No CBSE marks, no copied workbook text.
+- **Design.** Premium/clean/school-ERP feel. Neo only in student empty states. Status colors: green/yellow/red/blue/grey.
 
-## Sidebars (per role)
+## Work plan (executed across this + follow-up turns)
 
-**Principal**: Dashboard · Grades · Teachers · Students · Implementation Tracker · CT & AI Progress · Projects · Evidence Portfolio · Reports · Certificates · Calendar · Settings
+### 1. Data foundation (this turn)
+Rewrite `src/lib/namma-demo.ts` to seed the full Namma Vidya Public School dataset described in the brief:
+- 1 school, principal + academic coordinator, 14 teachers, 384 students (Grades 3–8, sections A/B, 32/section) with realistic Indian names.
+- Grade-level metrics (implementation %, workbook %, projects %, evidence %, risk, weekly trend).
+- School summary (health 76, evidence 74%, students on-track 287, needs-attention 72, delayed 25, etc.).
+- 60+ observation entries, 40+ project entries with rubric scores, 1482 evidence-item counters, 96 certificate-eligible students.
+- Weekly completion trend (weeks 1–9), competency coverage %, evidence-by-type breakdown.
+- Smart alerts + recommended actions arrays.
 
-**Teacher**: Dashboard · My Classes · Weekly Planner · Student Completion · Workbook Tracker · Projects · Assessments · Observation Journal · Reports · Resources
+Add `src/lib/namma-implementation.ts` — typed selectors over the seed (grade summary, teacher rows, student rows, competency data, timeline, alerts).
 
-**Student**: Dashboard · My Grade Journey · Weekly Tasks · Workbook Check-ins · Portal Activities · Projects · Badges · Portfolio · Certificates
+### 2. Principal Command Centre (this turn)
+Rewrite `src/routes/principal.index.tsx` as the flagship screen:
+- Hero row: Implementation Health, Evidence Readiness, Students On Track, Teacher Updates, Project Backlog, Certificates.
+- Health Score Breakdown card (7 components summing to 76).
+- Grade Overview cards (3–8), clickable → grade drill-down.
+- Smart Insights list.
+- Recommended Next Actions.
+- Charts: grade bars, weekly trend line, competency horizontal bars, evidence donut (Recharts).
 
-**Namma AI Admin**: Schools · Grade Templates · Learning Outcomes · Activity Library · Report Templates · User Management · Analytics · Support (keeps existing Schools/Teachers/Students admin flows already built)
+### 3. Grade drill-down (this turn)
+New `src/routes/principal.grades.$grade.tsx` with section A/B comparison, teacher card, insights, recommended actions.
+Rewrite `src/routes/principal.grades.tsx` as a grade-grid index.
 
-## Grade model
+### 4. Teacher & Student surfaces (this turn)
+- Rewrite `src/routes/teacher.index.tsx` as "Weekly Workspace" (Ms. Ritu Malhotra / Grade 6A) with pending-task cards, quick-update panel trigger, 32-row student completion table.
+- Rewrite `src/routes/index.tsx` (student home) as status-only Progress Profile with completion %, pending items, teacher feedback, certificate status.
 
-Grades 3–5 → CT only. Grades 6–8 → CT + AI + Projects. Stored as a `track` field on each grade so Phase 2 missions/QR flow can attach later.
+### 5. Follow-up turns (queued)
+Turn B: Workbook Tracker, Project Review Centre, Competency Analytics, Observation Journal.
+Turn C: Evidence Portfolio (school/class/student), Reports Centre with printable previews, Certificate Centre, Implementation Calendar heatmaps.
+Turn D: Academic Coordinator role + sidebar, Admin panel refresh, smart-alert engine polish, filters/search across tables.
 
-## Phase 2 readiness (structure only, not built)
+### 6. Cleanup
+Hide legacy learning entries from student sidebar (Portal Activities, Grade Journey mission pages) — keep files but remove from `STUDENT_NAV` in `namma-roles.ts` so they don't appear in Phase 1. Keep verify/QR flow available under Teacher.
 
-- Mission model (id, grade, week, workbookPages, portalActivitySlug, quiz, reflection, project, badge, teacherApproval, status).
-- Unique completion code format: `NAI-G{grade}-M{mission}-{studentInitials}-{4digit}`.
-- Activity library taxonomy (CT / AI Literacy / Reflection / Project / Gamified).
-- All Phase 2 routes exist but render "Available in Namma AI Learning Pack 2027–28".
+## Technical notes
 
-## Build order (subsequent turns, one per turn)
+- All data localStorage-backed via existing `namma-demo` seed; idempotent re-seed with a bumped `SEED_VERSION` so this turn's richer data replaces prior seed.
+- Charts via existing `recharts` (already in `src/components/ui/chart.tsx`).
+- New shared components under `src/components/namma/command/`: `StatCard`, `InsightCard`, `GradeCard`, `SectionCompare`, `ActionList`, `MiniHeatmap`.
+- Add a `roleRedirect` update so coordinator role can slot in later without refactor.
+- No backend, no new packages.
 
-1. Principal dashboard
-2. Teacher dashboard
-3. Student completion tracker
-4. Evidence portfolio
-5. Reports
-6. Admin panel expansion
-7. Phase 2 student journey (My Grade Journey + Missions)
-8. QR-linked activity flow + completion code + teacher approval
+## This turn's deliverables
 
-## Technical details
+1. Rewritten `src/lib/namma-demo.ts` (full dataset + version bump).
+2. New `src/lib/namma-implementation.ts` (selectors).
+3. New `src/components/namma/command/*` primitives.
+4. Rewritten `src/routes/principal.index.tsx` (Command Centre).
+5. New `src/routes/principal.grades.$grade.tsx` + rewritten `src/routes/principal.grades.tsx`.
+6. Rewritten `src/routes/teacher.index.tsx` (Weekly Workspace + student table).
+7. Rewritten `src/routes/index.tsx` (student status view).
+8. Trim `STUDENT_NAV` in `src/lib/namma-roles.ts`.
 
-- **Files added**
-  - `src/lib/namma-roles.ts` — role type, current-role helpers, post-login redirect map.
-  - `src/lib/namma-curriculum.ts` — grade tracks, week structure, mission/activity types, seed data.
-  - `src/lib/namma-legal.ts` — approved phrasing constants.
-  - `src/components/namma/role-sidebar.tsx` — shared sidebar shell driven by role config.
-  - `src/components/namma/role-shell.tsx` — role-scoped `AppShell` that swaps sidebar + guards role.
-  - `src/routes/principal.tsx` (layout) + `principal.index.tsx` … `principal.settings.tsx` (12 shells).
-  - `src/routes/teacher.tsx` becomes a layout; add `teacher.index.tsx` … `teacher.resources.tsx` (10 shells).
-  - `src/routes/student.tsx` (layout) + `student.index.tsx` … `student.certificates.tsx` (9 shells).
-  - `src/routes/admin.tsx` layout extended: add `admin.grade-templates.tsx`, `admin.learning-outcomes.tsx`, `admin.activity-library.tsx`, `admin.report-templates.tsx`, `admin.users.tsx`, `admin.analytics.tsx`, `admin.support.tsx`.
-- **Files edited**
-  - `src/routes/login.tsx` — route by role using `roleRedirect(role)`.
-  - `src/routes/index.tsx` — redirect authed users to their role home.
-  - `src/lib/namma-admin.ts` — add `role`, `grade_track`, seed demo school on first mount.
-  - `src/components/namma/app-shell.tsx` — accept `role` prop; keep student shell as-is.
-- **Placeholder shell** — each shell uses the existing `page-placeholder.tsx` component with a title, one-line description, and a "Coming in the next build step" note. Zero business logic.
-- **No design tokens change.** Reuse existing gradients, radii, shadows. Sidebars for principal/teacher/admin drop mascot avatars and use a tighter, whiter surface for the "premium ERP" feel; student sidebar keeps Neo.
-- **No backend.** Everything remains localStorage-backed. Data shapes match Supabase-ready tables for a later migration.
-
-Confirm this plan and I'll implement the structure in the next turn, then move to the Principal dashboard as step 1 of the build order.
+Reply "go" and I'll implement turn 1. Follow-up turns unlock the remaining screens in the order listed.
