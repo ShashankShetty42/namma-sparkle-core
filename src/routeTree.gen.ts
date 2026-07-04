@@ -54,8 +54,10 @@ import { Route as PrincipalSettingsRouteImport } from './routes/principal.settin
 import { Route as PrincipalReportsRouteImport } from './routes/principal.reports'
 import { Route as PrincipalProjectsRouteImport } from './routes/principal.projects'
 import { Route as PrincipalProgressRouteImport } from './routes/principal.progress'
+import { Route as PrincipalProgramsRouteImport } from './routes/principal.programs'
 import { Route as PrincipalImplementationRouteImport } from './routes/principal.implementation'
 import { Route as PrincipalGradesRouteImport } from './routes/principal.grades'
+import { Route as PrincipalFutureProgramsRouteImport } from './routes/principal.future-programs'
 import { Route as PrincipalEvidenceRouteImport } from './routes/principal.evidence'
 import { Route as PrincipalCertificatesRouteImport } from './routes/principal.certificates'
 import { Route as PrincipalCalendarRouteImport } from './routes/principal.calendar'
@@ -65,6 +67,7 @@ import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminStudentsRouteImport } from './routes/admin.students'
 import { Route as AdminSchoolsRouteImport } from './routes/admin.schools'
 import { Route as AdminReportTemplatesRouteImport } from './routes/admin.report-templates'
+import { Route as AdminProgramsRouteImport } from './routes/admin.programs'
 import { Route as AdminOversightRouteImport } from './routes/admin.oversight'
 import { Route as AdminLearningOutcomesRouteImport } from './routes/admin.learning-outcomes'
 import { Route as AdminGradeTemplatesRouteImport } from './routes/admin.grade-templates'
@@ -300,6 +303,11 @@ const PrincipalProgressRoute = PrincipalProgressRouteImport.update({
   path: '/progress',
   getParentRoute: () => PrincipalRoute,
 } as any)
+const PrincipalProgramsRoute = PrincipalProgramsRouteImport.update({
+  id: '/programs',
+  path: '/programs',
+  getParentRoute: () => PrincipalRoute,
+} as any)
 const PrincipalImplementationRoute = PrincipalImplementationRouteImport.update({
   id: '/implementation',
   path: '/implementation',
@@ -308,6 +316,11 @@ const PrincipalImplementationRoute = PrincipalImplementationRouteImport.update({
 const PrincipalGradesRoute = PrincipalGradesRouteImport.update({
   id: '/grades',
   path: '/grades',
+  getParentRoute: () => PrincipalRoute,
+} as any)
+const PrincipalFutureProgramsRoute = PrincipalFutureProgramsRouteImport.update({
+  id: '/future-programs',
+  path: '/future-programs',
   getParentRoute: () => PrincipalRoute,
 } as any)
 const PrincipalEvidenceRoute = PrincipalEvidenceRouteImport.update({
@@ -353,6 +366,11 @@ const AdminSchoolsRoute = AdminSchoolsRouteImport.update({
 const AdminReportTemplatesRoute = AdminReportTemplatesRouteImport.update({
   id: '/admin/report-templates',
   path: '/admin/report-templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminProgramsRoute = AdminProgramsRouteImport.update({
+  id: '/admin/programs',
+  path: '/admin/programs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminOversightRoute = AdminOversightRouteImport.update({
@@ -427,6 +445,7 @@ export interface FileRoutesByFullPath {
   '/admin/grade-templates': typeof AdminGradeTemplatesRoute
   '/admin/learning-outcomes': typeof AdminLearningOutcomesRoute
   '/admin/oversight': typeof AdminOversightRoute
+  '/admin/programs': typeof AdminProgramsRoute
   '/admin/report-templates': typeof AdminReportTemplatesRoute
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
@@ -436,8 +455,10 @@ export interface FileRoutesByFullPath {
   '/principal/calendar': typeof PrincipalCalendarRoute
   '/principal/certificates': typeof PrincipalCertificatesRoute
   '/principal/evidence': typeof PrincipalEvidenceRoute
+  '/principal/future-programs': typeof PrincipalFutureProgramsRoute
   '/principal/grades': typeof PrincipalGradesRouteWithChildren
   '/principal/implementation': typeof PrincipalImplementationRoute
+  '/principal/programs': typeof PrincipalProgramsRoute
   '/principal/progress': typeof PrincipalProgressRoute
   '/principal/projects': typeof PrincipalProjectsRoute
   '/principal/reports': typeof PrincipalReportsRoute
@@ -492,6 +513,7 @@ export interface FileRoutesByTo {
   '/admin/grade-templates': typeof AdminGradeTemplatesRoute
   '/admin/learning-outcomes': typeof AdminLearningOutcomesRoute
   '/admin/oversight': typeof AdminOversightRoute
+  '/admin/programs': typeof AdminProgramsRoute
   '/admin/report-templates': typeof AdminReportTemplatesRoute
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
@@ -501,8 +523,10 @@ export interface FileRoutesByTo {
   '/principal/calendar': typeof PrincipalCalendarRoute
   '/principal/certificates': typeof PrincipalCertificatesRoute
   '/principal/evidence': typeof PrincipalEvidenceRoute
+  '/principal/future-programs': typeof PrincipalFutureProgramsRoute
   '/principal/grades': typeof PrincipalGradesRouteWithChildren
   '/principal/implementation': typeof PrincipalImplementationRoute
+  '/principal/programs': typeof PrincipalProgramsRoute
   '/principal/progress': typeof PrincipalProgressRoute
   '/principal/projects': typeof PrincipalProjectsRoute
   '/principal/reports': typeof PrincipalReportsRoute
@@ -560,6 +584,7 @@ export interface FileRoutesById {
   '/admin/grade-templates': typeof AdminGradeTemplatesRoute
   '/admin/learning-outcomes': typeof AdminLearningOutcomesRoute
   '/admin/oversight': typeof AdminOversightRoute
+  '/admin/programs': typeof AdminProgramsRoute
   '/admin/report-templates': typeof AdminReportTemplatesRoute
   '/admin/schools': typeof AdminSchoolsRouteWithChildren
   '/admin/students': typeof AdminStudentsRoute
@@ -569,8 +594,10 @@ export interface FileRoutesById {
   '/principal/calendar': typeof PrincipalCalendarRoute
   '/principal/certificates': typeof PrincipalCertificatesRoute
   '/principal/evidence': typeof PrincipalEvidenceRoute
+  '/principal/future-programs': typeof PrincipalFutureProgramsRoute
   '/principal/grades': typeof PrincipalGradesRouteWithChildren
   '/principal/implementation': typeof PrincipalImplementationRoute
+  '/principal/programs': typeof PrincipalProgramsRoute
   '/principal/progress': typeof PrincipalProgressRoute
   '/principal/projects': typeof PrincipalProjectsRoute
   '/principal/reports': typeof PrincipalReportsRoute
@@ -629,6 +656,7 @@ export interface FileRouteTypes {
     | '/admin/grade-templates'
     | '/admin/learning-outcomes'
     | '/admin/oversight'
+    | '/admin/programs'
     | '/admin/report-templates'
     | '/admin/schools'
     | '/admin/students'
@@ -638,8 +666,10 @@ export interface FileRouteTypes {
     | '/principal/calendar'
     | '/principal/certificates'
     | '/principal/evidence'
+    | '/principal/future-programs'
     | '/principal/grades'
     | '/principal/implementation'
+    | '/principal/programs'
     | '/principal/progress'
     | '/principal/projects'
     | '/principal/reports'
@@ -694,6 +724,7 @@ export interface FileRouteTypes {
     | '/admin/grade-templates'
     | '/admin/learning-outcomes'
     | '/admin/oversight'
+    | '/admin/programs'
     | '/admin/report-templates'
     | '/admin/schools'
     | '/admin/students'
@@ -703,8 +734,10 @@ export interface FileRouteTypes {
     | '/principal/calendar'
     | '/principal/certificates'
     | '/principal/evidence'
+    | '/principal/future-programs'
     | '/principal/grades'
     | '/principal/implementation'
+    | '/principal/programs'
     | '/principal/progress'
     | '/principal/projects'
     | '/principal/reports'
@@ -761,6 +794,7 @@ export interface FileRouteTypes {
     | '/admin/grade-templates'
     | '/admin/learning-outcomes'
     | '/admin/oversight'
+    | '/admin/programs'
     | '/admin/report-templates'
     | '/admin/schools'
     | '/admin/students'
@@ -770,8 +804,10 @@ export interface FileRouteTypes {
     | '/principal/calendar'
     | '/principal/certificates'
     | '/principal/evidence'
+    | '/principal/future-programs'
     | '/principal/grades'
     | '/principal/implementation'
+    | '/principal/programs'
     | '/principal/progress'
     | '/principal/projects'
     | '/principal/reports'
@@ -828,6 +864,7 @@ export interface RootRouteChildren {
   AdminGradeTemplatesRoute: typeof AdminGradeTemplatesRoute
   AdminLearningOutcomesRoute: typeof AdminLearningOutcomesRoute
   AdminOversightRoute: typeof AdminOversightRoute
+  AdminProgramsRoute: typeof AdminProgramsRoute
   AdminReportTemplatesRoute: typeof AdminReportTemplatesRoute
   AdminSchoolsRoute: typeof AdminSchoolsRouteWithChildren
   AdminStudentsRoute: typeof AdminStudentsRoute
@@ -1163,6 +1200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrincipalProgressRouteImport
       parentRoute: typeof PrincipalRoute
     }
+    '/principal/programs': {
+      id: '/principal/programs'
+      path: '/programs'
+      fullPath: '/principal/programs'
+      preLoaderRoute: typeof PrincipalProgramsRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
     '/principal/implementation': {
       id: '/principal/implementation'
       path: '/implementation'
@@ -1175,6 +1219,13 @@ declare module '@tanstack/react-router' {
       path: '/grades'
       fullPath: '/principal/grades'
       preLoaderRoute: typeof PrincipalGradesRouteImport
+      parentRoute: typeof PrincipalRoute
+    }
+    '/principal/future-programs': {
+      id: '/principal/future-programs'
+      path: '/future-programs'
+      fullPath: '/principal/future-programs'
+      preLoaderRoute: typeof PrincipalFutureProgramsRouteImport
       parentRoute: typeof PrincipalRoute
     }
     '/principal/evidence': {
@@ -1238,6 +1289,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/report-templates'
       fullPath: '/admin/report-templates'
       preLoaderRoute: typeof AdminReportTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/programs': {
+      id: '/admin/programs'
+      path: '/admin/programs'
+      fullPath: '/admin/programs'
+      preLoaderRoute: typeof AdminProgramsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/oversight': {
@@ -1334,8 +1392,10 @@ interface PrincipalRouteChildren {
   PrincipalCalendarRoute: typeof PrincipalCalendarRoute
   PrincipalCertificatesRoute: typeof PrincipalCertificatesRoute
   PrincipalEvidenceRoute: typeof PrincipalEvidenceRoute
+  PrincipalFutureProgramsRoute: typeof PrincipalFutureProgramsRoute
   PrincipalGradesRoute: typeof PrincipalGradesRouteWithChildren
   PrincipalImplementationRoute: typeof PrincipalImplementationRoute
+  PrincipalProgramsRoute: typeof PrincipalProgramsRoute
   PrincipalProgressRoute: typeof PrincipalProgressRoute
   PrincipalProjectsRoute: typeof PrincipalProjectsRoute
   PrincipalReportsRoute: typeof PrincipalReportsRoute
@@ -1349,8 +1409,10 @@ const PrincipalRouteChildren: PrincipalRouteChildren = {
   PrincipalCalendarRoute: PrincipalCalendarRoute,
   PrincipalCertificatesRoute: PrincipalCertificatesRoute,
   PrincipalEvidenceRoute: PrincipalEvidenceRoute,
+  PrincipalFutureProgramsRoute: PrincipalFutureProgramsRoute,
   PrincipalGradesRoute: PrincipalGradesRouteWithChildren,
   PrincipalImplementationRoute: PrincipalImplementationRoute,
+  PrincipalProgramsRoute: PrincipalProgramsRoute,
   PrincipalProgressRoute: PrincipalProgressRoute,
   PrincipalProjectsRoute: PrincipalProjectsRoute,
   PrincipalReportsRoute: PrincipalReportsRoute,
@@ -1431,6 +1493,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminGradeTemplatesRoute: AdminGradeTemplatesRoute,
   AdminLearningOutcomesRoute: AdminLearningOutcomesRoute,
   AdminOversightRoute: AdminOversightRoute,
+  AdminProgramsRoute: AdminProgramsRoute,
   AdminReportTemplatesRoute: AdminReportTemplatesRoute,
   AdminSchoolsRoute: AdminSchoolsRouteWithChildren,
   AdminStudentsRoute: AdminStudentsRoute,

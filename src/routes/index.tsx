@@ -71,11 +71,11 @@ function StudentProgress() {
       <div className="shell-inner !gap-6">
         <section className="rounded-3xl border border-border/60 bg-white p-6 shadow-sm md:p-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
-            <Sparkles className="h-3 w-3" /> Student · Progress Profile
+            <Sparkles className="h-3 w-3" /> My New-Age Skills Progress
           </div>
           <h1 className="mt-3 font-display text-3xl font-extrabold text-foreground">{ME.name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {ME.grade} · Week {ME.week} · Teacher {ME.teacher}
+            Active Program: <strong>CBSE CT & AI</strong> · {ME.grade} · Week {ME.week} · Teacher {ME.teacher}
           </p>
         </section>
 
