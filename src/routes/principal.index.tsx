@@ -39,9 +39,8 @@ import { cn } from "@/lib/utils";
 import {
   COMPETENCY_COVERAGE,
   DEMO_ACADEMIC_YEAR,
-  DEMO_CURRENT_WEEK,
+  
   DEMO_SCHOOL_NAME,
-  DEMO_TOTAL_WEEKS,
   EVIDENCE_MIX,
   GRADE_SUMMARIES,
   SCHOOL_STATS,
@@ -50,6 +49,11 @@ import {
   type AlertTone,
   type GradeSummary,
 } from "@/lib/namma-demo";
+import {
+  ACADEMIC_SETUP,
+  ACADEMIC_METRICS,
+  TIMELINE_SEGMENTS,
+} from "@/lib/namma-academic";
 
 export const Route = createFileRoute("/principal/")({
   head: () => ({
@@ -97,6 +101,9 @@ function PrincipalCommandCentre() {
     <AppShell>
       <div className="shell-inner !gap-6">
         <HeroBar />
+        <ModeBanner />
+        <AcademicSetupCard />
+        <AcademicTimelineCard />
         <ActiveProgramCard />
         <KpiGrid />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -113,9 +120,227 @@ function PrincipalCommandCentre() {
           <SmartInsights />
           <RecommendedActions />
         </div>
+        <NextYearReminder />
         <FutureProgramsStrip />
       </div>
     </AppShell>
+  );
+}
+
+/* ─────────── Mid-Year Mode banner ─────────── */
+
+function ModeBanner() {
+  return (
+    <section className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 via-white to-white p-5 shadow-sm md:p-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-blue-100 text-blue-700">
+            <Activity className="h-5 w-5" />
+          </span>
+          <div>
+            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-blue-700">
+              Mid-Year Tracking Mode · Active
+            </span>
+            <h2 className="mt-1 font-display text-lg font-extrabold text-foreground">
+              Academic-Year Implementation Tracker
+            </h2>
+            <p className="mt-0.5 max-w-2xl text-sm text-muted-foreground">
+              This school joined after the academic year started. Namma AI is tracking
+              implementation from <strong>{ACADEMIC_SETUP.activeWindow}</strong>, with
+              optional backfill for <strong>{ACADEMIC_SETUP.backfillPeriod}</strong>.
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            to="/principal/setup-wizard"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white px-3 py-2 text-xs font-semibold text-foreground shadow-sm hover:bg-muted/40"
+          >
+            Manage Setup
+          </Link>
+          <Link
+            to="/principal/backfill"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white px-3 py-2 text-xs font-semibold text-foreground shadow-sm hover:bg-muted/40"
+          >
+            Start Backfill
+          </Link>
+          <Link
+            to="/principal/gap-analysis"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground px-3 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-95"
+          >
+            Generate Gap Report
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────── Current academic setup card ─────────── */
+
+function AcademicSetupCard() {
+  const items: { label: string; value: string }[] = [
+    { label: "Academic Year", value: ACADEMIC_SETUP.academicYear },
+    { label: "School Calendar", value: `${ACADEMIC_SETUP.academicStart} – ${ACADEMIC_SETUP.academicEnd}` },
+    { label: "Namma AI Onboarding", value: ACADEMIC_SETUP.onboardingMonth },
+    { label: "Implementation Mode", value: ACADEMIC_SETUP.currentModeLabel },
+    { label: "Current Academic Window", value: ACADEMIC_SETUP.activeWindow },
+    { label: "Backfill Period", value: ACADEMIC_SETUP.backfillPeriod },
+    { label: "Tracking Coverage", value: `${ACADEMIC_SETUP.trackingCoverageMonths} months active tracking` },
+    { label: "Backfill Status", value: ACADEMIC_SETUP.backfillStatus },
+  ];
+  return (
+    <section className="rounded-3xl border border-border/60 bg-white p-5 shadow-sm md:p-6">
+      <div className="flex items-end justify-between">
+        <div>
+          <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+            Current Academic Setup
+          </div>
+          <h2 className="font-display text-lg font-extrabold text-foreground">
+            {ACADEMIC_SETUP.schoolName} · {ACADEMIC_SETUP.city}
+          </h2>
+        </div>
+        <Link
+          to="/principal/setup-wizard"
+          className="text-xs font-semibold text-foreground hover:underline"
+        >
+          Configure Academic Year →
+        </Link>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+        {items.map((i) => (
+          <div key={i.label} className="rounded-2xl border border-border/60 bg-muted/20 p-3">
+            <div className="text-[0.6rem] font-bold uppercase tracking-wider text-muted-foreground">
+              {i.label}
+            </div>
+            <div className="mt-1 font-display text-sm font-extrabold text-foreground">
+              {i.value}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ─────────── Academic-year progress timeline ─────────── */
+
+function AcademicTimelineCard() {
+  return (
+    <section className="rounded-3xl border border-border/60 bg-white p-5 shadow-sm md:p-6">
+      <div className="flex items-end justify-between">
+        <div>
+          <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+            Academic-Year Progress
+          </div>
+          <h2 className="font-display text-lg font-extrabold text-foreground">
+            {ACADEMIC_SETUP.academicYear} · Tracking Timeline
+          </h2>
+        </div>
+        <div className="hidden gap-3 text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground md:flex">
+          <LegendDot className="bg-slate-300" /> Backfill
+          <LegendDot className="bg-blue-500" /> Active
+          <LegendDot className="bg-emerald-500" /> Future
+        </div>
+      </div>
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+        {TIMELINE_SEGMENTS.map((s) => {
+          const cls =
+            s.tone === "past"
+              ? "border-slate-200 bg-slate-50"
+              : s.tone === "active"
+                ? "border-blue-200 bg-blue-50/60"
+                : "border-emerald-200 bg-emerald-50/60";
+          const chip =
+            s.tone === "past"
+              ? "bg-slate-200 text-slate-700"
+              : s.tone === "active"
+                ? "bg-blue-200 text-blue-800"
+                : "bg-emerald-200 text-emerald-800";
+          return (
+            <div key={s.id} className={cn("rounded-2xl border p-4", cls)}>
+              <div className="text-[0.6rem] font-bold uppercase tracking-wider text-muted-foreground">
+                {s.range}
+              </div>
+              <div className="mt-1 font-display text-base font-extrabold text-foreground">
+                {s.title}
+              </div>
+              <span
+                className={cn(
+                  "mt-2 inline-flex items-center rounded-full px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider",
+                  chip,
+                )}
+              >
+                {s.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-6">
+        <MiniStat label="Active Tracking" value={`${ACADEMIC_METRICS.activeTrackingProgressPct}%`} />
+        <MiniStat label="Backfill" value={`${ACADEMIC_METRICS.backfillCompletionPct}%`} />
+        <MiniStat label="Evidence Readiness" value={`${ACADEMIC_METRICS.evidenceReadinessPct}%`} />
+        <MiniStat label="Year Remaining" value={`${ACADEMIC_METRICS.trackingCoveragePct}%`} />
+        <MiniStat label="Gap Score" value={ACADEMIC_METRICS.gapSeverity} />
+        <MiniStat label="2027–28 Ready" value={`${ACADEMIC_METRICS.readinessNextYearPct}%`} />
+      </div>
+    </section>
+  );
+}
+
+function LegendDot({ className }: { className?: string }) {
+  return <span className={cn("inline-block h-2.5 w-2.5 rounded-full", className)} />;
+}
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-white p-3">
+      <div className="text-[0.6rem] font-bold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+      <div className="mt-0.5 font-display text-base font-extrabold tabular-nums text-foreground">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────── Prepare for next year reminder ─────────── */
+
+function NextYearReminder() {
+  return (
+    <section className="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50/60 via-white to-white p-5 shadow-sm md:p-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-emerald-700">
+            Prepare for 2027–28 Full-Year Implementation
+          </div>
+          <h2 className="mt-1 font-display text-lg font-extrabold text-foreground">
+            Get ready for a full Grade 3–8 rollout next academic year
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Use 2026–27 to organise tracking, backfill evidence, and identify implementation
+            gaps. Activate Full-Year Mode before the next academic year for complete Grade
+            3–8 implementation tracking.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            to="/principal/setup-wizard"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white px-3 py-2 text-xs font-semibold text-foreground shadow-sm hover:bg-muted/40"
+          >
+            View 2027–28 Readiness
+          </Link>
+          <Link
+            to="/principal/setup-wizard"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground px-3 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-95"
+          >
+            Plan Full-Year Setup
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -136,7 +361,7 @@ function HeroBar() {
             School-wide implementation visibility for future-ready learning programs at{" "}
             <strong>{DEMO_SCHOOL_NAME}</strong>. Currently active:{" "}
             <strong>CBSE CT & AI</strong> · Grades 3–8 · Academic Year {DEMO_ACADEMIC_YEAR} ·
-            Week {DEMO_CURRENT_WEEK} of {DEMO_TOTAL_WEEKS}.
+            Current Tracking Month: <strong>{ACADEMIC_SETUP.currentMonthYear}</strong>.
           </p>
         </div>
         <div className="flex gap-2">
@@ -391,7 +616,7 @@ function HealthBreakdown() {
 
 function WeeklyTrendCard() {
   return (
-    <Card title="Weekly Completion Trend" eyebrow={`Weeks 1–${DEMO_CURRENT_WEEK}`}>
+    <Card title="Monthly Tracking Trend" eyebrow={`Active window · ${ACADEMIC_SETUP.currentMonthYear}`}>
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={WEEKLY_TREND}>
           <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" vertical={false} />
@@ -513,7 +738,7 @@ function GradeCard({ g }: { g: GradeSummary }) {
 
       <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
         <Metric label="Students" value={g.students} />
-        <Metric label="Week" value={`${g.currentWeek} / 35`} />
+        <Metric label="Current Period" value={ACADEMIC_SETUP.currentPeriodLabel} />
         <MetricBar label="Implementation" value={g.studentCompletion} />
         <MetricBar label="Workbook" value={g.workbookTracking} />
         {g.track === "CT+AI" && (
