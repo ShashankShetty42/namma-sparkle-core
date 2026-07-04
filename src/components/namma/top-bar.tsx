@@ -20,7 +20,7 @@ export function TopBar() {
   const initial = displayName.trim().charAt(0).toUpperCase() || "E";
   const handleLogout = () => {
     signOut();
-    navigate({ to: "/welcome", replace: true });
+    navigate({ to: "/login", replace: true });
   };
 
 
