@@ -64,13 +64,7 @@ export function TopBar() {
 
 
       <div className="flex items-center gap-2 md:gap-3">
-        <AnimatedCounter
-          value={320}
-          icon={<Star className="h-4 w-4" />}
-          suffix="XP"
-          toneClass="text-xp bg-xp-soft"
-        />
-        <StreakFlame count={5} />
+        {/* Phase 1: XP + streak hidden — CT & AI Command Centre focus */}
         <button type="button" aria-label="Notifications" className="namma-icon-btn relative">
           <Bell className="h-4 w-4" />
           <span className="namma-dot" />
