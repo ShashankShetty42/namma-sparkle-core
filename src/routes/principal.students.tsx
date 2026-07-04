@@ -4,7 +4,7 @@ import { GraduationCap, Search, Users } from "lucide-react";
 
 import { AppShell } from "@/components/namma/app-shell";
 import { cn } from "@/lib/utils";
-import { GRADE_SUMMARIES, getDemoCompletionRows } from "@/lib/namma-demo";
+import { getDemoCompletionRows } from "@/lib/namma-demo";
 
 export const Route = createFileRoute("/principal/students")({
   head: () => ({
@@ -22,45 +22,34 @@ export const Route = createFileRoute("/principal/students")({
 function StudentsRoster() {
   const rows = React.useMemo(() => getDemoCompletionRows(), []);
   const [q, setQ] = React.useState("");
-  const [gradeFilter, setGradeFilter] = React.useState<"All" | string>("All");
+  const [status, setStatus] = React.useState<"All" | "Completed" | "In Progress" | "Needs Attention">("All");
 
   const filtered = rows.filter((r) => {
-    if (gradeFilter !== "All" && r.grade !== gradeFilter) return false;
-    if (q && !`${r.student} ${r.grade}`.toLowerCase().includes(q.toLowerCase())) return false;
+    if (status !== "All" && r.status !== status) return false;
+    if (q && !r.student.toLowerCase().includes(q.toLowerCase())) return false;
     return true;
   });
 
   const kpis = [
-    { label: "Total students", value: rows.length, tone: "blue" },
-    {
-      label: "Completed term",
-      value: rows.filter((r) => r.status === "Completed").length,
-      tone: "green",
-    },
-    {
-      label: "In progress",
-      value: rows.filter((r) => r.status === "In Progress").length,
-      tone: "amber",
-    },
-    {
-      label: "Needs attention",
-      value: rows.filter((r) => r.status === "Needs Attention").length,
-      tone: "rose",
-    },
-  ] as const;
+    { label: "Students shown", value: rows.length, tone: "blue" as const },
+    { label: "Completed term", value: rows.filter((r) => r.status === "Completed").length, tone: "green" as const },
+    { label: "In progress", value: rows.filter((r) => r.status === "In Progress").length, tone: "amber" as const },
+    { label: "Needs attention", value: rows.filter((r) => r.status === "Needs Attention").length, tone: "rose" as const },
+  ];
 
   return (
     <AppShell>
       <div className="shell-inner !gap-6">
         <section className="rounded-3xl border border-border/60 bg-white p-6 shadow-sm md:p-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
-            <Users className="h-3 w-3" /> Principal · Students
+            <Users className="h-3 w-3" /> Principal · Students · Grade 6A
           </div>
           <h1 className="mt-3 font-display text-3xl font-extrabold text-foreground">
-            School-wide student directory
+            Student directory
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Every learner across Grades 3–8 with live CT &amp; AI implementation status.
+            Live CT &amp; AI implementation status for every learner. Drill into other grades from
+            the Grades page.
           </p>
         </section>
 
@@ -100,19 +89,19 @@ function StudentsRoster() {
               />
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {(["All", ...GRADE_SUMMARIES.map((g) => g.label)] as const).map((g) => (
+              {(["All", "Completed", "In Progress", "Needs Attention"] as const).map((s) => (
                 <button
-                  key={g}
+                  key={s}
                   type="button"
-                  onClick={() => setGradeFilter(g)}
+                  onClick={() => setStatus(s)}
                   className={cn(
                     "rounded-full border px-3 py-1 text-xs font-bold transition",
-                    gradeFilter === g
+                    status === s
                       ? "border-foreground bg-foreground text-white"
                       : "border-border/60 text-foreground hover:bg-muted/40",
                   )}
                 >
-                  {g}
+                  {s}
                 </button>
               ))}
             </div>
@@ -123,21 +112,23 @@ function StudentsRoster() {
               <thead>
                 <tr className="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                   <th className="px-3 py-2 text-left">Student</th>
-                  <th className="px-3 py-2 text-left">Grade</th>
-                  <th className="px-3 py-2 text-right">Workbook</th>
-                  <th className="px-3 py-2 text-right">Assessment</th>
-                  <th className="px-3 py-2 text-right">Project</th>
+                  <th className="px-3 py-2 text-left">Workbook</th>
+                  <th className="px-3 py-2 text-left">Portal</th>
+                  <th className="px-3 py-2 text-left">Quiz</th>
+                  <th className="px-3 py-2 text-left">Project</th>
+                  <th className="px-3 py-2 text-left">Last activity</th>
                   <th className="px-3 py-2 text-left">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.slice(0, 80).map((r) => (
-                  <tr key={`${r.grade}-${r.student}`} className="border-t border-border/60">
+                {filtered.map((r) => (
+                  <tr key={r.student} className="border-t border-border/60">
                     <td className="px-3 py-3 font-semibold text-foreground">{r.student}</td>
-                    <td className="px-3 py-3 text-muted-foreground">{r.grade}</td>
-                    <td className="px-3 py-3 text-right tabular-nums">{r.workbookPct}%</td>
-                    <td className="px-3 py-3 text-right tabular-nums">{r.assessmentPct}%</td>
-                    <td className="px-3 py-3 text-right tabular-nums">{r.projectPct}%</td>
+                    <td className="px-3 py-3 text-muted-foreground">{r.workbook}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{r.portal}</td>
+                    <td className="px-3 py-3 tabular-nums text-muted-foreground">{r.quiz}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{r.project}</td>
+                    <td className="px-3 py-3 text-xs text-muted-foreground">{r.lastActivity}</td>
                     <td className="px-3 py-3">
                       <span
                         className={cn(
@@ -155,11 +146,6 @@ function StudentsRoster() {
               </tbody>
             </table>
           </div>
-          {filtered.length > 80 && (
-            <p className="mt-3 text-xs text-muted-foreground">
-              Showing 80 of {filtered.length} matching students.
-            </p>
-          )}
         </section>
       </div>
     </AppShell>
