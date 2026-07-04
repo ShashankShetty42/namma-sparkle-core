@@ -28,6 +28,11 @@ function ShellInner({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [authed, setAuthed] = React.useState<boolean | null>(null);
 
+  // One-time demo data seed so dashboards feel like a live CBSE school.
+  React.useEffect(() => {
+    ensureDemoSeed({ autoSignIn: true });
+  }, []);
+
   // Auth gate: redirect unauthenticated users to /welcome.
   React.useEffect(() => {
     if (typeof window === "undefined") return;
