@@ -106,7 +106,7 @@ function LoginPage() {
       schoolCode: activeRole === "admin" ? undefined : schoolCode || DEMO_SCHOOL_ID,
     });
     setTimeout(() => {
-      toast.success(`Signed in as ${meta.title}`);
+      // Phase 1: silent sign-in — no toast
       navigate({ to: ROLE_HOME[activeRole] });
     }, 350);
   }
@@ -118,7 +118,7 @@ function LoginPage() {
       email,
       schoolCode: activeRole === "admin" ? undefined : DEMO_SCHOOL_ID,
     });
-    toast.success(`Demo · ${meta.title} view`);
+    // Phase 1: silent demo entry — no toast
     navigate({ to: ROLE_HOME[activeRole] });
   }
 
