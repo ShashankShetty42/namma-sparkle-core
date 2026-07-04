@@ -40,7 +40,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
       const a = getAuth();
       setAuthed(a.isAuthed);
       if (!a.isAuthed) {
-        navigate({ to: "/welcome", replace: true });
+        navigate({ to: "/login", replace: true });
         return;
       }
       // Role-based redirect: keep teachers/principals/admins on their dashboards.
@@ -130,7 +130,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
         </AnimatePresence>
       </div>
 
-      <OnboardingDialog />
+      {/* Phase 1: character selection / onboarding hidden */}
     </div>
   );
 }
