@@ -87,7 +87,7 @@ function TeacherWorkspace() {
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
                 Active Program: <strong>CBSE CT & AI</strong> · {TEACHER.className} ·{" "}
-                {TEACHER.students} students · Week {TEACHER.week}
+                {TEACHER.students} students · Current Tracking Period: October Week 2
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
