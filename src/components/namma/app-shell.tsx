@@ -130,7 +130,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
         </AnimatePresence>
       </div>
 
-      <OnboardingDialog />
+      {/* Phase 1: character selection / onboarding hidden */}
     </div>
   );
 }
