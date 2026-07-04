@@ -68,6 +68,9 @@ export const ROLE_HOME: Record<UserRole, string> = {
 
 export const PRINCIPAL_NAV: RoleNavItem[] = [
   { label: "Command Centre", to: "/principal", icon: LayoutDashboard, tone: "story" },
+  { label: "Academic Setup", to: "/principal/setup-wizard", icon: Settings, tone: "decide", badge: "Mid-Year" },
+  { label: "Backfill Centre", to: "/principal/backfill", icon: ClipboardCheck, tone: "challenge", badge: "35%" },
+  { label: "Gap Analysis", to: "/principal/gap-analysis", icon: FileBarChart, tone: "reflect", badge: "Medium" },
   { label: "Active Programs", to: "/principal/programs", icon: Layers, tone: "decide", badge: "1 active" },
   { label: "Grade Insights", to: "/principal/grades", icon: GraduationCap, tone: "explore" },
   { label: "Teacher Support", to: "/principal/teachers", icon: Users, tone: "decide" },
