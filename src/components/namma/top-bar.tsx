@@ -1,10 +1,11 @@
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Bell, Flame, LogOut, Menu, Search, Sparkles, Star } from "lucide-react";
+import { Bell, FlaskConical, Flame, LogOut, Menu, Sparkles, Star } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useAppShell } from "@/components/namma/app-shell-context";
 import { getProfile, onNammaState, signOut } from "@/lib/namma-progress";
+import { isDemoSchoolActive } from "@/lib/namma-demo";
 
 export function TopBar() {
   const { isMobile, setMobileOpen } = useAppShell();
